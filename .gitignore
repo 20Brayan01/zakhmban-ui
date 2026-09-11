@@ -1,0 +1,11 @@
+node_modules/
+coverage/
+*.log
+.eslintcache
+.DS_Store
+
+# dist/ is deliberately NOT ignored.
+# Frozen Technical Architecture v1.1 §2.2: the built output is committed and
+# consumers install a ready artifact with no prepare step. Removing dist/ from
+# version control breaks every consumer's install, not just this repository's
+# build. tests/architecture/build-output.test.ts asserts this.

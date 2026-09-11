@@ -1,0 +1,12 @@
+node_modules/
+coverage/
+pnpm-lock.yaml
+
+# Generated output. Prettier must never be able to make `pnpm verify:dist`
+# fail by reformatting an artifact the TypeScript compiler produced.
+dist/
+
+# Source-of-truth documents are authored prose, preserved as supplied. The UI
+# System Specification lives here and is not this repository's to reflow —
+# reformatting it would put unrelated churn into every commit that touches it.
+docs/

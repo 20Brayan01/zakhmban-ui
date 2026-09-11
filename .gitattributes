@@ -1,0 +1,8 @@
+# Normalised line endings so `pnpm verify:dist` compares identically on every
+# platform: a CRLF checkout would otherwise show the committed artifact as
+# dirty after a clean rebuild.
+* text=auto eol=lf
+
+# The committed build artifact is generated, never hand-edited. Collapsing it
+# by default keeps a source diff readable; it stays expandable on demand.
+dist/** linguist-generated=true
