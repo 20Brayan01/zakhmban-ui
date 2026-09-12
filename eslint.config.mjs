@@ -107,10 +107,14 @@ export default tseslint.config(
   },
 
   {
-    // Build scripts and the architecture suite run in Node and report to the
-    // terminal, so they are exempt from no-console. They are not package
-    // payload: tsconfig.build.json excludes both from the emit.
-    files: ["scripts/**/*.mjs", "tests/**/*.ts"],
+    // Build scripts, the architecture suite, and standalone Node test
+    // fixtures (tests/**/*.mjs — e.g. a script spawned as its own process to
+    // probe timezone-dependent behaviour in isolation) all run directly in
+    // Node and report to the terminal, so they are exempt from no-console.
+    // None of these are package payload: tsconfig.build.json excludes both
+    // src/**/__tests__ and every *.test.ts from the emit, and tests/ is
+    // outside tsconfig.build.json's `include` entirely.
+    files: ["scripts/**/*.mjs", "tests/**/*.ts", "tests/**/*.mjs"],
     languageOptions: {
       globals: {
         console: "readonly",
