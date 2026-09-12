@@ -1,0 +1,120 @@
+# Release validation for @zakhmban/ui.
+#
+# This workflow releases nothing. Frozen Technical Architecture v1.1 §2 lists
+# this repository as "committed dist/; semver tags … consumed as a git-tag
+# dependency", and §2.2 fixes the mechanism: a consumer writes
+# `github:20Brayan01/zakhmban-ui#v0.1.0`, pnpm resolves the tag to a commit and
+# installs the committed artifact with no prepare step. The tag IS the release.
+# Nothing is published, packaged, deployed or uploaded, so there is nothing for
+# this workflow to do except prove the tagged commit is fit to be consumed —
+# and refuse the two ways a tag can be wrong.
+#
+# Wrong in the first way: the commit does not pass the gates. Answered by
+# running the same gates CI runs, against the tag's own tree.
+#
+# Wrong in the second way: the commit is not on main. A tag is the only thing
+# standing between a consumer's lockfile and arbitrary code, and `git tag` can
+# be pointed at any commit in the repository — an unreviewed branch tip, a
+# commit whose pull request was closed, a local commit that was never pushed to
+# a branch at all. CI green on a pull request says nothing about where a tag
+# later landed. That is what the ancestry check below is for.
+#
+# Third-party actions are pinned by commit SHA, matching ci.yml and frozen §22
+# ("All third-party actions are pinned by commit SHA"). The version comment is
+# provenance only; the SHA is what runs.
+
+name: Release
+
+on:
+  push:
+    tags:
+      # The semver tag convention of frozen §2.2 and README "Consumption":
+      # v0.1.0, v0.2.0, v1.4.0. Nothing else starts this workflow — not a
+      # branch push, not a pull request, not a manual dispatch.
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+# Read-only. A workflow that only validates needs no more, and a release token
+# that cannot write is a release token that cannot be turned against the tag it
+# is inspecting.
+permissions:
+  contents: read
+
+jobs:
+  validate-release:
+    name: validate-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The ancestry check needs real history on both sides. The default
+          # shallow single-ref checkout can answer no question about main.
+          fetch-depth: 0
+
+      - name: Verify the tag is on main
+        # Runs before the toolchain is installed: a tag from the wrong place
+        # should be rejected in seconds, and nothing below this line can make
+        # such a tag acceptable.
+        #
+        # `merge-base --is-ancestor A B` succeeds when A is an ancestor of B or
+        # is B itself, so a tag on main's tip passes, a tag on an older main
+        # commit passes, and a tag on a commit that reached main through a
+        # merge passes — it is in main's history. A commit that lives only on a
+        # feature branch is an ancestor of nothing on main and fails.
+        #
+        # Shell note: GITHUB_REF_NAME is read as a shell variable at runtime and
+        # is never interpolated into the script text, so a tag name cannot
+        # become a command. This file contains no GitHub expression syntax at
+        # all, so no workflow-context value is ever pasted into a shell script.
+        run: |
+          set -euo pipefail
+
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+
+          tag_commit="$(git rev-parse HEAD^{commit})"
+          main_commit="$(git rev-parse refs/remotes/origin/main)"
+
+          echo "tag:         $GITHUB_REF_NAME"
+          echo "tag commit:  $tag_commit"
+          echo "origin/main: $main_commit"
+
+          if ! git merge-base --is-ancestor "$tag_commit" refs/remotes/origin/main; then
+            echo "::error::Tag $GITHUB_REF_NAME points at $tag_commit, which is not in the history of main."
+            echo "A release tag must name a commit that reached main through a reviewed pull request."
+            echo "Consumers install this commit verbatim, so an off-main tag ships unreviewed code."
+            exit 1
+          fi
+
+          echo "OK — $tag_commit is contained in main history."
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Verify committed dist/
+        # The gate that matters most at a tag. A consumer runs no build: it
+        # installs the dist/ committed at this exact commit. If the artifact
+        # here is not what this source produces, the tag ships something no
+        # reviewer ever read.
+        run: pnpm verify:dist
