@@ -14,15 +14,18 @@ const exportsMap = manifest["exports"] as Record<string, unknown>;
  * files behind a new entry. Widening the package's public surface is always a
  * reviewed diff here, never a side effect of a refactor.
  *
- * Reserved by UI System Specification v0.2 §7 ("Exports") and not yet declared,
- * because an export whose target does not exist is a broken package:
+ * `./utils/format` ships with this commit: Jalali dates, Persian numerals,
+ * Toman formatting, duration, phone display masking (`src/format/`, mapped
+ * to the public subpath UI System Specification v0.2 §7 names for it).
+ *
+ * Still reserved by v0.2 §7 and not yet declared, because an export whose
+ * target does not exist is a broken package:
  *
  *   ./styles           token CSS and static styles
  *   ./tokens           generated typed token object
  *   ./tokens/tailwind-preset
- *   ./utils/format     Jalali, Persian numerals, Toman, duration, phone masking
  */
-const DECLARED_SUBPATHS = [".", "./package.json"];
+const DECLARED_SUBPATHS = [".", "./utils/format", "./package.json"];
 
 describe("exports contract", () => {
   it("declares exactly the subpaths this commit ships", () => {
@@ -66,6 +69,27 @@ describe("exports contract", () => {
     expect(Object.keys(root)).toEqual(["types", "default"]);
     expect(root["types"]).toBe("./dist/index.d.ts");
     expect(root["default"]).toBe("./dist/index.js");
+  });
+
+  it("routes every conditional deep entry through dist, with types resolved first", () => {
+    // The same "types" life first rule applies to every deep entry, not only
+    // root — generalised here so a future entry inherits the guard rather
+    // than needing its own copy of this test.
+    for (const [subpath, target] of Object.entries(exportsMap)) {
+      if (typeof target === "string") {
+        continue; // "./package.json" — a plain file map, no conditions.
+      }
+      const conditions = target as Record<string, string>;
+      expect(Object.keys(conditions), subpath).toEqual(["types", "default"]);
+      expect(conditions["types"], subpath).toMatch(/\.d\.ts$/);
+      expect(conditions["default"], subpath).toMatch(/\.js$/);
+    }
+  });
+
+  it("declares the utils/format entry at the exact subpath the specification names", () => {
+    const format = exportsMap["./utils/format"] as Record<string, string>;
+    expect(format["types"]).toBe("./dist/format/index.d.ts");
+    expect(format["default"]).toBe("./dist/format/index.js");
   });
 
   it("never exposes src, tests, scripts or an internal path", () => {
