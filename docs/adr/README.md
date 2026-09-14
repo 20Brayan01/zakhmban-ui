@@ -30,6 +30,7 @@ one. Decisions of that kind are recorded in `ARCHITECTURE.md`.
 | # | Title | Status | Date |
 | --- | --- | --- | --- |
 | [0001](0001-tailwind-token-delivery.md) | Tailwind Token Delivery Strategy | Accepted | 2026-09-11 |
+| [0002](0002-validation-helpers-contract.md) | Validation Helpers Public Contract | Accepted | 2026-09-13 |
 
 ## Format
 
