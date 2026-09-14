@@ -24,13 +24,18 @@ describe("source entry", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports nothing yet, and says so honestly", () => {
-    // C1 is the foundation commit. An empty public surface is the correct state
-    // and makes every later widening a visible diff in exports-contract.test.ts
-    // and in this file.
+  it("exports exactly the Validation Helpers capability, and nothing else", async () => {
+    // ADR 0002 (docs/adr/0002-validation-helpers-contract.md): the root
+    // barrel widens only by a reviewed diff. This is that diff's guard for
+    // the Validation Helpers commit — exactly these two names, no default
+    // export, and no fifth name arriving unnoticed alongside them.
+    const entry = await import("../../dist/index.js");
+    expect(Object.keys(entry).sort()).toEqual(
+      ["isValidIranianNationalId", "normalizeIranianMobile"].sort(),
+    );
+
     const source = readFileSync(`${srcDir}/index.ts`, "utf8");
-    expect(source).toContain("export {}");
-    expect(source).not.toMatch(/^export (const|function|class|default)\b/m);
+    expect(source).not.toMatch(/^export default\b/m);
   });
 
   it("ships no component, token, icon or stylesheet at this commit", () => {
