@@ -1,0 +1,162 @@
+/**
+ * GENERATED FILE — do not edit. Changes here are discarded.
+ *
+ * Written by scripts/generate-tokens.mjs from the authored CSS custom
+ * properties in src/tokens/. Edit those, then run `pnpm build`;
+ * `node scripts/generate-tokens.mjs --check` fails the build if this file
+ * and its source disagree.
+ *
+ * The Tailwind v4 `@theme` artifact — ADR 0001 and ADR 0003 §12. It
+ * references custom properties and restates no value, so the literal exists
+ * in exactly one file and this artifact cannot become a second place a colour
+ * is defined (ADR 0001 clarification 3).
+ *
+ * It is not a JavaScript Tailwind preset, not a Tailwind configuration file,
+ * and not a runtime or peer dependency. A consumer that uses Tailwind imports
+ * it; a consumer that does not ignores it and loses nothing. Content and
+ * source scanning stay with the consumer: this package supplies token custom
+ * properties and the theme mappings over them, and no utility classes.
+ *
+ * Import order matters and is consumer-visible. A `@theme` layer imported
+ * before the custom properties it references, or before Tailwind itself,
+ * fails quietly with unstyled output:
+ *
+ *   @import "tailwindcss";
+ *   @import "@zakhmban/ui/styles";
+ *   @import "@zakhmban/ui/tokens/tailwind-preset";
+ *
+ * Four families are deliberately unmapped, because Tailwind v4 has no
+ * namespace for them — durations, the press scale, the stacking roles and
+ * control geometry, including the two focus-indicator widths. They are
+ * reached through the custom property, which every consumer already has via
+ * `@zakhmban/ui/styles`. Folding geometry into `--spacing-*` would reopen a
+ * closed scale, and `z-10`/`z-20`/`z-30` must not stand in for the stacking
+ * roles: the coincidence is not a contract.
+ *
+ * No `--breakpoint-*`, `--container-*` or `--animate-*` key is emitted, and
+ * no `@keyframes`: Decision 16b is deferred, and v0.2 §7 places keyframes
+ * under styles/, which has not begun.
+ */
+
+@theme {
+  /* Namespace reset — the approved scales are closed. */
+  --color-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --ease-*: initial;
+  --spacing: initial;
+  --spacing-*: initial;
+
+  /* Semantic colour. */
+  --color-action-blue-hover: var(--action-blue-hover);
+  --color-action-blue-press: var(--action-blue-press);
+  --color-action-blue-rest: var(--action-blue-rest);
+  --color-action-green-hover: var(--action-green-hover);
+  --color-action-green-press: var(--action-green-press);
+  --color-action-green-rest: var(--action-green-rest);
+  --color-action-red-hover: var(--action-red-hover);
+  --color-action-red-press: var(--action-red-press);
+  --color-action-red-rest: var(--action-red-rest);
+  --color-background: var(--background);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-dark: var(--brand-blue-dark);
+  --color-brand-blue-soft: var(--brand-blue-soft);
+  --color-brand-green: var(--brand-green);
+  --color-brand-green-dark: var(--brand-green-dark);
+  --color-brand-green-soft: var(--brand-green-soft);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-brand-red-soft: var(--brand-red-soft);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-fg: var(--danger-fg);
+  --color-disabled-bg: var(--disabled-bg);
+  --color-disabled-border: var(--disabled-border);
+  --color-disabled-text: var(--disabled-text);
+  --color-divider: var(--divider);
+  --color-focus-indicator-inner: var(--focus-indicator-inner-color);
+  --color-focus-indicator-outer: var(--focus-indicator-outer-color);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-info-fg: var(--info-fg);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-link-press: var(--link-press);
+  --color-neutral-status-bg: var(--neutral-status-bg);
+  --color-neutral-status-fg: var(--neutral-status-fg);
+  --color-on-brand-icon: var(--on-brand-icon);
+  --color-on-brand-text: var(--on-brand-text);
+  --color-overlay: var(--overlay);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-fg: var(--success-fg);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  /* Type steps — size, with line height and weight attached. */
+  --text-body: var(--text-body-size);
+  --text-body--font-weight: var(--text-body-weight);
+  --text-body--line-height: var(--text-body-line-height);
+  --text-button: var(--text-button-size);
+  --text-button--font-weight: var(--text-button-weight);
+  --text-button--line-height: var(--text-button-line-height);
+  --text-caption: var(--text-caption-size);
+  --text-caption--font-weight: var(--text-caption-weight);
+  --text-caption--line-height: var(--text-caption-line-height);
+  --text-card-title: var(--text-card-title-size);
+  --text-card-title--font-weight: var(--text-card-title-weight);
+  --text-card-title--line-height: var(--text-card-title-line-height);
+  --text-display: var(--text-display-size);
+  --text-display--font-weight: var(--text-display-weight);
+  --text-display--line-height: var(--text-display-line-height);
+  --text-label: var(--text-label-size);
+  --text-label--font-weight: var(--text-label-weight);
+  --text-label--line-height: var(--text-label-line-height);
+  --text-page-title: var(--text-page-title-size);
+  --text-page-title--font-weight: var(--text-page-title-weight);
+  --text-page-title--line-height: var(--text-page-title-line-height);
+  --text-section-title: var(--text-section-title-size);
+  --text-section-title--font-weight: var(--text-section-title-weight);
+  --text-section-title--line-height: var(--text-section-title-line-height);
+
+  /* Weights. */
+  --font-weight-bold: var(--weight-bold);
+  --font-weight-medium: var(--weight-medium);
+  --font-weight-regular: var(--weight-regular);
+  --font-weight-semibold: var(--weight-semibold);
+
+  /* Spacing — the closed eight-step scale. */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-8: var(--space-8);
+
+  /* Radius roles. */
+  --radius-button: var(--_radius-input);
+  --radius-card: var(--_radius-card);
+  --radius-control: var(--_radius-control);
+  --radius-input: var(--_radius-input);
+  --radius-sheet: var(--_radius-sheet);
+
+  /* Elevation — the three reserved surfaces. */
+  --shadow-modal: var(--_shadow-modal);
+  --shadow-nav: var(--_shadow-nav);
+  --shadow-sheet: var(--_shadow-sheet);
+
+  /* Font family. */
+  --font-ui: var(--_font-ui);
+
+  /* Easing — the only curve in the system. */
+  --ease-standard: var(--easing-standard);
+}

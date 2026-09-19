@@ -1,7 +1,11 @@
 # ADR 0003 — Token Representation and Artifact Contract
 
 - **Status:** Accepted
-- **Date:** 2026-09-18
+- **Date:** 2026-09-18 · **clarified 2026-09-19** by the Typography Alias
+  Ruling, which supplies the exact authored value of the eight typography
+  aliases this ADR named but never valued. See the clarification section
+  before Sources. **No design value, identifier, count or mapping
+  changes.**
 - **Scope:** the **representation** of the Token Foundation V1 values that the
   Scoped Token Foundation V1 Owner Sign-off of 2026-09-18 froze — how they are
   named, where they are authored, how they are layered, how they are derived
@@ -117,7 +121,7 @@ file is created.
 | File | Contents |
 | --- | --- |
 | `colors.css` | the 30 raw palette entries; every semantic colour; the two focus-indicator colours; `--overlay` |
-| `typography.css` | the eight type steps (size, line height, weight, and the composite alias); the four weight tokens |
+| `typography.css` | the eight type steps (size, line height, weight, and the Semantic Typography Size Alias — §7); the four weight tokens |
 | `spacing.css` | the eight spacing steps |
 | `elevation.css` | `--shadow-nav`, `--shadow-sheet`, `--shadow-modal` |
 | `motion.css` | the three durations, the shimmer duration, the easing curve, the press scale |
@@ -176,7 +180,8 @@ consumer-facing reference to them, as the Incidental Accessibility Findings
 Ruling requires.
 
 **Mechanical tally at acceptance.** **118 public tokens** — 48 colour, 36
-typography (24 step sub-properties, 8 composite aliases, 4 weight tokens), 8
+typography (24 step sub-properties, 8 Semantic Typography Size Aliases, 4
+weight tokens), 8
 spacing, 5 radius, 3 elevation, 6 motion, 1 font, 8 geometry (6 control values
 and the 2 focus-indicator widths), 3 layering. **39 internal** — the 30 raw
 palette entries, `--radius-checkbox`, and the 8 `--_` sources. **One logical
@@ -328,7 +333,18 @@ the input list's requirement that a minimum-height contract be represented
 
 **Typography — v0.2 §2.2, Decision 7, Decision 8**
 
-Each step is authored as three properties plus one composite alias.
+Each step is authored as three properties plus one **Semantic Typography
+Size Alias**, whose exact value is fixed by the **Typography Alias Ruling**
+of 2026-09-19:
+
+```css
+--text-<step>: var(--text-<step>-size);
+```
+
+The alias is **not** a CSS `font` shorthand and composes no `font-family`,
+`font-weight`, `line-height`, `font-style` or `font-stretch`; the three
+sub-properties below stay independently addressable.
+
 
 | Step | `-size` | `-line-height` | `-weight` |
 | --- | --- | --- | --- |
@@ -340,6 +356,17 @@ Each step is authored as three properties plus one composite alias.
 | `--text-label` | `13px` | `1.5` | `500` |
 | `--text-caption` | `12px` | `1.5` | `400` (Decision 8) |
 | `--text-button` | `15px` | `1` | `600` |
+
+| Alias | Authored value | Resolved value |
+| --- | --- | --- |
+| `--text-display` | `var(--text-display-size)` | `32px` |
+| `--text-page-title` | `var(--text-page-title-size)` | `22px` |
+| `--text-section-title` | `var(--text-section-title-size)` | `19px` |
+| `--text-card-title` | `var(--text-card-title-size)` | `16px` |
+| `--text-body` | `var(--text-body-size)` | `15px` |
+| `--text-label` | `var(--text-label-size)` | `13px` |
+| `--text-caption` | `var(--text-caption-size)` | `12px` |
+| `--text-button` | `var(--text-button-size)` | `15px` |
 
 | New identifier | Value |
 | --- | --- |
@@ -397,7 +424,9 @@ offers `font` shorthand, but it resets `font-family`, `font-stretch` and
 `font-variant` as a side effect, so a single composite type property would
 silently clear `--font-ui` and the `font-variant-numeric: tabular-nums` rule
 v0.2 §2.2 requires for money, scores and countdowns. Three properties plus a
-composite alias avoid that.
+Semantic Typography Size Alias avoid that: the alias carries the step's size
+only, and the Tailwind artifact attaches line height and weight through
+`--text-<s>--line-height` and `--text-<s>--font-weight` (§12).
 
 ### 9 · `--shadow-none` is omitted
 
@@ -560,7 +589,7 @@ generates every multiple of 4px and reopens the closed spacing scale.
 | `--text-secondary` | `--color-text-secondary` | `text-text-secondary` |
 | `--focus-indicator-inner-color` | `--color-focus-indicator-inner` | `ring-focus-indicator-inner` |
 | `--focus-indicator-outer-color` | `--color-focus-indicator-outer` | `ring-focus-indicator-outer` |
-| type step `--text-<s>` | `--text-<s>: var(--text-<s>-size)` | `text-<s>` |
+| type step alias `--text-<s>` | `--text-<s>: var(--text-<s>-size)` | `text-<s>` |
 | its line height | `--text-<s>--line-height: var(--text-<s>-line-height)` | applied by `text-<s>` |
 | its weight | `--text-<s>--font-weight: var(--text-<s>-weight)` | applied by `text-<s>` |
 | `--weight-<w>` | `--font-weight-<w>: var(--weight-<w>)` | `font-<w>` |
@@ -878,9 +907,9 @@ nested overlay policy.
   Tailwind utility.** Consumers write arbitrary values against the custom
   property. Tailwind v4 has no namespace for any of them, and inventing one by
   folding them into `--spacing-*` would reopen a closed scale.
-- **Type steps are three properties plus an alias, not one.** More surface than
-  a single composite, and the `font` shorthand's side effects make the single
-  composite unsafe.
+- **Type steps are three properties plus a size alias, not one.** More surface
+  than a single composite, and the `font` shorthand's side effects make the
+  single composite unsafe.
 - **`--radius-pill` is a named role with no value**, so a pill surface stays a
   component concern until an owner rules. That is a visible gap, and it is the
   correct one: the alternative was inventing `999px`.
@@ -975,6 +1004,49 @@ Rejected: the Owner Font Contract and Delivery Ruling approved none, and
 `docs/adr/README.md` makes an unnamed public subpath an ADR trigger. If
 implementation proves one is technically necessary, work stops and this ADR is
 amended — which is the outcome the ruling already prescribes.
+
+## Clarification — Typography Alias Ruling, 2026-09-19
+
+**Status: clarification of an accepted ADR, not an amendment of a design
+value.** Recorded because this ADR named, counted and placed the eight
+typography aliases but **never stated their value**: §7's table carried
+`-size`, `-line-height` and `-weight` and no fourth column, and the only
+printed `--text-<s>: var(--text-<s>-size)` was §12's **Tailwind theme key**,
+not the authored `:root` property. The implementation audit of
+`caa1efe11fafcadb1a9ca307f5fd0eb6658b3c21` classified that silence as a
+blocking contract gap requiring an owner ruling.
+
+**The owner supplied the value on 2026-09-19.** The Typography Alias Ruling is
+recorded in
+[`../architecture/token-table-ratification.md`](../architecture/token-table-ratification.md)
+and inventoried in
+[`../architecture/canonical-document-registry.md`](../architecture/canonical-document-registry.md).
+Each of the eight is a **Semantic Typography Size Alias**, authored exactly as
+`--text-<step>: var(--text-<step>-size)`, with the per-step table now printed
+in §7 above.
+
+**This clarification:**
+
+- **supplies the previously missing exact authored value**, and nothing else;
+- **changes no token identifier**;
+- **changes no implemented value** — the local implementation already carried
+  these exact eight declarations, and no token-source correction was made;
+- **changes no count** — the boundary remains **118 public tokens**, **39
+  internal properties** and **one role without an approved literal**,
+  `--radius-pill`;
+- **changes no Tailwind mapping** — §12's row is unchanged in substance;
+- **introduces no `font` shorthand**, and composes no `font-family`,
+  `font-weight`, `line-height`, `font-style` or `font-stretch`;
+- **authorizes no Styles work**, no component work, and no publication, tag
+  or release.
+
+**Terminology.** For these eight properties the phrase *"composite alias"* is
+superseded by *"Semantic Typography Size Alias"*, and the current normative
+sections above use the new term. The word **composite retains its §8 meaning
+elsewhere** — a property holding a complete CSS value in one place, which is
+the three `box-shadow` tokens and nothing else. Historical wording in the
+sign-off and in the Token Table's own ADR 0003 input-list disposition is
+**left as written**, for the audit trail.
 
 ## Sources
 

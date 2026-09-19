@@ -178,6 +178,9 @@ in full in the Token Table.
 | **Owner Font Contract and Delivery Ruling** | 2026-09-18 | family, fallback stack, delivery model, pinned artifact, licensing basis | **nothing** — it confirms §2.2's family and settles delivery, which v0.2 never fixed |
 | **Owner Interaction Ladder Mapping Ruling** | 2026-09-18 | the nine filled-action ladder identifiers for green, blue and red; retirement of Decision 3a's six | **§2.1's interaction-family shape and count summary** — *"`--*-hover` / `--*-press` · 6 tokens"* — replaced by three tone families × rest/hover/press = **nine** identities. It **also** supersedes **Decision 3a's six identifiers**, which v0.2 never prints. |
 | **Scoped Token Foundation V1 Owner Sign-off** | 2026-09-18 | freezes the V1 value and semantic baseline; authorizes ADR 0003 to define its representation | **nothing** — it approves no new value and supersedes nothing; it fixes the standing of values already approved |
+| **Typography Alias Ruling** | 2026-09-19 | the exact authored value of the eight public typography aliases — `--text-display`, `--text-page-title`, `--text-section-title`, `--text-card-title`, `--text-body`, `--text-label`, `--text-caption`, `--text-button` — each a **Semantic Typography Size Alias** authored as `--text-<step>: var(--text-<step>-size)` | **nothing in v0.2** — v0.2 never states an alias value. It supersedes **ADR 0003's ambiguous "composite alias" wording** for these eight properties only. No identifier, value, count or Tailwind mapping changes. |
+| **Token Foundation V1 Implementation Authorization** | 2026-09-19 | authorizes Token Foundation V1 implementation only; discharges sign-off condition 3 subject to final audit | **nothing in v0.2** — it supersedes the **current-status statements** in this registry and the Token Table that said implementation was blocked or unauthorized. Publication, merge, tag, release, Styles, components and consumer integration stay unauthorized. |
+| **Token Foundation V1 Publication Authorization** | 2026-09-20 | authorizes publication of Token Foundation V1 — branch push, pull request, merge and post-merge verification — after the final implementation audit passed against `cf39e03522c462b1061b3f47d9b01dc2c67aaa05` and closed BCG-1 and BDC-1 | **nothing in v0.2** — it supersedes, for publication only, the 2026-09-19 record's *"Publication, merge, tag and release remain unauthorized"*. **Tag, release and package publication stay unauthorized**, as do Styles, components, consumer integration and every deferred entry. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -240,6 +243,13 @@ runtime export `tokens`, three type exports `TokenName` / `TokenValue` /
 resolved strings, `as const`. This closed the one blocking gap the final
 readiness audit found and **changed no design value**.
 
+**Clarified 2026-09-19** by the **Typography Alias Ruling**, which supplies
+the exact authored value of the eight typography aliases ADR 0003 named,
+counted and placed but never valued, and replaces the ambiguous phrase
+"composite alias" with **Semantic Typography Size Alias** for those eight
+properties. **No design value, identifier, count or Tailwind mapping
+changes**, and the local implementation required no correction.
+
 **It creates and changes no design value**, supersedes no part of UI System
 Specification v0.2, and resolves no deferred decision. **Nothing is implemented
 by it.** Three values it could not derive from a canonical source are
@@ -259,7 +269,10 @@ which cannot be published while the Button sm 40-versus-44 conflict is open.
 - **Open, deferred and proposed entries are not implementation authority.**
 - **The Token Table as a whole is open, partially ratified and NOT signed
   off.**
-- **Token Foundation implementation has not begun.**
+- **Token Foundation implementation has begun** — **superseded 2026-09-19**;
+  the bullet previously read *"Token Foundation implementation has not
+  begun"*, which was correct at its own date. See the implementation
+  authorization record below.
 
 ### Scoped Token Foundation V1 Owner Sign-off — 2026-09-18
 
@@ -283,9 +296,12 @@ representation of the approved values. **ADR 0003 may represent them; it may
 not change, reinterpret or replace them.** **ADR 0003 was written and accepted
 on 2026-09-18** and changed no value.
 
-**What remains blocked.** **Token Foundation implementation is not
-authorized.** It stays blocked until **all three** of the following are
-complete:
+**What remained blocked, as recorded on 2026-09-18 — SUPERSEDED 2026-09-19.**
+The three conditions below are the sign-off's own, preserved as written. All
+three are now discharged; see the implementation authorization record at the
+end of this section. At their own date they read: **Token Foundation
+implementation is not authorized**, and stays blocked until **all three** of
+the following are complete:
 
 1. **ADR 0003 is written and accepted** — **COMPLETE, 2026-09-18**;
 2. **rescoped 2026-09-19.** The original condition named the
@@ -300,12 +316,101 @@ complete:
 3. **a final Token Foundation implementation-readiness audit passes against
    the corrected scope** — none has.
 
-**One of the three remains outstanding, so implementation is still
-blocked.**
+**Superseded 2026-09-19.** At the date above, one of the three remained
+outstanding. **Condition 3 is now discharged** by the completed scoped
+readiness audit and the completed implementation audit of
+`caa1efe11fafcadb1a9ca307f5fd0eb6658b3c21`, subject to the corrected
+implementation commit passing final audit, and **the owner authorized Token
+Foundation V1 implementation**. The full record, including the two matters
+the implementation audit referred to the owner, is in the Token Table's
+**Token Foundation V1 Implementation Authorization** section.
 
 **The sign-off also does not authorize** Styles, Icons, Primitives or any
 component, any responsive or desktop value, or any consumer change; and it
 **resolves no deferred decision**.
+
+### Typography Alias Ruling — 2026-09-19
+
+**Authority kind: representation value, owner tier.** It sits at authority
+level 3 — approved owner design/product rulings — and governs the wording it
+names.
+
+**What it governs.** The exact authored value of the eight public typography
+aliases, and nothing else:
+
+| Alias | Authored value |
+| --- | --- |
+| `--text-display` | `var(--text-display-size)` |
+| `--text-page-title` | `var(--text-page-title-size)` |
+| `--text-section-title` | `var(--text-section-title-size)` |
+| `--text-card-title` | `var(--text-card-title-size)` |
+| `--text-body` | `var(--text-body-size)` |
+| `--text-label` | `var(--text-label-size)` |
+| `--text-caption` | `var(--text-caption-size)` |
+| `--text-button` | `var(--text-button-size)` |
+
+**Authority over the ambiguous wording.** ADR 0003 named, counted and placed
+these eight but never stated their value, and called them *"composite
+aliases"* — a phrase its own §8 reserves for a property holding a complete
+CSS value in one place. **The ruling governs that wording**: for these eight
+properties the term is **Semantic Typography Size Alias**, and ADR 0003's
+current normative sections now use it. **ADR 0003 remains representation
+authority**; the ruling supplies the one value ADR 0003 left unstated rather
+than displacing it.
+
+**What does not change.** No public identifier · no implemented value · no
+Tailwind mapping · the **118 / 39 / 1** boundary · `--radius-pill` as the one
+role without an approved literal.
+
+### Token Foundation V1 Implementation Authorization — 2026-09-19
+
+**The owner authorized Token Foundation V1 implementation** after the
+documentation and contract package was merged and verified on `main`.
+**Scope: Token Foundation V1 only.**
+
+**The previous implementation gate is discharged.** Sign-off §7 conditions 1
+and 2′ were already complete; **condition 3 is discharged** by the completed
+scoped readiness audit and the completed implementation audit of local commit
+`caa1efe11fafcadb1a9ca307f5fd0eb6658b3c21`, **subject to the corrected
+implementation commit passing final audit**. Every current-status statement
+in this registry and in the Token Table saying implementation is blocked,
+unauthorized, not begun or may not begin is **superseded as of this date**;
+the dated historical statements remain correct at their own dates and are not
+withdrawn.
+
+**Still prohibited, and not touched by this authorization:** publication ·
+push · pull request · merge · tag · release · Styles · Icons · Primitives or
+any component · dark mode · consumer-repository changes · Therapist
+integration · font binary delivery · `@font-face` · every deferred Token
+Table entry.
+
+### Token Foundation V1 Publication Authorization — 2026-09-20
+
+**The final implementation audit passed** against
+`cf39e03522c462b1061b3f47d9b01dc2c67aaa05`, and **both blocking findings are
+closed** — **BCG-1**, the Typography Alias contract gap, by the Typography
+Alias Ruling of 2026-09-19; **BDC-1**, the authorization contradiction, by the
+implementation authorization of 2026-09-19 together with the dated
+supersession markers now carried by the four stale status statements.
+
+**Authorized:** branch push of `feat/token-foundation-v1` · pull request
+against `main` · merge after the required checks pass, using a true merge
+commit · post-merge verification.
+
+**Not authorized, and unchanged by this record:** version change · tag ·
+release · package publication · Styles · Icons · Primitives or any component ·
+consumer-repository change · Therapist integration · every deferred Token
+Table entry. `@zakhmban/ui` stays **`0.0.0`** and **`private`**, with **no tag
+and no release**.
+
+**Release-only blocker carried forward:** `pnpm smoke:tailwind` must be wired
+into `.github/workflows/release.yml` **before the first tag**, discharging
+ADR 0001's *"before release, not assumed"* obligation for every later commit.
+It does not gate this publication, which the implementing commit already
+discharged under ADR 0003 §18 assertion 16.
+
+**No token, value, count, artifact or implementation file changes** under this
+authorization. The full record is in the Token Table.
 
 ## Missing design-system document — scoped disposition
 
@@ -431,6 +536,10 @@ implementer may not treat it as canonical.
 
 ## What this ruling does not do
 
+This section states what the **Canonical Documentation Authority and
+Supersession Ruling of 2026-09-18** does, as at its own date. It is a dated
+historical statement and is not a current status report.
+
 - **It changes no token, value, role, component, export, font or build
   artifact.**
 - **It does not sign off the Token Table**, which remains open, partially
@@ -438,7 +547,9 @@ implementer may not treat it as canonical.
 - **It did not create ADR 0003.** The number was still reserved when this
   ruling was recorded. **ADR 0003 was written and accepted separately on
   2026-09-18**; nothing in it is attributed to this ruling.
-- **It does not begin Token Foundation implementation**, which has not begun.
+- **It does not begin Token Foundation implementation**, which had not begun
+  at its date. **Implementation was authorized on 2026-09-19** and has since
+  begun locally — see the implementation authorization section above.
 - **It resolves no deferred decision** — Decisions 4b, 6b, 11 and 16b,
   `--shadow-none`, the banner accent contract and every other deferred item
   remain exactly as they were.

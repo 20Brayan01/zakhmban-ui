@@ -1,0 +1,44 @@
+/**
+ * Elevation tokens — authored by hand. This file is a source of truth.
+ *
+ * Decision 4a approves exactly three: the reserved surfaces v0.2 §1
+ * principle 1 names — "Elevation is reserved for sheets, modals and the
+ * bottom nav". `--shadow-xs`, `--shadow-sm` and `--shadow-md` are deferred by
+ * Decision 4b and are not public tokens. `--shadow-none` is omitted by
+ * ADR 0003 §9: the absence of elevation is `box-shadow: none`, which needs no
+ * token.
+ *
+ * ADR 0003 §8: a composite value is one custom property holding the complete
+ * CSS value. `box-shadow` accepts the whole value in one place, so each
+ * shadow is one property, not four, and survives as one declaration, one
+ * string in the typed object and one `@theme` entry.
+ *
+ * ADR 0003 §10: `--shadow-*` is exactly a Tailwind v4 theme namespace, so
+ * `@theme { --shadow-nav: var(--shadow-nav) }` would be circular and invalid.
+ * Each public property therefore aliases a package-internal `--_` source, and
+ * the Tailwind artifact references the internal source. The literal still
+ * exists exactly once.
+ *
+ * ADR 0003 §4: the rgb triple 0 42 94 is `--blue-900` #002a5e, which is also
+ * `--text-primary` and `--brand-blue-dark`, so "navy-tinted" holds literally.
+ * A test asserts the triple. `nav` and `sheet` carry negative Y, so "upward"
+ * holds.
+ *
+ * Elevation is never the sole signal for state, selection or hierarchy, a
+ * shadow on a bordered card is a defect, and hover elevation is not part of
+ * the approved interaction model (Decision 4a, preserved rules).
+ */
+
+:root {
+  /* Bottom navigation — upward. */
+  --_shadow-nav: 0 -2px 12px rgba(0, 42, 94, 0.06);
+  --shadow-nav: var(--_shadow-nav);
+
+  /* Bottom sheet — upward. */
+  --_shadow-sheet: 0 -12px 40px rgba(0, 42, 94, 0.14);
+  --shadow-sheet: var(--_shadow-sheet);
+
+  /* Modal — downward. */
+  --_shadow-modal: 0 16px 48px rgba(0, 42, 94, 0.18);
+  --shadow-modal: var(--_shadow-modal);
+}

@@ -5040,6 +5040,13 @@ recorded below. **Condition 3 is not complete: no final Token Foundation
 implementation-readiness audit has passed against the corrected scope.**
 **Implementation therefore remains blocked.**
 
+> **Superseded 2026-09-19 — status only.** The paragraph above is correct
+> at its own date and is preserved unchanged. **Condition 3 is now
+> discharged and the owner has authorized Token Foundation V1
+> implementation**; see the **Token Foundation V1 Implementation
+> Authorization** record at the end of this file. Publication, merge, tag
+> and release remain unauthorized.
+
 **The original condition 2 stays in the record** as the position at its own
 date. It is rescoped, not deleted, and the Website and PWA annotations remain
 recorded in the external legacy cleanup section below.
@@ -5047,7 +5054,9 @@ recorded in the external legacy cleanup section below.
 ### 8 · What this sign-off does not claim
 
 - **The entire Token Table is not signed off.**
-- **Token Foundation implementation may not begin.**
+- **Token Foundation implementation may not begin.** — **superseded
+  2026-09-19**; authorized on that date, see the implementation
+  authorization record at the end of this file.
 - **ADR 0003 did not exist when this sign-off was recorded.** It was
   **written and accepted later the same day, 2026-09-18**, and **changed no
   value this sign-off froze.** The sign-off itself claims nothing from it.
@@ -5392,6 +5401,12 @@ them.
 
 ### What is still blocked
 
+> **Superseded 2026-09-19 — status only.** This section states the position
+> as at 2026-09-19 before the owner's authorization, and is preserved
+> unchanged. **Condition 3 is discharged and implementation is
+> authorized**; see the **Token Foundation V1 Implementation
+> Authorization** record at the end of this file.
+
 **Token Foundation implementation remains blocked.** Of the sign-off's three
 conditions, as rescoped by the owner scope ruling of 2026-09-19, **the first
 two are now complete**:
@@ -5481,6 +5496,13 @@ remain future work.
 
 **The final Token Foundation implementation-readiness audit remains open**,
 and **Token Foundation implementation is still not authorized.**
+
+> **Superseded 2026-09-19 — status only.** The paragraph above is correct
+> at its own date and is preserved unchanged. **Condition 3 is now
+> discharged and the owner has authorized Token Foundation V1
+> implementation**; see the **Token Foundation V1 Implementation
+> Authorization** record at the end of this file. Publication, merge, tag
+> and release remain unauthorized.
 
 ---
 
@@ -5573,3 +5595,281 @@ responsibility.**
 **This record authorizes nothing.** It does not authorize Therapist
 integration, it does not authorize Styles, and it changes no approved Token
 Foundation design or representation decision.
+
+---
+
+## TYPOGRAPHY ALIAS RULING — the Owner Ruling, 2026-09-19
+
+**Decided by:** human design/product owner · **Date:** 2026-09-19
+**Status: APPROVED.** It is **not** a numbered Token Table decision and **not**
+Decision 17.
+
+**Outcome:** the exact authored value of the eight public typography aliases
+is fixed. **No token identifier changes, no token value changes, no count
+changes, and no implementation correction is required.**
+
+### The gap this ruling closes
+
+ADR 0003 **named** the eight aliases (§2, §7, §8), **counted** them (§5 — "8
+composite aliases" inside the 118) and **placed** them in `typography.css`,
+but **never stated their value**. §7's typography table carries three columns
+— `-size`, `-line-height`, `-weight` — and no fourth. The one place the
+corpus prints `--text-<step>: var(--text-<step>-size)` is §12's **Tailwind
+mapping** table, whose column is the Tailwind theme key, not the authored
+`:root` property.
+
+The implementation audit of the local Token Foundation V1 commit identified
+this as a **blocking contract gap requiring an owner ruling**, correctly
+declining to treat the implementer's choice as approved merely because the
+tests encoded it. This ruling supplies the missing value.
+
+### The eight approved public aliases
+
+`--text-display` · `--text-page-title` · `--text-section-title` ·
+`--text-card-title` · `--text-body` · `--text-label` · `--text-caption` ·
+`--text-button`
+
+### Classification
+
+**Each of the eight is a Semantic Typography Size Alias.**
+
+### Approved authored representation
+
+Each alias is authored exactly as:
+
+```css
+--text-<step>: var(--text-<step>-size);
+```
+
+In full, and binding:
+
+| Alias | Authored value |
+| --- | --- |
+| `--text-display` | `var(--text-display-size)` |
+| `--text-page-title` | `var(--text-page-title-size)` |
+| `--text-section-title` | `var(--text-section-title-size)` |
+| `--text-card-title` | `var(--text-card-title-size)` |
+| `--text-body` | `var(--text-body-size)` |
+| `--text-label` | `var(--text-label-size)` |
+| `--text-caption` | `var(--text-caption-size)` |
+| `--text-button` | `var(--text-button-size)` |
+
+**Their resolved public TypeScript values are the terminal size strings of the
+corresponding `--text-<step>-size` tokens**, reached by the ordinary alias
+resolution ADR 0003 §11 already requires.
+
+### What these aliases are not
+
+1. **They are not CSS `font` shorthand values.**
+2. **They neither contain nor compose** `font-family`, `font-weight`,
+   `line-height`, `font-style` or `font-stretch`.
+3. **They create no second typography representation.** The `-size`,
+   `-line-height` and `-weight` properties **remain independently addressable
+   public tokens**, exactly as ADR 0003 §7 records them.
+
+### What is unchanged
+
+- **The Tailwind mapping is unchanged**: `--text-<step>:
+  var(--text-<step>-size)`, with line height and weight attached through
+  `--text-<step>--line-height` and `--text-<step>--font-weight`.
+- **The public token total remains exactly 118.**
+- **The internal property total remains exactly 39.**
+- **`--radius-pill` remains the one logical role without an approved
+  literal**, and remains unimplemented.
+- **No public identifier changes and no implemented value changes.**
+
+### Terminology superseded
+
+**For these eight tokens only, the phrase "composite alias" is superseded by
+"Semantic Typography Size Alias".** The earlier phrase was ambiguous: ADR 0003
+§8 defines a composite as a property holding a complete CSS value in one
+place, which a size alias is not. **Historical text is not rewritten**;
+ADR 0003 carries a dated clarification pointing here.
+
+### Owner rationale
+
+- it **preserves the approved 118-token public API** exactly as signed off;
+- it **avoids an invalid font-shorthand interpretation**, which would have
+  reset `font-family` and `font-variant` and silently defeated `--font-ui`
+  and the `tabular-nums` rule of v0.2 §2.2;
+- it is **compatible with Tailwind v4's `--text-*` namespace**;
+- it **avoids a cascade conflict in Tailwind consumers**, where the package's
+  unlayered `:root` declaration and Tailwind's `@theme` emission of the same
+  property must agree;
+- it **keeps size, line height and weight separately addressable**;
+- it **invents no second typography representation**.
+
+### Scope
+
+**This ruling fixes a representation value that ADR 0003 left unstated. It
+changes no design value, resolves no deferred decision, authorizes no Styles
+or component work, and authorizes no publication, tag or release.**
+
+### Relationship to the implementation
+
+**This ruling approves the implementation already present in
+`src/tokens/typography.css`.** All eight aliases are authored there at exactly
+the values above. **No token-source correction is required**, and none is
+made.
+
+---
+
+## TOKEN FOUNDATION V1 IMPLEMENTATION AUTHORIZATION — RECORDED, 2026-09-19
+
+**Decided by:** human design/product owner · **Date:** 2026-09-19
+**Status: RECORDED.** This is the canonical record of an authorization the
+owner gave directly. It is **not** a numbered Token Table decision.
+
+### The authorization
+
+**The owner explicitly authorized Token Foundation V1 implementation**, after
+the documentation and contract package had been **merged and verified on
+`main`** — `main` = `origin/main` =
+`5ac2aa1abd6302030767392b804dac7e28820076`, with the approved documentation
+commit `666f8a658fb30d985f5cd8d55522a0977f38fdc4` an ancestor of it.
+
+**Scope: Token Foundation V1 only.** The authorization did **not** authorize:
+Styles · component styles or any UI component · dark mode · Therapist
+integration · any consumer repository change · font binary delivery ·
+`@font-face` · a package release or tag · Website or PWA changes · deferred
+V2 tokens · unrelated refactoring.
+
+### What has happened since
+
+| | |
+| --- | --- |
+| **Implementation branch** | `feat/token-foundation-v1`, created from the verified `origin/main` |
+| **Local implementation commit** | `caa1efe11fafcadb1a9ca307f5fd0eb6658b3c21`, parent `5ac2aa1abd6302030767392b804dac7e28820076` |
+| **Implementation audit** | performed read-only against that commit |
+
+**The implementation audit verified the mechanical implementation** — the
+118 / 39 / 1 boundary, the identifier set and values against this Token
+Table, the typed artifact, the Tailwind artifact, the generator, source and
+`dist` parity, the public export contract and a clean Tailwind v4 consumer
+smoke test — **and identified exactly two matters requiring the owner**:
+
+1. **the missing Typography Alias owner ruling** — the eight alias values
+   were not stated by any canonical source;
+2. **a stale authorization status** — current-status statements in this file
+   still said implementation was blocked and unauthorized.
+
+**The owner has now supplied the Typography Alias ruling**, recorded in the
+section immediately above.
+
+### Condition 3
+
+The Scoped Token Foundation V1 Owner Sign-off §7 set three conditions.
+Conditions 1 and 2′ were already complete. **Condition 3 — a final Token
+Foundation implementation-readiness audit against the corrected scope — is
+discharged** by the completed scoped readiness audit and the completed
+implementation audit, **subject to the corrected implementation commit
+passing final audit**.
+
+### Superseded status statements
+
+**As of this dated record, every current-status statement in this file or in
+the canonical document registry saying that Token Foundation implementation
+"remains blocked", "is still not authorized", "may not begin" or "has not
+begun" is SUPERSEDED**, specifically:
+
+- the sign-off §7 status paragraph dated 2026-09-19 — *"Condition 3 is not
+  complete … Implementation therefore remains blocked."*;
+- the *"What is still blocked"* paragraph under the ADR 0003 acceptance
+  record — *"Token Foundation implementation remains blocked."*;
+- the closing sentence of the external legacy documentation cleanup record —
+  *"the final Token Foundation implementation-readiness audit remains open,
+  and Token Foundation implementation is still not authorized."*;
+- the registry's *"Token Foundation implementation has not begun"* bullet and
+  its *"What remains blocked"* paragraph.
+
+**Dated historical pre-authorization statements remain historically correct
+and are not withdrawn.** They record the position at their own date, which is
+how this file has always handled supersession. **Nothing in the authorization
+trail is deleted or silently rewritten.**
+
+### What remains unauthorized
+
+**Publication, merge, tag and release remain unauthorized.** So do Styles,
+components, consumer integration and every deferred entry in this file. The
+implementation is **local and unpushed**: no remote implementation branch, no
+pull request, no merge, no tag, no release, and `@zakhmban/ui` remains
+`0.0.0` and `private`.
+
+> **Superseded in part 2026-09-20 — publication only.** The paragraph above is
+> correct at its own date and is preserved unchanged. **Publication — branch
+> push, pull request and merge — is now authorized**; see the **Token
+> Foundation V1 Publication Authorization** record at the end of this file.
+> **Tag, release and package publication remain unauthorized**, as do Styles,
+> components, consumer integration and every deferred entry.
+
+---
+
+## TOKEN FOUNDATION V1 PUBLICATION AUTHORIZATION — RECORDED, 2026-09-20
+
+**Decided by:** human design/product owner · **Date:** 2026-09-20
+**Status: RECORDED.** Canonical record of a publication authorization the
+owner gave directly. It is **not** a numbered Token Table decision, and it
+**changes no token, value, count or artifact**.
+
+### The final implementation audit
+
+**The final Token Foundation V1 implementation audit passed** against local
+commit `cf39e03522c462b1061b3f47d9b01dc2c67aaa05`, parent
+`5ac2aa1abd6302030767392b804dac7e28820076`. It was read-only, re-derived the
+token baseline independently of the repository's own tests, and confirmed the
+**118 / 39 / 1** boundary, the approved identifier set and values, the typed
+and Tailwind artifacts, generator determinism, source and `dist` parity, the
+public export contract and a clean Tailwind v4 consumer resolution.
+
+**Both previously blocking findings are CLOSED:**
+
+| Finding | Subject | Closure |
+| --- | --- | --- |
+| **BCG-1** | Typography Alias contract gap — the eight alias values were stated by no canonical source | **CLOSED** by the Typography Alias Ruling of 2026-09-19. All eight aliases in `src/tokens/typography.css` match the ruling exactly, and ADR 0003 §7 now prints their authored and resolved values. |
+| **BDC-1** | Implementation authorization contradiction — the canonical record said implementation was blocked while the branch said it was implemented | **CLOSED** by the Token Foundation V1 Implementation Authorization of 2026-09-19 and the dated supersession markers applied to the four stale current-status statements. The repository now reads consistently from its own files. |
+
+### What this authorization approves
+
+**Token Foundation V1 is approved for publication**, namely:
+
+- **branch push** of `feat/token-foundation-v1`;
+- **pull-request creation** against `main`;
+- **merge after the required checks pass**, using a true merge commit;
+- **post-merge verification on `main`**.
+
+### What this authorization does not approve
+
+**It approves no version change, no tag, no release, no package publication**,
+and no Styles, component, consumer-integration or deferred work. `@zakhmban/ui`
+remains **`0.0.0`** and **`private`**. **No tag and no release exist**, and
+neither is authorized by this record.
+
+### Release-only blocker, carried forward
+
+**`pnpm smoke:tailwind` must be wired into `.github/workflows/release.yml`
+before the first tag.** ADR 0001 requires extensionless-subpath resolution
+through `@tailwindcss/postcss` to be proven *before release, not assumed*. The
+implementing commit discharged that proof and committed a repeatable pinned
+script, but the release workflow does not yet run it, so a later regression
+could reach a tag unproven. **This blocks the first tag. It does not block
+this publication**, because ADR 0003 §18 assertion 16 placed the obligation on
+the implementing commit, which met it.
+
+### Non-blocking follow-ups, carried forward
+
+Eight remain deferred and none was implemented here: `smoke:tailwind` CI
+wiring · generator atomic writes · generator diagnostic ordering · lint
+extension coverage beyond `.ts`/`.tsx` · a literal bidirectional
+typed-object ↔ authored-CSS assertion · `verify-dist` index-versus-HEAD
+behaviour · `format:check` workflow coverage · the value-spelling editorial
+clarification.
+
+### Implementation unchanged
+
+**No implementation file and no token value changes as part of this
+authorization.** The authored token CSS, the generated TypeScript and Tailwind
+artifacts, the generator, build and dist-verification scripts, the tests, the
+package manifest, the lint configuration, the workflows and every committed
+`dist/` artifact are **byte-identical** to the audited commit. The only
+tracked change is this documentation record and the commit-message status that
+accompanies it.

@@ -1,0 +1,165 @@
+/**
+ * Colour tokens — authored by hand. This file is a source of truth.
+ *
+ * ADR 0003 §2: this file carries the thirty raw palette entries, every
+ * semantic colour, the two focus-indicator colours and `--overlay`.
+ *
+ * ADR 0003 §4, two layers joined by `var()`:
+ *
+ *   - the raw palette holds every colour literal;
+ *   - every semantic colour references a palette entry and restates no hex;
+ *   - two roles that share one value stay two properties — a generator that
+ *     de-duplicates by value is a defect.
+ *
+ * ADR 0003 §5: the raw palette is internal. Components and consuming
+ * applications never reference it (Decision 1 constraint 2), and it reaches
+ * neither the typed object nor the Tailwind artifact.
+ *
+ * ADR 0003 §3: one light theme on `:root`. No `prefers-color-scheme` block,
+ * no `[data-theme]` selector, no `.dark` class, no second declaration of any
+ * token anywhere in the package.
+ */
+
+:root {
+  /* ----------------------------------------------------------------------
+   * Raw palette — INTERNAL. Thirty entries: Decision 1 (25), Amendment 1
+   * (+3) and Amendment 2 (+2). Values reproduced unaltered; the ramps are
+   * deliberately sparse and must not be regularised (Decision 1 constraints
+   * 4 and 10).
+   * -------------------------------------------------------------------- */
+
+  /* Green — 9 */
+  --green-50: #f0f8e7;
+  --green-400: #68ab11;
+  --green-450: #64a50c;
+  --green-500: #3c9220;
+  --green-550: #347f1b;
+  --green-600: #0c7912;
+  --green-650: #1b7e17;
+  --green-700: #03651d;
+  --green-750: #026e1e;
+
+  /* Blue — 8 */
+  --blue-50: #eaf5fc;
+  --blue-400: #0383ce;
+  --blue-450: #0273b6;
+  --blue-500: #016fbb;
+  --blue-600: #0062ac;
+  --blue-700: #045398;
+  --blue-800: #01356f;
+  --blue-900: #002a5e;
+
+  /* Red — 5 */
+  --red-50: #fdebec;
+  --red-500: #ec1417;
+  --red-550: #d51013;
+  --red-600: #c80303;
+  --red-700: #b90304;
+
+  /* Warm green-tinted neutrals — 8 */
+  --white: #ffffff;
+  --neutral-25: #f7f9f5;
+  --neutral-50: #f1f3ef;
+  --neutral-100: #edf0ea;
+  --neutral-200: #e2e6dd;
+  --neutral-400: #a0a79c;
+  --neutral-500: #8a9384;
+  --neutral-600: #667085;
+
+  /* ----------------------------------------------------------------------
+   * Semantic colour — PUBLIC. Every entry below references a raw palette
+   * entry; none restates a literal. The one exception is `--overlay`, an
+   * alpha derivative (see the note above it).
+   * -------------------------------------------------------------------- */
+
+  /* Brand identity — v0.2 §2.1. Raw Brand Identity, distinct from the
+   * Semantic Action Fill ladders below (Decision 12). */
+  --brand-green: var(--green-500);
+  --brand-green-dark: var(--green-600);
+  --brand-green-soft: var(--green-50);
+  --brand-blue: var(--blue-400);
+  --brand-blue-dark: var(--blue-900);
+  --brand-blue-soft: var(--blue-50);
+  --brand-red: var(--red-500);
+  --brand-red-dark: var(--red-600);
+  --brand-red-soft: var(--red-50);
+
+  /* Status — Decision 2. The INFO asymmetry is ratified as intentional:
+   * `--info-fg` is `--blue-600`, not `--brand-blue-dark`. Do not "correct"
+   * it. Status text uses `-fg` on `-bg`, never the base tone. */
+  --success: var(--green-500);
+  --success-fg: var(--green-600);
+  --success-bg: var(--green-50);
+  --info: var(--blue-400);
+  --info-fg: var(--blue-600);
+  --info-bg: var(--blue-50);
+  --danger: var(--red-500);
+  --danger-fg: var(--red-600);
+  --danger-bg: var(--red-50);
+
+  /* Fourth status tone — archived, expired, withdrawn, closed. The Owner
+   * Contrast Ruling remapped the foreground from `--neutral-500` to
+   * `--neutral-600`: 4.6961:1 on the unchanged background. */
+  --neutral-status-fg: var(--neutral-600);
+  --neutral-status-bg: var(--neutral-25);
+
+  /* Ink. `--text-muted` is retired by the Owner Contrast Ruling; readable
+   * de-emphasis uses `--text-secondary`. `--text-secondary` and
+   * `--neutral-status-fg` stay separable although both resolve to #667085. */
+  --text-primary: var(--blue-900);
+  --text-secondary: var(--neutral-600);
+
+  /* Surfaces. Decision 14: Page Background and Surface/Card are distinct
+   * roles at one value. `--surface-subtle` is never a full-page canvas. */
+  --background: var(--white);
+  --surface: var(--white);
+  --surface-subtle: var(--neutral-25);
+
+  /* Lines — v0.2 §2.1. */
+  --border: var(--neutral-200);
+  --border-strong: var(--neutral-400);
+  --divider: var(--neutral-100);
+
+  /* Disabled is a colour swap, never opacity on the whole control. */
+  --disabled-bg: var(--neutral-50);
+  --disabled-text: var(--neutral-400);
+  --disabled-border: var(--neutral-200);
+
+  /* Semantic Action Fill — the nine state-aligned identities of the Owner
+   * Interaction Ladder Mapping Ruling. Hover darkens the fill; press darkens
+   * further and applies `--press-scale`. The six Decision 3a identifiers are
+   * retired and must not be reintroduced as aliases. */
+  --action-green-rest: var(--green-550);
+  --action-green-hover: var(--green-600);
+  --action-green-press: var(--green-750);
+  --action-blue-rest: var(--blue-450);
+  --action-blue-hover: var(--blue-600);
+  --action-blue-press: var(--blue-700);
+  --action-red-rest: var(--red-550);
+  --action-red-hover: var(--red-600);
+  --action-red-press: var(--red-700);
+
+  /* On-brand foregrounds — Decision 12a and 12b. Kept separate: the Icon
+   * contract is an additive amendment to §3.1 and is not the Text contract. */
+  --on-brand-text: var(--white);
+  --on-brand-icon: var(--white);
+
+  /* Inline text links — Decision 13. The persistent underline is a Styles and
+   * component rule, not a token. The visited state is deferred. */
+  --link: var(--blue-500);
+  --link-hover: var(--blue-600);
+  --link-press: var(--blue-800);
+
+  /* Focus indicator colours — Decision 3b, CONTROL -> 2px WHITE -> 2px NAVY
+   * -> PAGE. Four independently addressable scalars; the two widths live in
+   * base.css. There is no composite focus token, and the two-ring
+   * composition belongs to Styles or the component. */
+  --focus-indicator-inner-color: var(--white);
+  --focus-indicator-outer-color: var(--blue-900);
+
+  /* Alpha derivative — ADR 0003 §4. Authored as a literal `rgba()` because
+   * `rgba()` takes no colour reference; the rgb triple is 0 42 94, which is
+   * `--blue-900` #002a5e, and a test asserts that. `color-mix()` is rejected
+   * by ADR 0003 alternative 4. */
+  --overlay: rgba(0, 42, 94, 0.4);
+}

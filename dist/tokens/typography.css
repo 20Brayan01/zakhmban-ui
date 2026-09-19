@@ -1,0 +1,85 @@
+/**
+ * Typography tokens — authored by hand. This file is a source of truth.
+ *
+ * ADR 0003 §2: the eight type steps (size, line height, weight, and the
+ * composite alias) and the four weight tokens.
+ *
+ * ADR 0003 §8: type steps are the deliberate exception to "composite values
+ * stay composite". CSS offers the `font` shorthand, but it resets
+ * `font-family`, `font-stretch` and `font-variant` as a side effect, so a
+ * single composite type property would silently clear `--font-ui` and the
+ * `font-variant-numeric: tabular-nums` rule v0.2 §2.2 requires for money,
+ * scores and countdowns. Three properties plus a composite alias avoid that;
+ * the alias carries the step's size, and the Tailwind artifact attaches line
+ * height and weight through `--text-<s>--line-height` and
+ * `--text-<s>--font-weight` (ADR 0003 §12).
+ *
+ * ADR 0003 §10: typography needs no `--_` source. Its `-size`,
+ * `-line-height` and `-weight` properties are public in their own right, and
+ * the Tailwind artifact references those rather than the step alias, so no
+ * `@theme { --text-x: var(--text-x) }` circularity arises.
+ *
+ * The scale is closed at eight steps (v0.2 §2.2); 12px is the floor.
+ */
+
+:root {
+  /* Weights — v0.2 §2.2 fixes exactly four. Each step's `-weight` references
+   * one of these, so the four exist in one place. Decision 7 resolved Body to
+   * 400 and Decision 8 resolved Caption to 400; weight 500 is approved for
+   * neither. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Display — 32px / 1.28 / 700. Launch screen, level score. */
+  --text-display-size: 32px;
+  --text-display-line-height: 1.28;
+  --text-display-weight: var(--weight-bold);
+  --text-display: var(--text-display-size);
+
+  /* Page title — 22px / 1.36 / 600. Step question, EmptyState title. */
+  --text-page-title-size: 22px;
+  --text-page-title-line-height: 1.36;
+  --text-page-title-weight: var(--weight-semibold);
+  --text-page-title: var(--text-page-title-size);
+
+  /* Section title — 19px / 1.42 / 600. Heading inside a scroll region. */
+  --text-section-title-size: 19px;
+  --text-section-title-line-height: 1.42;
+  --text-section-title-weight: var(--weight-semibold);
+  --text-section-title: var(--text-section-title-size);
+
+  /* Card title — 16px / 1.5 / 600. Card heading, ListRow primary. */
+  --text-card-title-size: 16px;
+  --text-card-title-line-height: 1.5;
+  --text-card-title-weight: var(--weight-semibold);
+  --text-card-title: var(--text-card-title-size);
+
+  /* Body — 15px / 1.68 / 400 (Decision 7). 1.68 is required for Persian
+   * ascenders. Body is one closed role; no body-large, body-small,
+   * body-medium or body-emphasis step exists. */
+  --text-body-size: 15px;
+  --text-body-line-height: 1.68;
+  --text-body-weight: var(--weight-regular);
+  --text-body: var(--text-body-size);
+
+  /* Label — 13px / 1.5 / 500. Field label, data-row key, chip. */
+  --text-label-size: 13px;
+  --text-label-line-height: 1.5;
+  --text-label-weight: var(--weight-medium);
+  --text-label: var(--text-label-size);
+
+  /* Caption — 12px / 1.5 / 400 (Decision 8). The floor. Its four-use role
+   * scope is a component contract, not a token constraint. */
+  --text-caption-size: 12px;
+  --text-caption-line-height: 1.5;
+  --text-caption-weight: var(--weight-regular);
+  --text-caption: var(--text-caption-size);
+
+  /* Button — 15px / 1 / 600. All button labels. */
+  --text-button-size: 15px;
+  --text-button-line-height: 1;
+  --text-button-weight: var(--weight-semibold);
+  --text-button: var(--text-button-size);
+}

@@ -1,0 +1,19 @@
+/**
+ * @zakhmban/ui/styles — the public stylesheet entry point.
+ *
+ * UI System Specification v0.2 §2: "A consumer imports the stylesheet once,
+ * at the application root, and gets every token: import "@zakhmban/ui/styles".
+ * Nothing else in the application imports token CSS, and no component imports
+ * it individually — a token that is present twice is a cascade bug waiting
+ * for a specificity change."
+ *
+ * ADR 0003 §13: at Token Foundation this entry imports the token CSS and
+ * nothing else. Static styles, the `@font-face` rule, resets, global RTL
+ * utilities and global focus styles are Styles work and have not begun.
+ *
+ * This is NOT an eighth token-family file. `src/tokens/base.css` is the
+ * aggregation point for the seven authored token files, so exactly one import
+ * appears here and the seven-file structure stays internal (ADR 0003 §2).
+ */
+
+@import "../tokens/base.css";

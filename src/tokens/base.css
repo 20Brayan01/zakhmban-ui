@@ -1,0 +1,117 @@
+/**
+ * Base tokens and the token aggregation point — authored by hand. This file
+ * is a source of truth.
+ *
+ * ADR 0003 §2: this file carries radius, control geometry, the two
+ * focus-indicator widths and the three stacking integers, and it imports the
+ * other six token files in the order listed there. `src/styles/index.css`
+ * therefore imports one file and the seven-file structure stays internal.
+ *
+ * ADR 0003 §3: one light theme on `:root`. No dark selector, no theme
+ * switching, no second declaration of any token.
+ */
+
+@import "./colors.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./elevation.css";
+@import "./motion.css";
+@import "./fonts.css";
+
+:root {
+  /* --------------------------------------------------------------------
+   * Radius — role names, no numeric ladder. Decision 5 is explicitly "not a
+   * definition or closure of the complete radius family" and Decision 9
+   * states 6px is not "a numeric radius-ladder entry", so a
+   * `--radius-12 / -14 / -16 / -24` ladder would read as a closed family
+   * neither decision approved.
+   *
+   * ADR 0003 §10: `--radius-*` is exactly a Tailwind v4 theme namespace, so
+   * each mapped public role aliases a package-internal `--_` source and the
+   * Tailwind artifact references that source.
+   *
+   * `--radius-pill` is NOT implemented. v0.2 §2.3 assigns the role — "pill
+   * chip, badge, search" — and states no number; the V2 kit's 999px is
+   * evidence under Ruling B, not authority, and silence never creates
+   * permission (ADR 0003 gap 1). A pill surface stays a component concern
+   * until an owner supplies the literal.
+   * ------------------------------------------------------------------ */
+
+  /* Decision 5 — the canonical 10-12px small-control band resolves to one
+   * value. No second step at 10px is approved. */
+  --_radius-control: 12px;
+  --radius-control: var(--_radius-control);
+
+  /* v0.2 §2.3, "14 input and button" — one literal, two roles. */
+  --_radius-input: 14px;
+  --radius-input: var(--_radius-input);
+  --radius-button: var(--radius-input);
+
+  /* v0.2 §2.3, "16 card". */
+  --_radius-card: 16px;
+  --radius-card: var(--_radius-card);
+
+  /* Decision 6a — BottomSheet, block-start corners only. 20px is not
+   * approved; Modal geometry is deferred as Decision 6b. */
+  --_radius-sheet: 24px;
+  --radius-sheet: var(--_radius-sheet);
+
+  /* Decision 9 — component-specific Checkbox geometry, package-INTERNAL. Not
+   * a public radius step, not a reusable token, and never mapped into
+   * Tailwind, so it needs no `--_` form. The visible Checkbox square
+   * dimension remains open and is not tokenised here. */
+  --radius-checkbox: 6px;
+
+  /* --------------------------------------------------------------------
+   * Control geometry — v0.2 §2.3.
+   *
+   * §2.3's "small control 40" is deliberately NOT exposed: the Button size
+   * sm 40px-versus-44px conflict is open and named in the sign-off's
+   * excluded list, and publishing a 40px token would settle it by
+   * representation (ADR 0003 gap 3). No token carries 40px here.
+   *
+   * Decision 10's Chip minimum creates no Chip token; its value is the
+   * canonical 44px tap minimum, applied by a component as
+   * `min-block-size: var(--control-min-target)`.
+   *
+   * Geometry is not folded into the Tailwind `--spacing-*` namespace: 44, 48,
+   * 52, 56, 64 and 20 are not spacing steps, and admitting them would reopen
+   * the closed scale (ADR 0003 §12).
+   * ------------------------------------------------------------------ */
+  --control-min-target: 44px;
+  --control-height-input: 48px;
+  --control-height-button: 52px;
+  --app-bar-height: 56px;
+  --bottom-nav-height: 64px;
+  --bottom-nav-safe-area: 20px;
+
+  /* --------------------------------------------------------------------
+   * Focus indicator widths — Decision 3b, CONTROL -> 2px WHITE -> 2px NAVY
+   * -> PAGE. The colours live in colors.css. The two widths stay separate
+   * identifiers although both resolve to 2px, for the same reason
+   * `--background` and `--surface` stay separate at #ffffff: equal values
+   * never justify collapsing distinct roles, and Decision 3b fixes the two
+   * rings independently.
+   * ------------------------------------------------------------------ */
+  --focus-indicator-inner-width: 2px;
+  --focus-indicator-outer-width: 2px;
+
+  /* --------------------------------------------------------------------
+   * Layering — Decision 15. Ordinary content < Application Chrome < Scrim <
+   * Dialog Surface. Ordinary content receives no token and stays at
+   * `z-index: auto`; no base or zero role is published. BottomSheet and
+   * Modal share one Dialog Surface layer. No Dropdown, Menu, Popover,
+   * Tooltip or Toast role is approved.
+   *
+   * All three are public (ADR 0003 §5): `Screen`, `Portal` and overlay
+   * composition are application-owned, so an application cannot honour the
+   * order without the integers.
+   *
+   * Tailwind's `z-10`, `z-20` and `z-30` happen to equal these today. They
+   * must not be used for the stacking roles — the coincidence is not a
+   * contract (ADR 0003 §12).
+   * ------------------------------------------------------------------ */
+  --z-chrome: 10;
+  --z-scrim: 20;
+  --z-dialog: 30;
+}

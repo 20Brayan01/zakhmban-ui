@@ -1,0 +1,25 @@
+/**
+ * Font tokens — authored by hand. This file is a source of truth.
+ *
+ * ADR 0003 §16: Token Foundation owns exactly one font token — `--font-ui` —
+ * and its complete approved stack. That is the whole of the font layer at
+ * this stage.
+ *
+ * `@font-face`, `font-display`, `font-synthesis`, the global body application
+ * and `font-variant-numeric` belong to Styles and are not written here. The
+ * binary, `OFL.txt` and the copyright notice belong to the package layer and
+ * sit under `src/styles/fonts/` when Styles begins. No font file, `@font-face`
+ * rule, licence file or checksum is added by Token Foundation.
+ *
+ * ADR 0003 §10: `--font-*` is exactly a Tailwind v4 theme namespace and
+ * `--font-ui` collides with it exactly, so the public property aliases a
+ * package-internal `--_` source and the Tailwind artifact references that
+ * source. The literal still exists exactly once.
+ *
+ * `--font-numeric` and `--font-sans` are not created (ADR 0003 §6).
+ */
+
+:root {
+  --_font-ui: "Vazirmatn", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-ui: var(--_font-ui);
+}
