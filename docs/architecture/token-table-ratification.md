@@ -6074,3 +6074,81 @@ overwritten.
 **No token, value, identifier, count or artifact changes.** `@zakhmban/ui`
 remains **`0.0.0`** and **`private`**, with **no tag and no release**. Styles,
 components and consumer integration remain outside this ruling.
+
+---
+
+## TOKEN FOUNDATION V0.1.0 RELEASE-SEQUENCE RULING — 2026-09-20
+
+**Decided by:** human design/product owner · **Date:** 2026-09-20
+**Status: APPROVED.** It is **not** a numbered Token Table decision, and it
+**changes no token, value, count or artifact**.
+
+### The allocation
+
+| Milestone | Version |
+| --- | --- |
+| **Token Foundation** | **v0.1.0** |
+| **Styles** | **v0.2.0** |
+| **Icons and the five primitives** | **v0.3.0** |
+| **Phase 6 · Harden** | **v1.0.0 — unchanged** |
+
+UI System Specification v0.2 §8's Phase 6 exit criterion, *"v1.0.0
+published"*, is **untouched by this ruling**.
+
+### What it supersedes, and what it does not
+
+**The earlier allocations were roadmap placeholders**, carried in the
+`README.md` status table — an orientation document, subordinate to this
+register and to the canonical document registry. **They were never
+ADR-frozen, never recorded in this file or the registry, and never a consumer
+commitment**: `zakhmban-therapists` declares no `@zakhmban/ui` dependency and
+no tag has ever existed to pin.
+
+**This ruling supersedes exactly two current roadmap allocations:**
+
+- Styles → v0.1.0, now **v0.2.0**;
+- Icons and the five primitives → v0.2.0, now **v0.3.0**.
+
+**It supersedes nothing else.** Dated historical statements elsewhere in this
+file and in the registry remain accurate for their own dates and **are not
+rewritten**.
+
+### What Token Foundation v0.1.0 contains
+
+- the **validation helpers** already on `main` (ADR 0002);
+- the **formatter utilities** already on `main`;
+- the **Token Foundation CSS** — the seven authored files and the style entry;
+- the **generated TypeScript token API**;
+- the **Tailwind v4 `@theme` artifact**;
+- the **existing approved package exports**, unchanged.
+
+### What Token Foundation v0.1.0 does not contain
+
+- the future **Styles** layer;
+- **font binaries** or `@font-face`;
+- **global reset or body rules**;
+- **icons**;
+- **primitives or components**;
+- **consumer integration**.
+
+**Importing `@zakhmban/ui/styles` at v0.1.0 yields the approved token custom
+properties and nothing more.** Font delivery, `@font-face`, resets, global
+body rules, focus styles and the overlay-root technique all arrive with
+Styles at v0.2.0.
+
+### SemVer intent
+
+**Adding Styles in v0.2.0 is intended to be an additive change** under UI
+System Specification v0.2 §7's versioning rule, which treats new capability
+as additive and reserves breaking status for removing or renaming a semantic
+token, a component or a prop.
+
+### Scope
+
+- **No identifier, token value, generated artifact or export changes** under
+  this ruling. The boundary remains **118 / 39 / 1**.
+- **The package remains private.**
+- **This ruling authorizes local version-bump preparation only.**
+- **Push, pull request, merge, tag creation, release-workflow execution,
+  GitHub Release, package publication and consumer integration each remain
+  separate actions**, and none is authorized here.

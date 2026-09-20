@@ -183,6 +183,7 @@ in full in the Token Table.
 | **Token Foundation V1 Publication Authorization** | 2026-09-20 | authorizes publication of Token Foundation V1 — branch push, pull request, merge and post-merge verification — after the final implementation audit passed against `cf39e03522c462b1061b3f47d9b01dc2c67aaa05` and closed BCG-1 and BDC-1 | **nothing in v0.2** — it supersedes, for publication only, the 2026-09-19 record's *"Publication, merge, tag and release remain unauthorized"*. **Tag, release and package publication stay unauthorized**, as do Styles, components, consumer integration and every deferred entry. |
 | **Token Foundation V1 Release Preparation** | 2026-09-20 | authorizes release preparation, limited to wiring `pnpm smoke:tailwind` into `release.yml` before the first tag | **nothing in v0.2** — it supersedes no rule. It records the disposition of the release-only blocker carried by the publication authorization. **Version, tag, release, package publication, Styles, components and consumer integration stay unauthorized.** |
 | **Owner Release Model Ruling** | 2026-09-20 | selects owner-triggered automated tagging: the owner supplies the version and the exact `main` SHA, the workflow validates first and only then creates and pushes the tag; an automated tag is verified in-run by `verify-created-tag`, since a `GITHUB_TOKEN` push starts no `push.tags` run | **nothing in v0.2** — it supersedes the earlier reading that a tag-triggered workflow could prevent a bad tag, and the *"release blocker cleared"* wording that rested on it. **Version change, GitHub Release and package publication remain unauthorized.** |
+| **Token Foundation v0.1.0 Release-Sequence Ruling** | 2026-09-20 | allocates Token Foundation **v0.1.0**, Styles **v0.2.0**, Icons and the five primitives **v0.3.0**; Phase 6's **v1.0.0** target unchanged | **nothing in v0.2** — v0.2 §8's Phase 6 `v1.0.0` exit criterion is untouched. It supersedes only the two `README.md` roadmap placeholders (Styles → v0.1.0, Icons/primitives → v0.2.0), which were never ADR-frozen and never a consumer commitment. **No token, value, count, artifact or export changes.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -482,6 +483,40 @@ tag creation is the only automated write in the repository.
 and **`private`**, with **no tag and no release**. The first tag additionally
 requires this branch merged, a separate reviewed version-bump pull request,
 and the owner starting the workflow.
+
+### Token Foundation v0.1.0 Release-Sequence Ruling — 2026-09-20
+
+**Authority kind: release-sequence allocation, owner tier.** Level 3 —
+approved owner design/product rulings.
+
+| Milestone | Version |
+| --- | --- |
+| Token Foundation | **v0.1.0** |
+| Styles | **v0.2.0** |
+| Icons and the five primitives | **v0.3.0** |
+| Phase 6 · Harden | **v1.0.0 — unchanged** |
+
+**What it supersedes.** Exactly two `README.md` roadmap placeholders — Styles
+→ v0.1.0 and Icons/primitives → v0.2.0. Those numbers were carried only in an
+orientation document, were never recorded in the Token Table, this registry
+or any ADR, and bound no consumer: `zakhmban-therapists` declares no
+`@zakhmban/ui` dependency and no tag has ever existed. **UI System
+Specification v0.2 §8's Phase 6 `v1.0.0` exit criterion is unchanged.**
+
+**What v0.1.0 ships.** Validation helpers, formatters, the Token Foundation
+CSS, the generated TypeScript token API and the Tailwind v4 `@theme`
+artifact, through the six existing exports. **It does not ship Styles** —
+`@zakhmban/ui/styles` yields token custom properties only, with no font
+delivery, no `@font-face`, no reset, no global body rules, no focus styles
+and no overlay-root technique. Those arrive with Styles at v0.2.0, **an
+additive change** under v0.2 §7's versioning rule.
+
+**Unchanged:** every token identifier and value, the **118 / 39 / 1**
+boundary, the generated artifacts, the exports, and `private: true`.
+
+**Not authorized by it:** push · pull request · merge · tag · release-workflow
+execution · GitHub Release · package publication · consumer integration. The
+ruling covers local version-bump preparation only.
 
 ## Missing design-system document — scoped disposition
 
