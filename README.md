@@ -14,14 +14,15 @@ string.
 place, and the first three capability areas have shipped. Every remaining
 capability arrives in its own commit.
 
-| Area                                                                     | State                                               |
-| ------------------------------------------------------------------------ | --------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                            |
-| Formatting utilities (`./utils/format`)                                  | shipped                                             |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                             |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; unreleased |
-| Styles                                                                   | not yet — released as `v0.1.0`                      |
-| Icons · the five primitives                                              | not yet — released as `v0.2.0`                      |
+| Area                                                                     | State                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                  |
+| Formatting utilities (`./utils/format`)                                  | shipped                                                                   |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                                                   |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; allocated **v0.1.0**, unreleased |
+| Styles                                                                   | not yet — allocated `v0.2.0`                                              |
+| Icons · the five primitives                                              | not yet — allocated `v0.3.0`                                              |
+| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                      |
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -37,9 +38,20 @@ the pushed ref back and proves it is annotated and points at the validated
 commit. A separate tag-triggered mode validates tags pushed by hand — that
 mode is **verification, not prevention**: the tag exists before it runs.
 
-**No tag and no release exist, and neither is authorized.** The package
-remains `0.0.0` and private, and consumption still waits for a published tag.
-**Styles, components and consumer integration have not begun.**
+**The release sequence is allocated** (Token Foundation v0.1.0
+Release-Sequence Ruling, 2026-09-20): **Token Foundation v0.1.0**, **Styles
+v0.2.0**, **Icons and the five primitives v0.3.0**, with **v1.0.0** remaining
+the Phase 6 target. The earlier roadmap numbers were placeholders in this
+table; they were never ADR-frozen and bound no consumer.
+
+**Version `0.1.0` is prepared locally on `chore/token-foundation-v0.1.0`.**
+It is not merged. **Tag `v0.1.0` does not exist**, the release workflow has
+**never been run**, **no GitHub Release exists**, **no package has been
+published**, and **no consumer integration has begun**. The package remains
+private. The first real release-workflow execution will be its first
+end-to-end runtime proof.
+
+**Styles, icons and components have not begun.**
 
 Where the design values stand, precisely:
 
@@ -164,6 +176,12 @@ gets every token:
 ```css
 @import "@zakhmban/ui/styles";
 ```
+
+**At v0.1.0 that import provides the approved token custom properties and
+nothing else.** It does **not** yet provide font delivery, `@font-face`,
+reset styles, global body rules, focus styles or the overlay-root technique.
+Those are **Styles**, which is unimplemented and allocated **v0.2.0**.
+**Styles is not included in v0.1.0.**
 
 **A Tailwind v4 consumer adds the `@theme` artifact, and the order is the
 contract.** A `@theme` layer imported before the custom properties it
