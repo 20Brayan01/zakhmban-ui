@@ -14,21 +14,28 @@ string.
 place, and the first three capability areas have shipped. Every remaining
 capability arrives in its own commit.
 
-| Area                                                                     | State                                                      |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                   |
-| Formatting utilities (`./utils/format`)                                  | shipped                                                    |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                                    |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — audited and approved for publication; unreleased |
-| Styles                                                                   | not yet — released as `v0.1.0`                             |
-| Icons · the five primitives                                              | not yet — released as `v0.2.0`                             |
+| Area                                                                     | State                                               |
+| ------------------------------------------------------------------------ | --------------------------------------------------- |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                            |
+| Formatting utilities (`./utils/format`)                                  | shipped                                             |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                             |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; unreleased |
+| Styles                                                                   | not yet — released as `v0.1.0`                      |
+| Icons · the five primitives                                              | not yet — released as `v0.2.0`                      |
 
-**Token Foundation V1 is implemented and approved for publication.** The
-final implementation audit passed against commit
-`cf39e03522c462b1061b3f47d9b01dc2c67aaa05`, closing both blocking findings —
+**Token Foundation V1 is merged and verified on `main`**, through pull
+request #7. The final implementation audit closed both blocking findings —
 the **Typography Alias contract gap**, settled by the Typography Alias Ruling
 of 2026-09-19, and the **authorization contradiction**, settled by the
 implementation authorization of the same date.
+
+**The release model is owner-triggered automated tagging** (Owner Release
+Model Ruling, 2026-09-20). The owner starts the release workflow manually
+with a version and an exact `main` SHA; the workflow validates that commit in
+full and **only then** creates and pushes the tag. The same run then reads
+the pushed ref back and proves it is annotated and points at the validated
+commit. A separate tag-triggered mode validates tags pushed by hand — that
+mode is **verification, not prevention**: the tag exists before it runs.
 
 **No tag and no release exist, and neither is authorized.** The package
 remains `0.0.0` and private, and consumption still waits for a published tag.
@@ -67,9 +74,13 @@ Where the design values stand, precisely:
   (2026-09-19 and 2026-09-20), and sign-off condition 3 is discharged.
 - **Nothing has been tagged or released**, no package has been published, and
   no consumer repository has been changed.
-- **One release-only blocker stands**: `pnpm smoke:tailwind` must be wired
-  into `release.yml` before the first tag, so ADR 0001's _"proven before
-  release, not assumed"_ obligation holds for every later commit.
+- **`pnpm smoke:tailwind` is a required gate in the pre-tag and post-tag
+  validation modes**, guarded by `release-gate.test.ts`. ADR 0001's obligation was already
+  discharged by the implementing commit; the workflow makes the proof
+  repeatable and, in the manual mode, genuinely pre-tag.
+- **The first tag needs three things**: this branch reviewed and merged, a
+  separate owner-reviewed version-bump pull request, and the owner starting
+  the workflow with the approved version and SHA.
 
 The record is `docs/architecture/token-table-ratification.md`, with precedence
 in `docs/architecture/canonical-document-registry.md`.
@@ -197,15 +208,43 @@ and that is a pull request against this package.
 pnpm install
 ```
 
-| Command               | Purpose                                                                                                                                                  |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm lint`           | ESLint, including the structural boundary rules                                                                                                          |
-| `pnpm typecheck`      | `tsc --noEmit` across source, tests and config                                                                                                           |
-| `pnpm test`           | Vitest — the architecture suite in `tests/architecture/`                                                                                                 |
-| `pnpm build`          | Generates the token artifacts, `tsc` into `dist/`, copies CSS. No bundler.                                                                               |
-| `pnpm verify:dist`    | Rebuilds and fails if the committed artifact differs                                                                                                     |
-| `pnpm format:check`   | Prettier, check only                                                                                                                                     |
-| `pnpm smoke:tailwind` | Packs the package, installs it into a throwaway Tailwind v4 consumer and proves the preset resolves. Needs the network, so it is not part of `pnpm test` |
+| Command               | Purpose                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint`           | ESLint, including the structural boundary rules                                                                                                                                 |
+| `pnpm typecheck`      | `tsc --noEmit` across source, tests and config                                                                                                                                  |
+| `pnpm test`           | Vitest — the architecture suite in `tests/architecture/`                                                                                                                        |
+| `pnpm build`          | Generates the token artifacts, `tsc` into `dist/`, copies CSS. No bundler.                                                                                                      |
+| `pnpm verify:dist`    | Rebuilds and fails if the committed artifact differs                                                                                                                            |
+| `pnpm format:check`   | Prettier, check only                                                                                                                                                            |
+| `pnpm smoke:tailwind` | Packs the package, installs it into a throwaway Tailwind v4 consumer and proves the preset resolves. Needs the network, so it is a release gate rather than part of `pnpm test` |
+
+## Releasing
+
+Releases are **owner-triggered**. The owner runs the **Release** workflow from
+the Actions tab and supplies:
+
+- `version` — `0.1.0`, with **no** leading `v`, and it must already equal the
+  `version` in `package.json` on `main`;
+- `commit_sha` — the exact 40-character lowercase SHA of the `main` tip.
+
+Run it **from `main`** — `workflow_dispatch` executes the workflow file of
+the branch it is started from.
+
+The workflow validates that commit in full and **creates and pushes the
+annotated tag only if every gate passes**. A `verify-created-tag` job then
+re-reads the ref from the remote in the same run and fails unless it is
+present, annotated and pointing at the validated commit.
+
+The tag is pushed with the repository `GITHUB_TOKEN`, and GitHub starts no
+new workflow run for events created with that token, so **an automated tag
+does not trigger a second run** — which is why the in-run check above exists.
+The `push.tags` workflow remains for tags pushed **by hand or by another
+credential**.
+
+A version bump is a separate, owner-reviewed pull request: the workflow never
+edits `package.json`, and refuses to release when the manifest and the
+requested version disagree. Nothing is published to a registry and no GitHub
+Release is created — the tag is the release.
 
 Run `pnpm build` and commit the result with any source change. Never hand-edit
 `dist/`, and resolve a `dist/` merge conflict by rebuilding rather than by hand.

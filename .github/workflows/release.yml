@@ -1,48 +1,441 @@
-# Release validation for @zakhmban/ui.
+# Release for @zakhmban/ui.
 #
-# This workflow releases nothing. Frozen Technical Architecture v1.1 §2 lists
-# this repository as "committed dist/; semver tags … consumed as a git-tag
-# dependency", and §2.2 fixes the mechanism: a consumer writes
-# `github:20Brayan01/zakhmban-ui#v0.1.0`, pnpm resolves the tag to a commit and
-# installs the committed artifact with no prepare step. The tag IS the release.
-# Nothing is published, packaged, deployed or uploaded, so there is nothing for
-# this workflow to do except prove the tagged commit is fit to be consumed —
-# and refuse the two ways a tag can be wrong.
+# Frozen Technical Architecture v1.1 §2 lists this repository as "committed
+# dist/; semver tags … consumed as a git-tag dependency", and §2.2 fixes the
+# mechanism: a consumer writes `github:20Brayan01/zakhmban-ui#v0.1.0`, pnpm
+# resolves the tag to a commit and installs the committed artifact with no
+# prepare step. The tag IS the release. Nothing is published to a registry,
+# packaged, deployed or uploaded.
 #
-# Wrong in the first way: the commit does not pass the gates. Answered by
-# running the same gates CI runs, against the tag's own tree.
+# That makes tag creation the only moment that matters, and it is why this
+# workflow has two modes which must not be confused:
 #
-# Wrong in the second way: the commit is not on main. A tag is the only thing
-# standing between a consumer's lockfile and arbitrary code, and `git tag` can
-# be pointed at any commit in the repository — an unreviewed branch tip, a
-# commit whose pull request was closed, a local commit that was never pushed to
-# a branch at all. CI green on a pull request says nothing about where a tag
-# later landed. That is what the ancestry check below is for.
+#   1 · MANUAL, PRE-TAG (workflow_dispatch) — the owner supplies the version
+#       and the exact main commit SHA. Everything is validated FIRST, and the
+#       tag is created and pushed only after every gate has passed. This is
+#       the mode that can actually prevent a bad release, because the tag does
+#       not exist until the workflow makes it.
+#
+#   2 · AUTOMATIC, POST-TAG (push.tags) — validation of a tag that ALREADY
+#       exists. It CANNOT prevent a tag: the tag exists before the push event
+#       is emitted, a failing run does not remove it, and this mode holds no
+#       write permission to do so. It reports; it does not protect. Anything
+#       that describes it as preventing a bad tag is wrong.
+#
+# WHICH TAGS ACTUALLY REACH MODE 2 — read this before changing either mode.
+#
+# `create-tag` below pushes with the repository GITHUB_TOKEN, because
+# actions/checkout persists that token by default and no other credential is
+# configured anywhere in this repository. GitHub suppresses new workflow runs
+# for events created with GITHUB_TOKEN, `workflow_dispatch` and
+# `repository_dispatch` excepted, so that a workflow cannot trigger itself
+# recursively.
+#
+# Therefore: **a tag created by `create-tag` does NOT start a push.tags run.**
+# Mode 2 exists for tags pushed by a human or by any credential that is not
+# the repository GITHUB_TOKEN — which is exactly the case nobody reviewed.
+# Same-run assurance for an automated tag comes from `verify-created-tag`
+# instead, which reads the remote ref back inside the dispatch run.
+#
+# Do not add a personal access token, GitHub App or deploy key merely to force
+# a second run. That trades a documentation problem for a long-lived
+# high-privilege credential, and it is an owner decision, not a CI edit.
+#
+# Owner Release Model Ruling, 2026-09-20 — owner-triggered automated tagging.
+# Recorded in docs/architecture/token-table-ratification.md.
 #
 # Third-party actions are pinned by commit SHA, matching ci.yml and frozen §22
 # ("All third-party actions are pinned by commit SHA"). The version comment is
 # provenance only; the SHA is what runs.
+#
+# Shell safety: no workflow-context value is ever interpolated into a script
+# body. Every value a script reads arrives through a validated environment
+# variable and is quoted at the point of use, so neither a version string nor
+# a tag name can become a command.
 
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Semantic version WITHOUT a leading "v" — for example 0.1.0. Exactly
+          MAJOR.MINOR.PATCH; a prerelease or build-metadata suffix is rejected.
+          It must already equal the version field in package.json on main.
+        required: true
+        type: string
+      commit_sha:
+        description: >-
+          The exact full 40-character lowercase commit SHA to release. It must
+          be the current tip of main. A branch name, a short SHA or a tag name
+          is rejected.
+        required: true
+        type: string
   push:
     tags:
       # The semver tag convention of frozen §2.2 and README "Consumption":
-      # v0.1.0, v0.2.0, v1.4.0. Nothing else starts this workflow — not a
-      # branch push, not a pull request, not a manual dispatch.
+      # v0.1.0, v0.2.0, v1.4.0. This trigger is post-tag verification only.
       - "v[0-9]+.[0-9]+.[0-9]+"
 
-# Read-only. A workflow that only validates needs no more, and a release token
-# that cannot write is a release token that cannot be turned against the tag it
-# is inspecting.
+# Read-only by default, and inherited by every job that does not say
+# otherwise. Exactly one job below raises it, and only to `contents: write`.
 permissions:
   contents: read
 
+# One manual release at a time. `cancel-in-progress: false` is deliberate: a
+# tag-creation job that has already started must finish rather than be killed
+# half-way, which is the one thing that could leave an ambiguous remote state.
+# Post-tag verification runs get their own lane per ref, so a release never
+# queues behind an unrelated verification.
+#
+# GitHub Actions offers no repository-wide lock that spans separate workflow
+# runs reliably, so this policy narrows the race rather than removing it. The
+# mandatory safeguard is the remote-tag existence re-check immediately before
+# `git tag`, which is atomic against the remote through the push refspec.
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && 'manual' || github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  validate-release:
-    name: validate-release
+  # ---------------------------------------------------------------------
+  # MODE 1 · MANUAL, PRE-TAG — validate the candidate commit.
+  # No tag exists yet, and this job cannot create one.
+  # ---------------------------------------------------------------------
+  validate-candidate:
+    name: validate-candidate
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.inputs.outputs.version }}
+      commit_sha: ${{ steps.inputs.outputs.commit_sha }}
+      tag: ${{ steps.inputs.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Full history and tags: the checks below compare against main's tip
+          # and must be able to see every existing tag.
+          fetch-depth: 0
+
+      - name: Validate release inputs
+        id: inputs
+        env:
+          VERSION: ${{ inputs.version }}
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          # 1 · Strict stable SemVer. No leading "v", no prerelease, no build
+          #     metadata — V1 releases only.
+          if [ "${VERSION#v}" != "$VERSION" ]; then
+            echo "::error::version must not start with \"v\". Supply 0.1.0, not v0.1.0 — the workflow adds the prefix when it creates the tag."
+            exit 1
+          fi
+          if ! printf '%s' "$VERSION" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'; then
+            echo "::error::version \"$VERSION\" is not a strict MAJOR.MINOR.PATCH release version. Prerelease and build-metadata suffixes are not authorized for V1."
+            exit 1
+          fi
+
+          # 2 · Exact 40-character lowercase SHA. Lowercase is required rather
+          #     than normalised: every SHA in the canonical record is written
+          #     lowercase, and silently rewriting an owner's input is how a
+          #     typo becomes a release.
+          if ! printf '%s' "$COMMIT_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::commit_sha \"$COMMIT_SHA\" is not a 40-character lowercase hexadecimal SHA. A branch name, a short SHA or a tag name is not accepted."
+            exit 1
+          fi
+
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+
+          # 3 · The commit must exist, and must be main's current tip.
+          if ! git cat-file -e "${COMMIT_SHA}^{commit}" 2>/dev/null; then
+            echo "::error::commit $COMMIT_SHA does not exist in this repository."
+            exit 1
+          fi
+          main_tip="$(git rev-parse refs/remotes/origin/main)"
+          if [ "$COMMIT_SHA" != "$main_tip" ]; then
+            echo "::error::commit $COMMIT_SHA is not the current tip of main ($main_tip). Release the reviewed tip, or re-run with the current SHA."
+            exit 1
+          fi
+
+          # 4 · package.json at that commit must already carry the requested
+          #     version and must still be private. The workflow never edits
+          #     package.json: a version change is an owner-reviewed pull
+          #     request of its own.
+          manifest_version="$(git show "${COMMIT_SHA}:package.json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{process.stdout.write(String(JSON.parse(s).version))})')"
+          manifest_private="$(git show "${COMMIT_SHA}:package.json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{process.stdout.write(String(JSON.parse(s).private))})')"
+
+          if [ "$manifest_version" != "$VERSION" ]; then
+            echo "::error::package.json at $COMMIT_SHA is version $manifest_version, but $VERSION was requested. This workflow never edits package.json — land a separate owner-reviewed version-bump pull request first, then release its merge commit."
+            exit 1
+          fi
+          if [ "$manifest_private" != "true" ]; then
+            echo "::error::package.json at $COMMIT_SHA does not set \"private\": true. Consumption is by git tag, never by registry (frozen §2.2)."
+            exit 1
+          fi
+
+          # 5 · The tag must not already exist. The remote is asked FIRST and
+          #     without fetching: the tag fetch below would copy a remote tag
+          #     into the local repository and the local check would then
+          #     report it as local, hiding the fact that it is published.
+          tag="v${VERSION}"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/${tag}")" ]; then
+            echo "::error::tag $tag already exists on the remote. A published tag is never moved or reused — consumers pin it."
+            exit 1
+          fi
+          git fetch --tags --force origin
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "::error::tag $tag already exists locally at this commit's checkout."
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+          echo "OK — $tag will be created on $COMMIT_SHA once every gate below passes."
+
+      - name: Check out the validated commit
+        env:
+          COMMIT_SHA: ${{ steps.inputs.outputs.commit_sha }}
+        run: |
+          set -euo pipefail
+          git checkout --detach "$COMMIT_SHA"
+          echo "HEAD is now $(git rev-parse HEAD)"
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check generated token artifacts
+        # There is no `generate:tokens` package script; the generator is
+        # invoked directly, exactly as scripts/build.mjs invokes it. This
+        # proves the committed generated SOURCE is not stale, which a rebuild
+        # alone would silently repair.
+        run: node scripts/generate-tokens.mjs --check
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Verify committed dist/
+        # A consumer runs no build: it installs the dist/ committed at this
+        # exact commit. If the artifact is not what this source produces, the
+        # tag would ship something no reviewer ever read.
+        run: pnpm verify:dist
+
+      - name: Tailwind consumer smoke test
+        # ADR 0001: resolution of the extensionless subpath
+        # `@zakhmban/ui/tokens/tailwind-preset` through `@tailwindcss/postcss`
+        # must be proven against a real Tailwind 4 consumer before release,
+        # not assumed. Here that is literally true — no tag exists yet.
+        run: pnpm smoke:tailwind
+
+  # ---------------------------------------------------------------------
+  # MODE 1 · MANUAL, PRE-TAG — create the tag.
+  # The only job in this repository with write permission, and the only
+  # automated write of any kind: one annotated tag, on an already-validated
+  # commit. It cannot run unless validate-candidate succeeded in full.
+  # ---------------------------------------------------------------------
+  create-tag:
+    name: create-tag
+    if: github.event_name == 'workflow_dispatch'
+    needs: validate-candidate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the validated commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate-candidate.outputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Create and push the release tag
+        env:
+          VERSION: ${{ needs.validate-candidate.outputs.version }}
+          COMMIT_SHA: ${{ needs.validate-candidate.outputs.commit_sha }}
+          TAG: ${{ needs.validate-candidate.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # Re-verify everything immediately before writing. The validation
+          # job ran minutes ago in another runner; between then and now the
+          # remote may have moved, and another release attempt may have
+          # created this tag. These checks are the race safeguard, not the
+          # concurrency group.
+          if ! printf '%s' "$COMMIT_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::refusing to tag: commit_sha is malformed."
+            exit 1
+          fi
+          if [ "$TAG" != "v${VERSION}" ]; then
+            echo "::error::refusing to tag: tag $TAG does not match version $VERSION."
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "$COMMIT_SHA" ]; then
+            echo "::error::refusing to tag: checked-out HEAD is $(git rev-parse HEAD), not the validated $COMMIT_SHA."
+            exit 1
+          fi
+          if ! git cat-file -e "${COMMIT_SHA}^{commit}" 2>/dev/null; then
+            echo "::error::refusing to tag: commit $COMMIT_SHA does not exist."
+            exit 1
+          fi
+
+          git fetch --tags --force origin
+          if [ -n "$(git ls-remote --tags origin "refs/tags/${TAG}")" ]; then
+            echo "::error::refusing to tag: $TAG appeared on the remote after validation. Another release attempt won the race; nothing was changed."
+            exit 1
+          fi
+
+          manifest_version="$(git show "${COMMIT_SHA}:package.json" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{process.stdout.write(String(JSON.parse(s).version))})')"
+          if [ "$manifest_version" != "$VERSION" ]; then
+            echo "::error::refusing to tag: package.json at $COMMIT_SHA is $manifest_version, not $VERSION."
+            exit 1
+          fi
+
+          # The GitHub Actions automation identity, never a personal one: the
+          # tag is created by the workflow, and its authorship should say so.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Annotated, not lightweight: a release tag carries who made it and
+          # when, and `git describe` and `git tag -v` expect an object.
+          git tag -a "$TAG" "$COMMIT_SHA" -m "Release $TAG"
+
+          # Exactly one ref, fully qualified on both sides. No branch is
+          # pushed, no other tag is pushed, and --force is never used.
+          git push origin "refs/tags/${TAG}:refs/tags/${TAG}"
+
+          echo "Created and pushed annotated tag $TAG at $COMMIT_SHA."
+          echo "No GitHub Release was created and no package was published — the tag IS the release."
+          echo "This push used GITHUB_TOKEN, so it starts no push.tags run; verify-created-tag checks the remote ref next."
+
+  # ---------------------------------------------------------------------
+  # MODE 1 · MANUAL, POST-CREATE — read the remote ref back.
+  #
+  # The assurance a push.tags run would have given, obtained inside the same
+  # dispatch run because a GITHUB_TOKEN push starts no new run. It re-reads
+  # the tag from the remote and proves it is the object this workflow meant
+  # to create: present, annotated, and pointing at the validated commit.
+  #
+  # It deliberately does NOT re-run the validation suite. That exact SHA was
+  # fully validated before the tag existed; running it again would prove
+  # nothing new and would only lengthen the release. What was unproven until
+  # now is the remote ref itself.
+  #
+  # Read-only, like every job here except create-tag.
+  # ---------------------------------------------------------------------
+  verify-created-tag:
+    name: verify-created-tag
+    if: github.event_name == 'workflow_dispatch'
+    needs: [validate-candidate, create-tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate-candidate.outputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Verify the pushed tag on the remote
+        env:
+          COMMIT_SHA: ${{ needs.validate-candidate.outputs.commit_sha }}
+          TAG: ${{ needs.validate-candidate.outputs.tag }}
+          VERSION: ${{ needs.validate-candidate.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # Every value below comes from the validated outputs of
+          # validate-candidate, never from a fresh reading of the inputs or
+          # of the repository state, so this job cannot bless a different
+          # commit than the one the gates ran against.
+          if [ "$TAG" != "v${VERSION}" ]; then
+            echo "::error::propagated tag $TAG does not match propagated version $VERSION."
+            exit 1
+          fi
+
+          # 1 · The tag must exist on the remote.
+          remote_line="$(git ls-remote --tags origin "refs/tags/${TAG}" || true)"
+          if [ -z "$remote_line" ]; then
+            echo "::error::tag $TAG is not present on the remote after create-tag reported success."
+            exit 1
+          fi
+
+          # Fetch exactly this one tag, and nothing else.
+          git fetch --no-tags origin "+refs/tags/${TAG}:refs/tags/${TAG}"
+
+          # 2 · It must be an annotated tag object, not a lightweight ref.
+          object_type="$(git cat-file -t "refs/tags/${TAG}")"
+          echo "tag object type: $object_type"
+          if [ "$object_type" != "tag" ]; then
+            echo "::error::tag $TAG is a $object_type, not an annotated tag object."
+            exit 1
+          fi
+
+          # 3 · Dereferenced, it must point at exactly the validated commit.
+          tagged_commit="$(git rev-parse "refs/tags/${TAG}^{commit}")"
+          echo "tag:            $TAG"
+          echo "points at:      $tagged_commit"
+          echo "validated SHA:  $COMMIT_SHA"
+          if [ "$tagged_commit" != "$COMMIT_SHA" ]; then
+            echo "::error::tag $TAG points at $tagged_commit, not the validated commit $COMMIT_SHA."
+            exit 1
+          fi
+
+          # The remote line's object id is the tag object for an annotated
+          # tag; confirm it agrees with what was fetched, so a tag replaced
+          # between the two reads is caught rather than ignored.
+          remote_object="$(printf '%s' "$remote_line" | cut -f1)"
+          local_object="$(git rev-parse "refs/tags/${TAG}")"
+          if [ "$remote_object" != "$local_object" ]; then
+            echo "::error::tag $TAG changed on the remote between reads: $remote_object vs $local_object."
+            exit 1
+          fi
+
+          echo "OK — $TAG is an annotated tag on the remote pointing at $COMMIT_SHA."
+          echo "This job created, moved and deleted nothing; it holds contents: read."
+
+  # ---------------------------------------------------------------------
+  # MODE 2 · AUTOMATIC, POST-TAG — verification, not prevention.
+  #
+  # Runs for a tag pushed by a human or by a credential other than the
+  # repository GITHUB_TOKEN. It does NOT run for a tag created by
+  # `create-tag`: GitHub suppresses workflow runs for GITHUB_TOKEN events, so
+  # that tag is covered by `verify-created-tag` in the same dispatch run
+  # instead. A failure here reports a bad tag; it cannot and does not undo
+  # one.
+  # ---------------------------------------------------------------------
+  verify-tag:
+    name: verify-tag
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,20 +445,19 @@ jobs:
           fetch-depth: 0
 
       - name: Verify the tag is on main
-        # Runs before the toolchain is installed: a tag from the wrong place
-        # should be rejected in seconds, and nothing below this line can make
-        # such a tag acceptable.
+        # A tag is the only thing standing between a consumer's lockfile and
+        # arbitrary code, and `git tag` can be pointed at any commit — an
+        # unreviewed branch tip, a commit whose pull request was closed, a
+        # local commit that was never pushed to a branch at all.
         #
-        # `merge-base --is-ancestor A B` succeeds when A is an ancestor of B or
-        # is B itself, so a tag on main's tip passes, a tag on an older main
-        # commit passes, and a tag on a commit that reached main through a
-        # merge passes — it is in main's history. A commit that lives only on a
-        # feature branch is an ancestor of nothing on main and fails.
+        # `merge-base --is-ancestor A B` succeeds when A is an ancestor of B
+        # or is B itself, so a tag on main's tip passes, a tag on an older
+        # main commit passes, and a tag that reached main through a merge
+        # passes. A commit that lives only on a feature branch fails.
         #
-        # Shell note: GITHUB_REF_NAME is read as a shell variable at runtime and
-        # is never interpolated into the script text, so a tag name cannot
-        # become a command. This file contains no GitHub expression syntax at
-        # all, so no workflow-context value is ever pasted into a shell script.
+        # Shell note: GITHUB_REF_NAME is read as a shell variable at runtime
+        # and is never interpolated into the script text, so a tag name cannot
+        # become a command.
         run: |
           set -euo pipefail
 
@@ -87,6 +479,26 @@ jobs:
 
           echo "OK — $tag_commit is contained in main history."
 
+      - name: Verify package.json matches the tag
+        # v0.1.0 must be cut from a tree whose manifest says 0.1.0. A mismatch
+        # means a consumer pinning the tag installs a package that disagrees
+        # with the name it was pinned by.
+        run: |
+          set -euo pipefail
+
+          manifest_version="$(node -e 'process.stdout.write(String(require("./package.json").version))')"
+          expected_tag="v${manifest_version}"
+
+          echo "package.json version: $manifest_version"
+          echo "expected tag:         $expected_tag"
+
+          if [ "$GITHUB_REF_NAME" != "$expected_tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $manifest_version at this commit."
+            exit 1
+          fi
+
+          echo "OK — tag and manifest agree."
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -99,6 +511,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Check generated token artifacts
+        run: node scripts/generate-tokens.mjs --check
+
+      - name: Format check
+        run: pnpm format:check
 
       - name: Lint
         run: pnpm lint
@@ -113,8 +531,10 @@ jobs:
         run: pnpm build
 
       - name: Verify committed dist/
-        # The gate that matters most at a tag. A consumer runs no build: it
-        # installs the dist/ committed at this exact commit. If the artifact
-        # here is not what this source produces, the tag ships something no
-        # reviewer ever read.
         run: pnpm verify:dist
+
+      - name: Tailwind consumer smoke test
+        # Post-tag verification of the ADR 0001 obligation. The tag already
+        # exists by the time this runs; a failure reports it and does not
+        # remove it.
+        run: pnpm smoke:tailwind
