@@ -10,7 +10,9 @@
  *
  * What it does, in a throwaway directory outside this repository:
  *
- *   1. `npm pack` the working tree — the same `files` set a consumer installs;
+ *   1. `npm pack --json` the working tree — the same `files` set a consumer
+ *      installs — and read the produced tarball's name out of the result
+ *      rather than reconstructing it from the package name and version;
  *   2. install that tarball into an empty project alongside Tailwind v4 and
  *      `@tailwindcss/postcss`, at pinned versions;
  *   3. run PostCSS over the exact ordered import snippet the README gives;
@@ -31,6 +33,7 @@
  */
 import { execFileSync } from "node:child_process";
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -38,7 +41,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -94,9 +97,86 @@ function npm(args, cwd) {
   execFileSync("npm", args, { cwd, stdio: "inherit" });
 }
 
+/**
+ * Same abstraction, but with stdout captured instead of inherited, for the
+ * one call whose output this script has to read. stderr still goes to the
+ * terminal so a genuine npm failure is visible rather than swallowed.
+ */
+function npmCapture(args, cwd) {
+  return execFileSync("npm", args, {
+    cwd,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+  });
+}
+
+/**
+ * Pack the working tree and return the tarball npm actually wrote.
+ *
+ * The name is npm's to decide — it derives from the package name and version
+ * — so this script asks rather than guesses. Reconstructing it locally is
+ * what made the smoke test fail the moment the version moved, and a guessed
+ * name that happens to be right is indistinguishable from one that is wrong
+ * until a release is already in flight.
+ *
+ * Everything below is a refusal rather than a fallback: there is no correct
+ * way to continue from a pack result this script cannot understand.
+ */
+function packTarball(destination) {
+  const output = npmCapture(
+    ["pack", "--pack-destination", destination, "--json"],
+    root,
+  );
+
+  let results;
+  try {
+    results = JSON.parse(output);
+  } catch (error) {
+    throw new Error(
+      `npm pack --json did not produce parseable JSON: ${error.message}`,
+    );
+  }
+
+  if (!Array.isArray(results)) {
+    throw new Error(
+      `npm pack --json returned ${typeof results}, expected an array.`,
+    );
+  }
+  if (results.length !== 1) {
+    throw new Error(
+      `npm pack --json reported ${results.length} tarballs, expected exactly 1.`,
+    );
+  }
+
+  const filename = results[0]?.filename;
+  if (typeof filename !== "string" || filename.trim() === "") {
+    throw new Error("npm pack --json reported no tarball filename.");
+  }
+  if (filename !== basename(filename)) {
+    throw new Error(
+      `npm pack --json reported "${filename}", which is not a plain filename.`,
+    );
+  }
+
+  // Resolve inside the directory this script created, and prove it stayed
+  // there. A filename is npm's output, not user input, but a path that
+  // escapes the temporary directory is a bug worth failing on rather than
+  // installing from.
+  const tarball = resolve(destination, filename);
+  if (!tarball.startsWith(`${resolve(destination)}/`)) {
+    throw new Error(`packed tarball ${tarball} escapes ${destination}.`);
+  }
+  if (!existsSync(tarball)) {
+    throw new Error(`npm pack reported ${filename}, but ${tarball} is absent.`);
+  }
+
+  return { filename, tarball };
+}
+
 try {
   console.log(`[smoke] packing the working tree into ${work}`);
-  npm(["pack", "--pack-destination", work, "--silent"], root);
+  const { filename, tarball } = packTarball(work);
+  console.log(`[smoke] npm packed ${filename}`);
 
   const consumer = join(work, "consumer");
   mkdirSync(consumer, { recursive: true });
@@ -108,7 +188,9 @@ try {
         name: "zakhmban-ui-tailwind-smoke",
         private: true,
         type: "module",
-        dependencies: { "@zakhmban/ui": "file:../zakhmban-ui-0.0.0.tgz" },
+        // The exact file npm reported, by absolute path. Never a name this
+        // script built from the package version.
+        dependencies: { "@zakhmban/ui": `file:${tarball}` },
         devDependencies: {
           "@tailwindcss/postcss": TAILWIND,
           postcss: POSTCSS,
