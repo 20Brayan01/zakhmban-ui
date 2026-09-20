@@ -181,6 +181,8 @@ in full in the Token Table.
 | **Typography Alias Ruling** | 2026-09-19 | the exact authored value of the eight public typography aliases — `--text-display`, `--text-page-title`, `--text-section-title`, `--text-card-title`, `--text-body`, `--text-label`, `--text-caption`, `--text-button` — each a **Semantic Typography Size Alias** authored as `--text-<step>: var(--text-<step>-size)` | **nothing in v0.2** — v0.2 never states an alias value. It supersedes **ADR 0003's ambiguous "composite alias" wording** for these eight properties only. No identifier, value, count or Tailwind mapping changes. |
 | **Token Foundation V1 Implementation Authorization** | 2026-09-19 | authorizes Token Foundation V1 implementation only; discharges sign-off condition 3 subject to final audit | **nothing in v0.2** — it supersedes the **current-status statements** in this registry and the Token Table that said implementation was blocked or unauthorized. Publication, merge, tag, release, Styles, components and consumer integration stay unauthorized. |
 | **Token Foundation V1 Publication Authorization** | 2026-09-20 | authorizes publication of Token Foundation V1 — branch push, pull request, merge and post-merge verification — after the final implementation audit passed against `cf39e03522c462b1061b3f47d9b01dc2c67aaa05` and closed BCG-1 and BDC-1 | **nothing in v0.2** — it supersedes, for publication only, the 2026-09-19 record's *"Publication, merge, tag and release remain unauthorized"*. **Tag, release and package publication stay unauthorized**, as do Styles, components, consumer integration and every deferred entry. |
+| **Token Foundation V1 Release Preparation** | 2026-09-20 | authorizes release preparation, limited to wiring `pnpm smoke:tailwind` into `release.yml` before the first tag | **nothing in v0.2** — it supersedes no rule. It records the disposition of the release-only blocker carried by the publication authorization. **Version, tag, release, package publication, Styles, components and consumer integration stay unauthorized.** |
+| **Owner Release Model Ruling** | 2026-09-20 | selects owner-triggered automated tagging: the owner supplies the version and the exact `main` SHA, the workflow validates first and only then creates and pushes the tag; an automated tag is verified in-run by `verify-created-tag`, since a `GITHUB_TOKEN` push starts no `push.tags` run | **nothing in v0.2** — it supersedes the earlier reading that a tag-triggered workflow could prevent a bad tag, and the *"release blocker cleared"* wording that rested on it. **Version change, GitHub Release and package publication remain unauthorized.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -411,6 +413,75 @@ discharged under ADR 0003 §18 assertion 16.
 
 **No token, value, count, artifact or implementation file changes** under this
 authorization. The full record is in the Token Table.
+
+### Token Foundation V1 Release Preparation — 2026-09-20
+
+**Token Foundation V1 is merged and verified on `main`** — implementation
+commit `5e979cf0d6bfcc47e18a4e21bed3f3012cd3a0a3`, via pull request #7, merge
+commit `6e9c6d788fb8fcf5ed9f6c30e6136d3135674489`.
+
+**Authorized, and limited to it:** making `pnpm smoke:tailwind` a required
+release gate. **Corrected before publication:** the first draft wired it into
+the tag-triggered workflow and called that prevention, which it is not — see
+the **Owner Release Model Ruling** below, which selects owner-triggered
+automated tagging instead.
+
+**Frozen §2.2's *the tag IS the release* is unchanged.** Nothing is published
+to a registry, and no GitHub Release is created.
+
+**Not authorized:** version change · tag · GitHub Release · package
+publication · Styles · Icons · Primitives or any component ·
+consumer-repository change · Therapist integration · every deferred Token
+Table entry. `@zakhmban/ui` stays **`0.0.0`** and **`private`**, with **no tag
+and no release**.
+
+**No token, value, count or artifact changes** under this authorization. The
+full record is in the Token Table.
+
+### Owner Release Model Ruling — 2026-09-20
+
+**Owner-triggered automated tagging.** The owner starts `release.yml`
+manually and supplies the semantic version and the exact 40-character
+lowercase `main` SHA. The workflow validates that commit in full — install,
+generator `--check`, format, lint, typecheck, test, build, `verify:dist`,
+`smoke:tailwind` — and **only then** creates and pushes the annotated tag.
+
+**Two modes, and they must not be conflated.** `workflow_dispatch` is
+**pre-tag prevention**: no tag exists until the gates pass. `push.tags` is
+**post-tag verification**; it reports on a tag that already exists and can
+neither prevent nor remove one. **Describing the tag-triggered mode as
+preventing a bad tag is an error this ruling corrects.**
+
+**GITHUB_TOKEN recursion, corrected before publication.** `create-tag` pushes
+with the repository `GITHUB_TOKEN`, and GitHub starts no new workflow run for
+events created with it (`workflow_dispatch` and `repository_dispatch`
+excepted). **An automatically created tag therefore does not start a
+`push.tags` run.** Same-run assurance comes from **`verify-created-tag`**,
+which re-reads the remote ref and proves it is present, annotated and
+pointing at the validated commit. `push.tags` is retained for **manually or
+externally pushed tags**. **No PAT, GitHub App or deploy key is introduced**
+to force a second run.
+
+**Dispatch from `main`.** `workflow_dispatch` executes the workflow file of
+the branch it is started from, and that chain grants `contents: write` to tag
+creation.
+
+**Authority.** This is a mechanism ruling. ADR 0001 binds *"the commit that
+implements it"* and ADR 0003 §18 assertion 16 is an assertion the commit must
+add; **neither requires a workflow gate**, and the implementing commit
+discharged the obligation. The workflow adds repeatable automated safety, not
+a missing contract.
+
+**Permissions.** Workflow default `contents: read`; all three validation
+jobs — `validate-candidate`, `verify-created-tag`, `verify-tag` —
+`contents: read`; **only the tag-creation job holds `contents: write`**, and
+tag creation is the only automated write in the repository.
+
+**Still unauthorized:** version change · GitHub Release · package publication
+· Styles · components · consumer integration. `@zakhmban/ui` stays **`0.0.0`**
+and **`private`**, with **no tag and no release**. The first tag additionally
+requires this branch merged, a separate reviewed version-bump pull request,
+and the owner starting the workflow.
 
 ## Missing design-system document — scoped disposition
 

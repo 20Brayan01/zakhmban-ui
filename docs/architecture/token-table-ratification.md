@@ -5855,6 +5855,13 @@ could reach a tag unproven. **This blocks the first tag. It does not block
 this publication**, because ADR 0003 §18 assertion 16 placed the obligation on
 the implementing commit, which met it.
 
+> **Superseded 2026-09-20 — mechanism only.** The paragraph above is preserved
+> as written. The phrase *"wired into `release.yml` before the first tag"* was
+> ambiguous and was read as a temporal gate that a tag-triggered workflow
+> cannot provide. The **Owner Release Model Ruling** at the end of this file
+> settles the mechanism: **owner-triggered automated tagging**. The canonical
+> ADR obligation itself was already discharged by the implementing commit.
+
 ### Non-blocking follow-ups, carried forward
 
 Eight remain deferred and none was implemented here: `smoke:tailwind` CI
@@ -5873,3 +5880,197 @@ package manifest, the lint configuration, the workflows and every committed
 `dist/` artifact are **byte-identical** to the audited commit. The only
 tracked change is this documentation record and the commit-message status that
 accompanies it.
+
+---
+
+## TOKEN FOUNDATION V1 RELEASE PREPARATION — RECORDED, 2026-09-20
+
+**Decided by:** human design/product owner · **Date:** 2026-09-20
+**Status: RECORDED.** Canonical record of a release-preparation
+authorization the owner gave directly. It is **not** a numbered Token Table
+decision, and it **changes no token, value, count or artifact**.
+
+### Where Token Foundation V1 stands
+
+**Token Foundation V1 is merged and verified on `main`.** The implementation
+commit `5e979cf0d6bfcc47e18a4e21bed3f3012cd3a0a3` reached `main` through
+pull request **#7**, merged with a true merge commit,
+`6e9c6d788fb8fcf5ed9f6c30e6136d3135674489`. Post-merge validation from a
+clean `main` passed all eight gates, and the **118 / 39 / 1** boundary,
+source/`dist` parity and the Typography Alias mappings were reverified there.
+
+### What this authorization covers
+
+**Release preparation is authorized, and it is limited to clearing the one
+recorded release-only blocker**: wiring `pnpm smoke:tailwind` into the
+release workflow before the first tag.
+
+**It authorizes nothing else.** No version change, no tag, no GitHub Release,
+no package publication, no Styles or component work, no consumer-repository
+change, no `zakhmban-therapists` integration, and no unrelated cleanup.
+
+### The blocker, and how it is addressed
+
+ADR 0001 requires that resolution of the extensionless subpath
+`@zakhmban/ui/tokens/tailwind-preset` through `@tailwindcss/postcss` be
+**proven against a real Tailwind 4 consumer before release, not assumed**, and
+ADR 0003 §18 assertion 16 makes that a gate. The implementing commit
+discharged the proof once and committed the repeatable script; the release
+workflow did not yet run it, so a later regression could have reached a tag
+unproven.
+
+**`.github/workflows/release.yml` runs `pnpm smoke:tailwind` as a required
+gate in both of its modes**, with no `continue-on-error` and no `if:`
+condition, and an architecture guard asserts it.
+
+**Corrected in this same commit, before publication.** An earlier draft of
+this record described the tag-triggered workflow as making the obligation
+*hold* for every tagged commit. That was wrong, and the release-workflow
+audit caught it: a tag-triggered run starts **after** the tag exists, cannot
+prevent it and cannot remove it. The wording is corrected here rather than
+marked, because this record has never been published. The mechanism that
+does provide prevention is recorded in the **Owner Release Model Ruling**
+below.
+
+### Status that this record fixes
+
+- **Version remains `0.0.0`** and the package remains **private**.
+- **No tag, no GitHub Release and no package publication is authorized**, and
+  none exists.
+- **Consumer integration remains unauthorized**, `zakhmban-therapists`
+  included.
+- **Styles and components remain outside this work** and have not begun.
+- **No Token Foundation value, identifier, count or artifact changes** under
+  this authorization.
+
+### Effect on the recorded release-only blocker
+
+**The release-only blocker recorded by the publication authorization of
+2026-09-20 is disposed of by the Owner Release Model Ruling below**, which
+replaces the ambiguous "wire it into `release.yml`" phrasing with a mechanism
+that actually prevents a bad tag. It remains recorded there as the position at
+its own date. **The first tag is still not authorized**, and authorizing it is
+a separate owner decision.
+
+---
+
+## OWNER RELEASE MODEL RULING — 2026-09-20
+
+**Decided by:** human design/product owner · **Date:** 2026-09-20
+**Status: APPROVED.** It is **not** a numbered Token Table decision, and it
+**changes no token, value, count or artifact**.
+
+### The model
+
+**Owner-triggered automated tagging.** The owner starts the release workflow
+manually from GitHub Actions and supplies two things:
+
+1. the intended **semantic version**, without a leading `v`;
+2. the **exact full 40-character lowercase commit SHA** on `main`.
+
+**The workflow validates that commit first. Only after every required gate
+passes does it create and push the version tag.**
+
+### Why the previous interpretation was wrong
+
+The earlier release-preparation work added `pnpm smoke:tailwind` to a
+**tag-triggered** workflow and described that as clearing the release
+blocker. The release-workflow audit established that it cannot: on GitHub the
+tag exists remotely **before** the `push` event is emitted, a failing run
+neither removes nor invalidates it, and the workflow holds `contents: read`
+and so could not undo it in any case. A tag-triggered run **reports on a
+release that has already happened**.
+
+**This ruling replaces that interpretation.** Prevention requires that the
+tag not exist until the gates pass, which only a pre-tag mechanism can
+deliver.
+
+### What the workflow does
+
+| Mode | Trigger | Permission | Effect |
+| --- | --- | --- | --- |
+| **Manual, pre-tag** | `workflow_dispatch` | `contents: read` for validation; `contents: write` for tag creation alone | validates the exact commit, then creates and pushes the tag. **This is prevention.** |
+| **Manual, post-create** | same `workflow_dispatch` run | `contents: read` | reads the pushed ref back from the remote and proves it is present, annotated, and pointing at the validated commit. |
+| **Automatic, post-tag** | `push` on `v*.*.*` | `contents: read` | re-runs every gate against the tagged tree. **This is verification, not prevention, and must never be described as such.** |
+
+> **Corrected 2026-09-20, before publication — GITHUB_TOKEN recursion.** An
+> earlier draft of this ruling stated that the tag the manual mode pushes
+> triggers the post-tag mode, and called that duplicate verification
+> intentional. **That is factually wrong.** `create-tag` pushes with the
+> repository `GITHUB_TOKEN`, and GitHub suppresses new workflow runs for
+> events created with that token — `workflow_dispatch` and
+> `repository_dispatch` excepted — so **an automatically created tag starts
+> no `push.tags` run**. The correction is recorded here rather than marked,
+> because this ruling has never been published.
+>
+> What the two modes actually cover:
+>
+> - **`verify-created-tag`** gives same-run assurance for an automated tag,
+>   inside the dispatch run.
+> - **`push.tags`** covers a tag pushed by a human or by any credential that
+>   is not the repository `GITHUB_TOKEN` — the case nobody reviewed, and the
+>   reason the trigger is kept.
+>
+> **No personal access token, GitHub App or deploy key is introduced** to
+> force a second run. Doing so would trade a wording defect for a long-lived
+> high-privilege credential and would be a separate owner decision.
+
+### Binding clauses
+
+1. The selected model is **owner-triggered automated tagging**.
+2. The owner selects the **semantic version** and the **exact `main` commit
+   SHA**. The workflow never chooses a version.
+3. The manual workflow performs **pre-tag validation**: install, generator
+   `--check`, format, lint, typecheck, test, build, `verify:dist` and
+   `smoke:tailwind`, against the supplied commit. It must be **dispatched
+   from `main`**: `workflow_dispatch` runs the workflow file of the branch it
+   is started from, and that chain grants `contents: write` to tag creation.
+4. **A tag is created only after all validations pass.**
+5. **Tag creation is the only automated write** in this repository.
+6. **Pull-request creation and merge remain manual owner actions.**
+7. **A `package.json` version change requires a separate owner-reviewed pull
+   request.** The workflow refuses to release when the manifest version and
+   the requested version disagree, and never edits the manifest.
+8. **The workflow creates no GitHub Release and publishes no package.**
+   Frozen §2.2 is unchanged: the tag IS the release.
+9. **The tag-triggered workflow is post-tag verification, not prevention**,
+   and every record must say so. It covers **manually or externally pushed
+   tags only**; a tag created by the workflow with `GITHUB_TOKEN` starts no
+   run, and is verified in-run by `verify-created-tag` instead.
+10. **The earlier "release blocker cleared" wording is superseded**, because
+    it overstated what the tag-triggered mechanism could do.
+11. **The canonical ADR obligation was already discharged by the implementing
+    commit.** ADR 0001 binds *"the commit that implements it"* and ADR 0003
+    §18 assertion 16 is an assertion *the commit must add*; neither requires a
+    workflow gate. This workflow adds repeatable automated release safety on
+    top of an obligation already met.
+12. **Tag, GitHub Release and package publication remain unauthorized
+    until** this workflow branch is manually reviewed and merged; **and** a
+    separate version-bump pull request is reviewed and merged; **and** the
+    owner manually starts the workflow with the approved version and SHA.
+
+### Same-run verification of an automated tag
+
+`verify-created-tag` runs after `create-tag` in the same dispatch,
+`needs: [validate-candidate, create-tag]`, `contents: read`. It re-reads the
+ref from the remote and fails on any mismatch: the tag must exist, be an
+**annotated** tag object, and dereference to **exactly** the validated commit
+SHA, with the remote and fetched object ids agreeing. It reuses the validated
+outputs rather than recomputing them, **does not re-run the validation
+suite** — that SHA was fully validated before the tag existed — and creates,
+moves and deletes nothing.
+
+### Race safety, stated honestly
+
+A `concurrency` group serialises manual release attempts and never cancels a
+tag-creation job that has begun. GitHub Actions offers no repository-wide
+lock spanning separate workflow runs, so **the mandatory safeguard is the
+remote-tag existence re-check immediately before `git tag`**, together with a
+non-forced single-ref push. A loser in a race is refused; no tag is moved or
+overwritten.
+
+### Scope
+
+**No token, value, identifier, count or artifact changes.** `@zakhmban/ui`
+remains **`0.0.0`** and **`private`**, with **no tag and no release**. Styles,
+components and consumer integration remain outside this ruling.
