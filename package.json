@@ -27,6 +27,12 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./styles": "./dist/styles/index.css",
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "default": "./dist/tokens/index.js"
+    },
+    "./tokens/tailwind-preset": "./dist/tokens/tailwind-preset.css",
     "./utils/format": {
       "types": "./dist/format/index.d.ts",
       "default": "./dist/format/index.js"
@@ -46,6 +52,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "verify:dist": "node scripts/verify-dist.mjs",
+    "smoke:tailwind": "node scripts/smoke-tailwind-consumer.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "format": "prettier --write .",

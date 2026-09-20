@@ -1,0 +1,31 @@
+/**
+ * Motion tokens — authored by hand. This file is a source of truth.
+ *
+ * v0.2 §2.4: three durations — 120ms for hover and press colour, 200ms
+ * default, 320ms for sheet entry and progress fills — on one easing curve.
+ * The skeleton shimmer's 1400ms is the one keyframe value §2.4 supplies, and
+ * it is tokenised here.
+ *
+ * ADR 0003 gap 2: the four keyframes have meanings but no canonical names.
+ * Naming them is a Styles decision, since v0.2 §7 places `keyframes` under
+ * `styles/`. No keyframe is named here and the Tailwind artifact emits no
+ * `--animate-*` key.
+ *
+ * The press scale is v0.2 §2.1's "press darkens further + 0.98 scale", the
+ * only transform in the system.
+ *
+ * Suppressing animation under `prefers-reduced-motion: reduce` is a Styles
+ * and component duty, not a token.
+ */
+
+:root {
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-shimmer: 1400ms;
+
+  /* The only curve in the system (v0.2 §2.4). */
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --press-scale: 0.98;
+}

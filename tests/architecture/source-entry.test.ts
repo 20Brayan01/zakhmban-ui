@@ -38,21 +38,21 @@ describe("source entry", () => {
     expect(source).not.toMatch(/^export default\b/m);
   });
 
-  it("ships no component, token, icon or stylesheet at this commit", () => {
-    // The C1 scope boundary, enforced rather than trusted. Each of these
-    // arrives in its own commit with its own tests; none may ride along in a
+  it("ships no component or icon at this commit", () => {
+    // The scope boundary, enforced rather than trusted. Each of these arrives
+    // in its own commit with its own tests; none may ride along in a
     // foundation change.
+    //
+    // "tokens" and "tailwind" left this list with Token Foundation V1, which
+    // ships src/tokens/ and the generated Tailwind artifact (ADR 0003 §18).
     const files = walk(srcDir);
 
     for (const forbidden of [
       "Button",
       "TextField",
-      "Select",
       "OtpInput",
       "BottomSheet",
       "Icon",
-      "tokens",
-      "tailwind",
     ]) {
       expect(
         files.some((file) =>
@@ -64,13 +64,51 @@ describe("source entry", () => {
 
     for (const file of files) {
       expect(
-        file.endsWith(".css"),
-        `${file} is a stylesheet — styles land in their own commit`,
-      ).toBe(false);
-      expect(
         file.endsWith(".tsx"),
         `${file} is a component — primitives land in their own commit`,
       ).toBe(false);
+    }
+  });
+
+  it("imports no @zakhmban specifier anywhere under src/", () => {
+    // The directional rule of UI System Specification v0.2 §7.3, enforced by
+    // a guard rather than only by lint: this package depends on no
+    // application and no sibling package, and it never reaches for itself
+    // through its own published name either. A lint override scoped to test
+    // fixtures cannot reach this assertion.
+    for (const file of walk(srcDir)) {
+      if (!file.endsWith(".ts") && !file.endsWith(".tsx")) {
+        continue;
+      }
+      const specifiers = [
+        ...readFileSync(file, "utf8").matchAll(
+          /(?:from|import|require)\s*\(?\s*["']([^"']+)["']/g,
+        ),
+      ].map((match) => match[1] as string);
+      for (const specifier of specifiers) {
+        expect(
+          specifier.startsWith("@zakhmban/"),
+          `${file} imports ${specifier}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it("keeps every stylesheet under src/tokens/ or src/styles/", () => {
+    // ADR 0003 §18: the blanket .css prohibition is replaced by a placement
+    // rule. Token CSS is authored under src/tokens/; the public stylesheet
+    // entry and, later, static styles and font assets live under src/styles/.
+    // A stylesheet anywhere else — beside a component, say — is the start of
+    // a second styling system.
+    for (const file of walk(srcDir)) {
+      if (!file.endsWith(".css")) {
+        continue;
+      }
+      const relative = file.slice(srcDir.length + 1);
+      expect(
+        relative.startsWith("tokens/") || relative.startsWith("styles/"),
+        `src/${relative} is a stylesheet outside src/tokens/ and src/styles/`,
+      ).toBe(true);
     }
   });
 });

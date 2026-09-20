@@ -1,0 +1,31 @@
+/**
+ * Spacing tokens — authored by hand. This file is a source of truth.
+ *
+ * v0.2 §2.3, 8pt rhythm: "Allowed steps only: 4 8 12 16 20 24 32 40". The
+ * scale is the package's own and closed at eight steps.
+ *
+ * The identifiers are ORDINAL, fixed by owner representation ruling:
+ * `--space-<n>` is the nth step of the approved scale, not a px value spelled
+ * into a name. No value-based identifier such as `--space-40` exists and no
+ * alias to one is retained — value-based naming also collides with itself,
+ * since `--space-4` would mean 4px under one reading and 16px under the
+ * approved scale.
+ *
+ * Steps 7 and 8 deliberately carry 32px and 40px rather than Tailwind's
+ * default 28px and 32px; the package scale is under no obligation to preserve
+ * Tailwind's values at those keys. The gaps at 28px and 36px are the approved
+ * scale's. No base spacing literal is created — the Tailwind artifact resets
+ * `--spacing` rather than redefining it (ADR 0003 §12) — and no ninth step is
+ * invented.
+ */
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+}

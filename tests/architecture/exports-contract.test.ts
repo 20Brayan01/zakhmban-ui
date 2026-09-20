@@ -14,18 +14,29 @@ const exportsMap = manifest["exports"] as Record<string, unknown>;
  * files behind a new entry. Widening the package's public surface is always a
  * reviewed diff here, never a side effect of a refactor.
  *
- * `./utils/format` ships with this commit: Jalali dates, Persian numerals,
- * Toman formatting, duration, phone display masking (`src/format/`, mapped
- * to the public subpath UI System Specification v0.2 §7 names for it).
+ * `./utils/format` ships Jalali dates, Persian numerals, Toman formatting,
+ * duration and phone display masking (`src/format/`, mapped to the public
+ * subpath UI System Specification v0.2 §7 names for it).
  *
- * Still reserved by v0.2 §7 and not yet declared, because an export whose
- * target does not exist is a broken package:
+ * Token Foundation V1 adds the three subpaths v0.2 §7 reserves and ADR 0003
+ * §13 declares, and no fourth:
  *
- *   ./styles           token CSS and static styles
- *   ./tokens           generated typed token object
- *   ./tokens/tailwind-preset
+ *   ./styles                    the stylesheet entry point of v0.2 §2
+ *   ./tokens                    the generated typed token object
+ *   ./tokens/tailwind-preset    the generated Tailwind v4 @theme artifact
+ *
+ * In particular there is no `@zakhmban/ui/fonts`: the Owner Font Contract and
+ * Delivery Ruling refused one, font binaries are internal assets referenced
+ * by package CSS, and consumers must not deep-import a font file.
  */
-const DECLARED_SUBPATHS = [".", "./utils/format", "./package.json"];
+const DECLARED_SUBPATHS = [
+  ".",
+  "./styles",
+  "./tokens",
+  "./tokens/tailwind-preset",
+  "./utils/format",
+  "./package.json",
+];
 
 describe("exports contract", () => {
   it("declares exactly the subpaths this commit ships", () => {

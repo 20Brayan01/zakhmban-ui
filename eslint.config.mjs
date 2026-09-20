@@ -107,6 +107,52 @@ export default tseslint.config(
   },
 
   {
+    // Architecture test fixtures stand in for a consuming application, so a
+    // fixture resolves the package through its own published specifier —
+    // that self-reference is the thing under test (ADR 0003 §11 assertion
+    // 17: "a TypeScript consumer fixture imports all four named exports …
+    // and type-checks"). The directional rule is unchanged everywhere else,
+    // and every other @zakhmban/* specifier stays restricted here too: the
+    // rule forbids depending on an application or a SIBLING package, and
+    // this package is neither of those to itself.
+    //
+    // src/ is not relieved of anything. `tests/architecture/
+    // source-entry.test.ts` asserts that no file under src/ imports a
+    // @zakhmban/ specifier at all, so the boundary that matters is enforced
+    // by a guard a lint override cannot reach.
+    files: ["tests/**/fixtures/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["next", "next/*"],
+              message:
+                "@zakhmban/ui is framework-free (frozen v1.1 §2.1: no routing). Next.js belongs to the consuming application.",
+            },
+            {
+              group: ["react-router", "react-router-dom", "react-router/*"],
+              message:
+                "@zakhmban/ui is framework-free (frozen v1.1 §2.1: no routing).",
+            },
+            {
+              group: ["axios", "axios/*", "node-fetch", "ky", "superagent"],
+              message:
+                "@zakhmban/ui contains no data fetching (frozen v1.1 §2.1). Transport belongs to @zakhmban/api-client.",
+            },
+            {
+              group: ["@zakhmban/*", "!@zakhmban/ui", "!@zakhmban/ui/*"],
+              message:
+                "@zakhmban/ui depends on no application and no sibling package. The dependency points one way (UI System Specification v0.2 §7.3, directional rule).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
     // Build scripts, the architecture suite, and standalone Node test
     // fixtures (tests/**/*.mjs — e.g. a script spawned as its own process to
     // probe timezone-dependent behaviour in isolation) all run directly in
