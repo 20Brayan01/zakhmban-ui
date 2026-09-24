@@ -161,6 +161,7 @@ reference kit, a consumer implementation or an AI agent.**
 | ADR 0001 | `docs/adr/0001-tailwind-token-delivery.md` | **Accepted** | Tailwind delivery form |
 | ADR 0002 | `docs/adr/0002-validation-helpers-contract.md` | **Accepted** | Validation Helpers public contract |
 | ADR 0003 | `docs/adr/0003-token-representation-and-artifact-contract.md` | **Accepted** — 2026-09-18 | token representation and artifact contract |
+| ADR 0004 | `docs/adr/0004-styles-keyframe-representation-contract.md` | **Accepted** — 2026-09-24 · **behaviour resolved 2026-09-25** | the four public keyframe names, their ownership, publicity and versioning rules, and the owner-decided behavioural contract each carries |
 | `ARCHITECTURE.md` | repository root | pointer | where each rule lives |
 | `README.md` | repository root | orientation | consumption and commands |
 | `tests/architecture/README.md` | `tests/architecture/` | orientation | guard traceability |
@@ -184,6 +185,8 @@ in full in the Token Table.
 | **Token Foundation V1 Release Preparation** | 2026-09-20 | authorizes release preparation, limited to wiring `pnpm smoke:tailwind` into `release.yml` before the first tag | **nothing in v0.2** — it supersedes no rule. It records the disposition of the release-only blocker carried by the publication authorization. **Version, tag, release, package publication, Styles, components and consumer integration stay unauthorized.** |
 | **Owner Release Model Ruling** | 2026-09-20 | selects owner-triggered automated tagging: the owner supplies the version and the exact `main` SHA, the workflow validates first and only then creates and pushes the tag; an automated tag is verified in-run by `verify-created-tag`, since a `GITHUB_TOKEN` push starts no `push.tags` run | **nothing in v0.2** — it supersedes the earlier reading that a tag-triggered workflow could prevent a bad tag, and the *"release blocker cleared"* wording that rested on it. **Version change, GitHub Release and package publication remain unauthorized.** |
 | **Token Foundation v0.1.0 Release-Sequence Ruling** | 2026-09-20 | allocates Token Foundation **v0.1.0**, Styles **v0.2.0**, Icons and the five primitives **v0.3.0**; Phase 6's **v1.0.0** target unchanged | **nothing in v0.2** — v0.2 §8's Phase 6 `v1.0.0` exit criterion is untouched. It supersedes only the two `README.md` roadmap placeholders (Styles → v0.1.0, Icons/primitives → v0.2.0), which were never ADR-frozen and never a consumer commitment. **No token, value, count, artifact or export changes.** |
+| **Styles Foundation v0.2.0 Contract Ruling** | 2026-09-24 | the **reset contract** (D-1), the **global body contract** (D-2), the **focus-visible contract** (D-3), the **reduced-motion contract** (D-5), and the **allocation of the overlay-root and Portal question to v0.3.0** (D-6). Keyframe naming (D-4) is delegated to **ADR 0004** as representation. | **nothing in v0.2** — v0.2 §7 places `reset, global, keyframes` under `styles/` but states no reset rule, no body rule and no focus mechanism, so there is nothing for this ruling to replace; where v0.2 does state a value (§2.2's `text-wrap: pretty`, §2.4's reduced-motion duty, §5's document-level direction ownership) the ruling **applies** it. It supersedes, **for the overlay-root technique only**, the Release-Sequence Ruling's sentence placing that technique in v0.2.0. **No token identifier, value, count, artifact or export changes.** |
+| **Styles Keyframe Behaviour and Procedural Ratification** | 2026-09-25 | **Part 1** procedurally ratifies the substantive content of local draft commit `6a6eae84`, clarifying that the disputed **STOP** barred inventing or silently filling undefined behavioural values and required implementation to stay blocked, but did not bar documenting the gap or creating the local draft. **Part 2** supplies the exact behavioural contract for all four keyframes — start and end frames, durations, timing functions, iteration, RTL invariance, static fallbacks — plus the repetition rule and a refined reduced-motion rule. | **two scoped clauses of v0.2 §2.4**, and nothing else: the single-curve statement is superseded **for `zakhmban-shimmer` and `zakhmban-spin` only**, which use `linear`; and the closed three-duration set is supplemented by **1000ms for `zakhmban-spin` only**, as an authored-Styles value that is **not a token** and does **not** reopen the set. Neither exception may be generalised. **No token identifier, value, count, artifact or export changes**, and **no keyframe name changes.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -233,6 +236,7 @@ reader learns what replaced part of it.
 | **0001** | Tailwind Token Delivery Strategy | **Accepted** — 2026-09-11 | representation / delivery |
 | **0002** | Validation Helpers Public Contract | **Accepted** — 2026-09-13 | representation / public contract |
 | **0003** | Token Representation and Artifact Contract | **Accepted** — 2026-09-18 | representation |
+| **0004** | Styles Keyframe Representation Contract | **Accepted** — 2026-09-24 | representation / public contract |
 
 **ADR 0003 is accepted, 2026-09-18.** It settles the representation of the
 Token Foundation V1 values the Scoped Token Foundation V1 Owner Sign-off froze
@@ -260,6 +264,38 @@ by it.** Three values it could not derive from a canonical source are
 §2.3 never states; the **four keyframe names**, which §2.4 describes without
 naming and which belong to Styles; and the **40px small-control geometry**,
 which cannot be published while the Button sm 40-versus-44 conflict is open.
+
+**ADR 0004 is accepted, 2026-09-24.** It freezes exactly four public
+`@keyframes` identifiers — **`zakhmban-shimmer`**, **`zakhmban-fade-up`**,
+**`zakhmban-slide-up`** and **`zakhmban-spin`** — and the ownership,
+publicity, generation and versioning rules that follow from publishing them.
+**It closes ADR 0003's second reported gap for the names only.** It records
+that the identifiers are package-owned and public, that CSS makes the
+`@keyframes` namespace global so a consumer redefinition silently replaces the
+package's animation, that the keyframes are **authored Styles CSS and not
+generated token output**, that **no `--animate-*` Tailwind key is authorized
+and the preset is unchanged**, and that each keyframe must end in the
+element's static end state so the approved reduced-motion contract can
+suppress it correctly. **It creates no motion value on its own authority**
+and **nothing is implemented by it.**
+
+**Behaviour resolved 2026-09-25.** As accepted, ADR 0004 reported that the
+four keyframe **bodies** were not derivable from any canonical source and
+listed each undefined field **as a gap rather than inventing one**. The
+**Styles Keyframe Behaviour Owner Decision of 2026-09-25** supplied every
+missing value before anything was published, and **§8 was rewritten to carry
+the exact contracts**: start and end frames, durations bound to
+`--duration-shimmer`, `--duration-base` and `--duration-slow` where an
+existing public token resolves to the approved value, timing functions,
+iteration rules, RTL invariance, per-keyframe reduced-motion fallbacks and
+the repetition rule. **No behavioural field remains unresolved and ADR 0004
+§8 is closed.** The four names, the ownership and publicity rules, the
+authored-versus-generated line and the Tailwind position are **unchanged**,
+and **no token was created**. ADR 0004 carries **two scoped supersessions of
+v0.2 §2.4** that belong to the owner, not to the ADR — `linear` for the two
+repeating keyframes, and 1000ms for `zakhmban-spin` as an authored-Styles
+value — each narrow, each non-generalisable, and both recorded in the Token
+Table. **Implementation remains unauthorized.**
 
 ## Token Table status
 
@@ -517,6 +553,134 @@ boundary, the generated artifacts, the exports, and `private: true`.
 **Not authorized by it:** push · pull request · merge · tag · release-workflow
 execution · GitHub Release · package publication · consumer integration. The
 ruling covers local version-bump preparation only.
+
+### Styles Foundation v0.2.0 Contract Ruling — 2026-09-24
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 —
+approved owner design/product rulings. **Implementation has not started.**
+
+**What it closes.** The **Scoped Token Foundation V1 Owner Sign-off** of
+2026-09-18 withheld authorization for the Styles layer in its §6. Those were
+deferrals, and under the deferral rule below only an owner may close one.
+This ruling is the owner closing four of them.
+
+| Decision | Subject | Outcome |
+| --- | --- | --- |
+| **D-1** | Reset contract | **APPROVED** — a three-rule authored reset: `box-sizing: border-box` on `*`/`*::before`/`*::after`; `margin: 0` and `padding: 0` on `html` and `body`; `font: inherit` on `button`, `input`, `select`, `textarea`. **No dependency-based reset** — normalize.css, modern-normalize and Josh Comeau's reset are each explicitly not authorized, as are media-element defaults, list-style removal, heading/paragraph resets, link styling, image rules, border removal, form-appearance resets, button background/cursor rules and blanket min-width rules. |
+| **D-2** | Global body contract | **APPROVED** — eight declarations, every one resolving through an existing public token: `font-family: var(--font-ui)` · `font-synthesis: none` · `background: var(--background)` · `color: var(--text-primary)` · `font-size: var(--text-body-size)` · `line-height: var(--text-body-line-height)` · `font-weight: var(--text-body-weight)` · `text-wrap: pretty`. **Excluded:** global `font-variant-numeric`, `-webkit-font-smoothing`, `-moz-osx-font-smoothing`, `text-rendering`, forced `direction`, forced `lang`, dark-mode rules, responsive or container rules. **The package must not set `direction: rtl`**; applications retain `<html lang="fa" dir="rtl">`, restating v0.2 §5. |
+| **D-3** | Focus-visible contract | **APPROVED** — selector `:focus-visible`; Decision 3b's `CONTROL → 2px WHITE → 2px NAVY → PAGE` unchanged; **both layers painted**, never a transparent `outline-offset` gap; **two box-shadow rings derived only from the four existing focus-indicator tokens**; the default outline replaced only inside the same rule that installs the replacement; **no global `:focus:not(:focus-visible) { outline: none }`**; no focus removal without an immediately effective replacement; **no `overflow: hidden` ancestor** in package Styles or primitives that would clip the indicator. **No raw colour literal.** Rendered verification owed on `--surface`, `--surface-subtle` and all three approved soft tints. |
+| **D-4** | Keyframe names | **DELEGATED TO ADR 0004** — naming is representation, not value. |
+| **D-5** | Reduced-motion contract | **APPROVED** — every package-owned animation suppressed when `prefers-reduced-motion: reduce` matches, **leaving the element in its static end state**; **coupled to ADR 0004's end-state rule**; **no arbitrary ultra-short-duration workaround**; consumer-owned animation stays the consumer's responsibility unless it invokes a package-owned keyframe. |
+| **D-6** | Overlay-root allocation | **APPROVED AS AN EXCLUSION** — all overlay-root and Portal techniques are **excluded from v0.2.0** and their decision work is **allocated to v0.3.0** alongside the five primitives. The deferral covers shared overlay-root selectors, Portal implementation, overlay container styling, simultaneous/nested overlay policy, body scroll locking, inert-background mechanics and pointer-event policy. **No implementation technique is approved by the allocation**, and Decision 15's position is restated, not amended. |
+
+**What it supersedes.** **For the overlay-root technique only**, the sentence
+in the Token Foundation v0.1.0 Release-Sequence Ruling of 2026-09-20 placing
+that technique in Styles at v0.2.0. Font delivery, `@font-face`, resets,
+global body rules and focus styles still arrive with Styles at **v0.2.0**; the
+overlay-root technique moves to **v0.3.0**. **That dated record is preserved
+unchanged.** Nothing else is superseded, and **no part of UI System
+Specification v0.2 is superseded by this ruling.**
+
+**Unchanged:** every token identifier and value, the **118 / 39 / 1**
+boundary, the generated artifacts, the exports, `private: true`, version
+`0.1.0`, the Owner Font Contract and Delivery Ruling in full, and repository
+visibility.
+
+**Still deferred:** the overlay-root and Portal technique, now at v0.3.0 ·
+the four keyframe **bodies**, per ADR 0004 §8 — **closed 2026-09-25**, see
+the Styles Keyframe Behaviour section below · `--radius-pill` · the 40px
+small-control geometry and the Button sm 40-versus-44 conflict, which remain
+**primitive scope** · container classes and **Decision 16b** · Decisions 4b,
+6b and 11 · the banner accent contract · Chip state coverage · the Checkbox
+visible-square dimension · the BottomNav badge-size defect · non-Card Surface
+bindings · typography role assignment for error text, banner prose and
+ListRow metadata · border widths · the visited-link colour · dark mode · LTR
+direction · `--shadow-none` representation · any sixth primitive · any fourth
+public subpath.
+
+**Implementation status — stated plainly.** **Styles is not implemented, not
+shipped and not released.** No CSS file, font binary, `OFL.txt`, `@font-face`,
+reset, body rule, focus rule, keyframe or reduced-motion block exists in this
+repository. `@zakhmban/ui/styles` continues to yield the approved token custom
+properties and nothing more. **This ruling authorizes documentation only**;
+Styles implementation is a **separate task**, and the version bump, tag,
+release-workflow execution, GitHub Release, package publication and
+`zakhmban-therapists` migration each remain **separate owner actions**.
+
+### Styles Keyframe Behaviour and Procedural Ratification — 2026-09-25
+
+**Authority kind: value decision plus a procedural clarification, owner
+tier.** Level 3 — approved owner design/product rulings. **Implementation has
+not started.**
+
+**Part 1 — procedural ratification.** A read-only audit of the local draft
+commit `6a6eae84c1694120d83212ba73761f566a69f636` reported one blocker: how
+the uppercase **STOP** in the authoring instruction was to be read once the
+four keyframe behaviours were found undefined. **The owner clarifies that
+STOP prohibited inventing or silently filling undefined behavioural values
+and required implementation to remain blocked while they were unresolved, but
+did not prohibit documenting the gap, completing the documentation review or
+creating the local draft commit.** The draft **invented no value** and
+**nothing had been pushed, merged, tagged, released or published**. The
+substantive content of `6a6eae84` is therefore **procedurally ratified**, the
+sole audit blocker is resolved, and **no new ADR is created** for a
+clarification that decides no value and no representation. **The ratification
+does not authorize implementation.**
+
+**Part 2 — the four behavioural contracts.** Every value is owner-supplied;
+ADR 0004 §8 records them verbatim and adds none. **No token is created.**
+
+| Keyframe | Start → End | Duration | Timing | Iteration |
+| --- | --- | --- | --- | --- |
+| `zakhmban-shimmer` | `background-position: 200% 0` → `-200% 0` | `var(--duration-shimmer)` · 1400ms | **`linear`** | infinite, **only while a real loading state is active** |
+| `zakhmban-fade-up` | `opacity: 0` / `translateY(8px)` → `opacity: 1` / `translateY(0)` | **`var(--duration-base)`** · 200ms | `var(--easing-standard)` | exactly 1 |
+| `zakhmban-slide-up` | `translateY(100%)` → `translateY(0)` | **`var(--duration-slow)`** · 320ms | `var(--easing-standard)` | exactly 1 |
+| `zakhmban-spin` | `rotate(0deg)` → `rotate(360deg)` | **1000ms**, authored-Styles value, **not a token** | **`linear`** | infinite, **only while a real loading or in-progress state is active** |
+
+Shimmer animates an owner-authorized gradient built from the existing public
+tokens `--surface-subtle` (base) and `--surface` (highlight) at
+`background-size: 200% 100%`; its physical coordinate movement is
+**invariant under document direction and is not mirrored for RTL**. Slide-up
+carries **no opacity animation**. Both repeating keyframes **must stop when
+their state ends** and **must not be used as permanent decoration**.
+
+**Repetition rule.** Fade-up and slide-up are **one-shot transitions**;
+shimmer and spin **may repeat only while communicating a real loading or
+in-progress state**. **Functional progress feedback is not decorative
+looping**, and **permanent, ambient or ornamental looping remains
+prohibited** — which closes v0.2 §2.4's *"looping decoration"* ambiguity.
+
+**Reduced-motion, refined without weakening D-5.** All package-owned
+animation is disabled under `prefers-reduced-motion: reduce`; **one-shot
+animations leave their final usable static state**; **repeating indicators
+use their documented static fallback** — a flat `var(--surface-subtle)`
+skeleton surface, and the `0deg` resting state; **no ultra-short-duration
+workaround**; consumers stay responsible for their own animation unless it
+invokes a package-owned keyframe; and **no content, control or status may
+become unavailable when motion is suppressed.**
+
+**Two scoped supersessions of v0.2 §2.4**, both the owner's and both entered
+in the Token Table: **`linear` for `zakhmban-shimmer` and `zakhmban-spin`
+only**, leaving `--easing-standard` the only curve for every transition and
+both one-shot keyframes; and **1000ms for `zakhmban-spin` only**, as an
+authored value that **does not reopen the three-duration token set**.
+**Neither exception may be generalised**, and nothing else in §2.4 is
+superseded.
+
+**Unchanged:** the four keyframe names · ADR 0004's ownership, publicity,
+authored-versus-generated and Tailwind positions · **no `--animate-*` key and
+no preset change** · every token identifier and value · the **118 / 39 / 1**
+boundary · the exports · `private: true` · version `0.1.0` · the overlay-root
+allocation to **v0.3.0** · `--radius-pill` and the 40px geometry, both still
+deferred · repository visibility.
+
+**Status.** **No behavioural field for the four keyframes remains
+unresolved**, and **ADR 0004 §8 is closed** — a Styles implementation commit
+may not vary a duration, curve, frame or iteration count in it. **Styles is
+still not implemented, not tagged and not released.** **Implementation
+becomes eligible only after this record is independently audited**, and the
+version bump, tag, release-workflow execution, GitHub Release, package
+publication and consumer migration each remain **separate owner actions**.
 
 ## Missing design-system document — scoped disposition
 

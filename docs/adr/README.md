@@ -60,6 +60,7 @@ read it rather than inferring an order from this file.
 | [0001](0001-tailwind-token-delivery.md) | Tailwind Token Delivery Strategy | Accepted | 2026-09-11 |
 | [0002](0002-validation-helpers-contract.md) | Validation Helpers Public Contract | Accepted | 2026-09-13 |
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
+| [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
 Table had accumulated — names, CSS custom properties, TypeScript exports,
@@ -72,6 +73,29 @@ values could not be derived from a canonical source — the **pill radius
 literal**, the **four keyframe names**, and the **40px small-control
 geometry**, whose Button sm conflict is open — and each is **reported as a gap
 rather than invented**.
+
+**ADR 0004 is accepted.** It freezes exactly four public `@keyframes`
+identifiers — `zakhmban-shimmer`, `zakhmban-fade-up`, `zakhmban-slide-up` and
+`zakhmban-spin` — closing **ADR 0003's second gap for the names only**. It
+records that they are package-owned public CSS identifiers in a namespace CSS
+makes global, that they are **authored Styles CSS rather than generated token
+output**, that **no `--animate-*` Tailwind key is authorized** and the preset
+is unchanged, and that each keyframe must end in the element's static end
+state so the approved reduced-motion contract can suppress it correctly. It
+**creates no motion value on its own authority** and **nothing is implemented
+by it**.
+
+**Behaviour resolved 2026-09-25.** As accepted, ADR 0004 reported that the
+four keyframe **bodies** were undefined by every canonical source and listed
+each missing field **as a gap rather than inventing one** — the same
+discipline ADR 0003 applied. The **Styles Keyframe Behaviour Owner Decision
+of 2026-09-25** supplied every value before anything was published, and
+**§8 now carries the exact contracts**. **No behavioural field remains
+unresolved**; the four names and every ownership, publicity and Tailwind
+position are unchanged; **no token was created**. The §8 values are the
+owner's, recorded verbatim — including two deliberately narrow supersessions
+of v0.2 §2.4 that belong to the owner and not to the ADR. **Implementation
+remains unauthorized and is a separate task.**
 
 ## Format
 

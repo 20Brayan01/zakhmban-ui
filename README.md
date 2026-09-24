@@ -14,15 +14,15 @@ string.
 place, and the first three capability areas have shipped. Every remaining
 capability arrives in its own commit.
 
-| Area                                                                     | State                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                  |
-| Formatting utilities (`./utils/format`)                                  | shipped                                                                   |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                                                   |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; allocated **v0.1.0**, unreleased |
-| Styles                                                                   | not yet — allocated `v0.2.0`                                              |
-| Icons · the five primitives                                              | not yet — allocated `v0.3.0`                                              |
-| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                      |
+| Area                                                                     | State                                                             |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                          |
+| Formatting utilities (`./utils/format`)                                  | shipped                                                           |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                                           |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`** |
+| Styles — contracts ratified, **not implemented**                         | not yet — allocated `v0.2.0`; overlay-root excluded, see below    |
+| Icons · the five primitives · overlay-root and Portal                    | not yet — allocated `v0.3.0`                                      |
+| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                              |
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -44,12 +44,50 @@ v0.2.0**, **Icons and the five primitives v0.3.0**, with **v1.0.0** remaining
 the Phase 6 target. The earlier roadmap numbers were placeholders in this
 table; they were never ADR-frozen and bound no consumer.
 
-**Version `0.1.0` is prepared locally on `chore/token-foundation-v0.1.0`.**
-It is not merged. **Tag `v0.1.0` does not exist**, the release workflow has
-**never been run**, **no GitHub Release exists**, **no package has been
-published**, and **no consumer integration has begun**. The package remains
-private. The first real release-workflow execution will be its first
-end-to-end runtime proof.
+### Working rule — proportionate audits, and always a recommendation
+
+**Project-execution guidance, not a canonical rule.** It binds how work is
+reported here; it decides no value and overrides nothing in
+[`docs/architecture/canonical-document-registry.md`](docs/architecture/canonical-document-registry.md).
+It is a **standing requirement for future checklists and roadmap templates**.
+
+**Audits.** Important implementation milestones get a proportionate precheck,
+post-merge verification and an end-of-phase audit. **Depth matches risk.**
+An audit that re-proves what a guard already enforces is ceremony, and
+ceremony is a cost, not a safeguard.
+
+**Recommendations.** Every audit or decision report that presents more than
+one viable option **must name the option the agent recommends**. It must give
+the reasoning, the benefits, the risks and the trade-offs, and **state the
+exact next action**. The recommendation is **advisory and labelled as such**;
+**the final decision is the owner's.** **PASS/BLOCK and "recommended" are
+separate concepts** — a report can pass and still recommend a change, or
+block and still recommend the cheapest route through.
+
+**A report must not list options without saying which one it recommends**,
+unless the evidence genuinely cannot distinguish them — in which case it says
+so, and says what evidence would.
+
+**Token Foundation v0.1.0 is released.** `package.json` on `main` is
+**`0.1.0`**, and the **annotated tag `v0.1.0` exists** — locally and on the
+remote — targeting
+**`b870e19cc0390113ce7c43a0674dc117998ee8b4`**. The **Release workflow ran
+successfully**: it validated that commit, created and pushed the tag, and
+`verify-created-tag` re-read the ref from the remote and confirmed it is
+annotated and points at the validated commit.
+
+What has **not** happened, and is not pending: **no GitHub Release object
+exists** — the tag _is_ the release under frozen §2.2, so this is the
+designed steady state, not a gap — and **the package has not been published
+to npm**. `private: true` stays set, which is what makes a registry publish
+fail by design. **It says nothing about the GitHub repository's visibility**,
+which is a separate setting and is unchanged by any of this.
+
+Consumers install from the tag:
+
+```jsonc
+"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.1.0"
+```
 
 **Styles, icons and components have not begun.**
 
@@ -179,9 +217,23 @@ gets every token:
 
 **At v0.1.0 that import provides the approved token custom properties and
 nothing else.** It does **not** yet provide font delivery, `@font-face`,
-reset styles, global body rules, focus styles or the overlay-root technique.
-Those are **Styles**, which is unimplemented and allocated **v0.2.0**.
-**Styles is not included in v0.1.0.**
+reset styles, global body rules, focus styles, reduced-motion handling or
+keyframes. **Styles is not included in v0.1.0**, is **not implemented**, and
+is **not merged, tagged or released**.
+
+The allocation, corrected 2026-09-25 by the Styles Foundation v0.2.0 Contract
+Ruling's **D-6**:
+
+|                          |                                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Styles — v0.2.0**      | font delivery · `@font-face` · the approved reset · global body defaults · `:focus-visible` styling · reduced-motion handling · the four approved keyframes                     |
+| **Excluded from v0.2.0** | the overlay-root and Portal technique                                                                                                                                           |
+| **v0.3.0**               | overlay-root · Portal behaviour · nested-overlay policy · body scroll locking · inert-background mechanics · pointer-event policy — **alongside Icons and the five primitives** |
+| **v1.0.0**               | Phase 6 · Harden, unchanged                                                                                                                                                     |
+
+Earlier text placing the overlay-root technique in Styles v0.2.0 is
+superseded for that technique only; everything else still arrives with
+Styles.
 
 **A Tailwind v4 consumer adds the `@theme` artifact, and the order is the
 contract.** A `@theme` layer imported before the custom properties it
