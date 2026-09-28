@@ -244,9 +244,9 @@ describe("token generation", () => {
       });
 
     // Seven authored token files, the generated Tailwind artifact, and the
-    // Styles entry with its font stylesheet.
+    // five Styles stylesheets: index, fonts, reset, global and keyframes.
     const sources = walk(join(root, "src"));
-    expect(sources.length).toBe(10);
+    expect(sources.length).toBe(13);
 
     for (const source of sources) {
       const built = join(

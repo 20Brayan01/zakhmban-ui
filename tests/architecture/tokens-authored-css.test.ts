@@ -79,13 +79,22 @@ describe("authored token CSS", () => {
     expect(readdirSync(stylesDir).sort()).toEqual([
       "fonts",
       "fonts.css",
+      "global.css",
       "index.css",
+      "keyframes.css",
+      "reset.css",
     ]);
     const entry = readFileSync(`${stylesDir}/index.css`, "utf8");
     const imports = [...entry.matchAll(/@import\s+"([^"]+)"/g)].map(
       (match) => match[1],
     );
-    expect(imports).toEqual(["../tokens/base.css", "./fonts.css"]);
+    expect(imports).toEqual([
+      "../tokens/base.css",
+      "./fonts.css",
+      "./reset.css",
+      "./global.css",
+      "./keyframes.css",
+    ]);
   });
 
   it("aggregates the other six files in base.css, in the ADR's order", () => {
@@ -395,7 +404,7 @@ describe("authored token CSS", () => {
     // keyframe and font-face constructs ARE authorized there, which is why
     // this list is shorter than the one above.
     const source = withoutComments(
-      ["fonts.css"]
+      ["fonts.css", "reset.css", "global.css", "keyframes.css"]
         .map((file) => readFileSync(`${stylesDir}/${file}`, "utf8"))
         .join("\n"),
     );

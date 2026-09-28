@@ -24,6 +24,7 @@ const UPSTREAM_FILENAME = "Vazirmatn[wght].woff2";
 const UPSTREAM_COMMIT = "83629f877e8f084cc07b47030b5d3a0ff06c76ec";
 
 const fontFace = readFileSync(`${stylesDir}/fonts.css`, "utf8");
+const globalCss = readFileSync(`${stylesDir}/global.css`, "utf8");
 
 /** CSS with every comment removed, so prose that names a construct is not mistaken for the construct. */
 function withoutComments(css: string): string {
@@ -95,6 +96,7 @@ describe("font delivery", () => {
     // block it is inert; the ruling assigns it to the Styles contract and D-2
     // places it on the global body rule.
     expect(rules.includes("font-synthesis")).toBe(false);
+    expect(withoutComments(globalCss)).toContain("font-synthesis: none");
   });
 
   it("resolves its URL to the stored binary, relatively", () => {
@@ -109,7 +111,13 @@ describe("font delivery", () => {
     // consumer and every CDN. Iran blocks Google Fonts, the frozen CSP model
     // allows no third-party font-src, and a PWA must not depend on a third
     // party to render.
-    for (const file of ["fonts.css", "index.css"]) {
+    for (const file of [
+      "fonts.css",
+      "index.css",
+      "global.css",
+      "reset.css",
+      "keyframes.css",
+    ]) {
       const source = withoutComments(
         readFileSync(`${stylesDir}/${file}`, "utf8"),
       );

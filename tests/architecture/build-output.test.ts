@@ -17,6 +17,9 @@ const srcDir = `${root}src`;
 const COPIED_STYLE_ASSETS = [
   "styles/index.css",
   "styles/fonts.css",
+  "styles/reset.css",
+  "styles/global.css",
+  "styles/keyframes.css",
   "styles/fonts/Vazirmatn-Variable.woff2",
   "styles/fonts/OFL.txt",
 ];
