@@ -243,8 +243,10 @@ describe("token generation", () => {
             : [];
       });
 
+    // Seven authored token files, the generated Tailwind artifact, and the
+    // Styles entry with its font stylesheet.
     const sources = walk(join(root, "src"));
-    expect(sources.length).toBe(9);
+    expect(sources.length).toBe(10);
 
     for (const source of sources) {
       const built = join(

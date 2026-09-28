@@ -1,0 +1,47 @@
+/**
+ * Font delivery — authored Styles CSS. This file is a source of truth.
+ *
+ * Owner Font Contract and Delivery Ruling, 2026-09-18: Delivery Model A —
+ * `zakhmban-ui` owns and distributes the approved Vazirmatn asset. Consumers
+ * receive the font through `@zakhmban/ui/styles` and must not load Vazirmatn
+ * through Google Fonts, a CDN, `next/font`, `@fontsource`, an application-owned
+ * `@font-face` or a copied application-local file.
+ *
+ * ADR 0003 §16 fixes the internal paths: the binary and its licence sit under
+ * `src/styles/fonts/`, and the `@font-face` rule lives here, so the relative
+ * URL never crosses a directory.
+ *
+ * PROVENANCE — recorded with the commit that adds the binary, as the ruling
+ * requires.
+ *
+ *   upstream repository  https://github.com/rastikerdar/vazirmatn
+ *   tag                  v33.003
+ *   upstream commit      83629f877e8f084cc07b47030b5d3a0ff06c76ec
+ *   release asset        vazirmatn-v33.003.zip
+ *   upstream filename    fonts/webfonts/Vazirmatn[wght].woff2
+ *   stored filename      fonts/Vazirmatn-Variable.woff2
+ *   SHA-256              4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92
+ *   byte size            111152
+ *   licence              SIL OFL 1.1 — fonts/OFL.txt, copied from the same tag
+ *
+ * The binary from the official release asset and the blob at the immutable tag
+ * were compared byte for byte and are identical. The asset is unmodified: no
+ * subsetting, no re-compression, no per-weight static split.
+ *
+ * `font-weight: 400 700` is the owner-approved descriptor range. The binary's
+ * own axis is wider, but the ruling exposes only 400 · 500 · 600 · 700 as
+ * public weights and excludes 800 and 900, so the descriptor states the
+ * approved range rather than the axis.
+ *
+ * `font-synthesis` is NOT an `@font-face` descriptor. The ruling assigns its
+ * application to Styles, and D-2 places it in the global body rule in
+ * `global.css`.
+ */
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("./fonts/Vazirmatn-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}

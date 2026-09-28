@@ -72,12 +72,20 @@ describe("authored token CSS", () => {
   });
 
   it("keeps the style entry separate — it is not an eighth token file", () => {
-    expect(readdirSync(stylesDir)).toEqual(["index.css"]);
+    // Styles v0.2.0 added four authored stylesheets and the font directory
+    // beside the entry. The entry still imports the tokens through the single
+    // base.css aggregation point, and FIRST, so every Styles rule below it
+    // resolves its values.
+    expect(readdirSync(stylesDir).sort()).toEqual([
+      "fonts",
+      "fonts.css",
+      "index.css",
+    ]);
     const entry = readFileSync(`${stylesDir}/index.css`, "utf8");
     const imports = [...entry.matchAll(/@import\s+"([^"]+)"/g)].map(
       (match) => match[1],
     );
-    expect(imports).toEqual(["../tokens/base.css"]);
+    expect(imports).toEqual(["../tokens/base.css", "./fonts.css"]);
   });
 
   it("aggregates the other six files in base.css, in the ADR's order", () => {
@@ -353,9 +361,16 @@ describe("authored token CSS", () => {
     }
   });
 
-  it("introduces no keyframes and no dark-theme mechanism", () => {
+  it("introduces no keyframes, no font face and no dark-theme mechanism", () => {
     // Comment-stripped: the authored files name these constructs in prose,
     // recording that each is deliberately absent. The guard is on the CSS.
+    //
+    // Scope, narrowed by Styles v0.2.0: `@keyframes` and `@font-face` are
+    // Styles constructs and now live in `src/styles/keyframes.css` and
+    // `src/styles/fonts.css`. They remain prohibited HERE — in the seven
+    // token files, the generated Tailwind artifact and the style entry — so
+    // the Token Foundation boundary is unchanged and neither construct can
+    // drift back into a token file or be inlined into the entry.
     const source = withoutComments(
       [
         ...AUTHORED_FILES.map(read),
@@ -369,6 +384,25 @@ describe("authored token CSS", () => {
       "prefers-color-scheme",
       "[data-theme",
       "@font-face",
+    ]) {
+      expect(source.includes(forbidden), `${forbidden} is present`).toBe(false);
+    }
+  });
+
+  it("keeps --animate-*, dark mode and theme selectors out of the Styles CSS too", () => {
+    // ADR 0004 §7 authorizes no `--animate-*` Tailwind key, and dark mode
+    // stays deferred, so neither may appear in the Styles files either. The
+    // keyframe and font-face constructs ARE authorized there, which is why
+    // this list is shorter than the one above.
+    const source = withoutComments(
+      ["fonts.css"]
+        .map((file) => readFileSync(`${stylesDir}/${file}`, "utf8"))
+        .join("\n"),
+    );
+    for (const forbidden of [
+      "--animate-",
+      "prefers-color-scheme",
+      "[data-theme",
     ]) {
       expect(source.includes(forbidden), `${forbidden} is present`).toBe(false);
     }

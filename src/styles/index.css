@@ -7,13 +7,24 @@
  * it individually — a token that is present twice is a cascade bug waiting
  * for a specificity change."
  *
- * ADR 0003 §13: at Token Foundation this entry imports the token CSS and
- * nothing else. Static styles, the `@font-face` rule, resets, global RTL
- * utilities and global focus styles are Styles work and have not begun.
+ * ORDER IS THE CONTRACT. Tokens come first, because every Styles rule that
+ * follows resolves its values through them. CSS `@import` must precede every
+ * other statement in a file, so this list is also the cascade order.
+ *
+ *   tokens     the 118 public custom properties (ADR 0003)
+ *   fonts      the single approved `@font-face` (Owner Font Ruling)
  *
  * This is NOT an eighth token-family file. `src/tokens/base.css` is the
- * aggregation point for the seven authored token files, so exactly one import
- * appears here and the seven-file structure stays internal (ADR 0003 §2).
+ * aggregation point for the seven authored token files, so exactly one token
+ * import appears here and the seven-file structure stays internal
+ * (ADR 0003 §2).
+ *
+ * The Styles files are imported rather than inlined so each contract stays in
+ * the file its governing decision names (v0.2 §7: "styles/ reset, global,
+ * keyframes"). No new package export is created: `@zakhmban/ui/styles` is the
+ * only entry, and the font binary is an internal asset reached by a relative
+ * URL from `fonts.css`, never a deep import.
  */
 
 @import "../tokens/base.css";
+@import "./fonts.css";

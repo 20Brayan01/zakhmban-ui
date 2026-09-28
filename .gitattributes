@@ -6,3 +6,8 @@
 # The committed build artifact is generated, never hand-edited. Collapsing it
 # by default keeps a source diff readable; it stays expandable on demand.
 dist/** linguist-generated=true
+
+# The approved font binary. `* text=auto` would classify it correctly by
+# content sniffing, but its byte parity between src/ and dist/ is a release
+# gate, so the declaration is explicit rather than inferred.
+*.woff2 binary
