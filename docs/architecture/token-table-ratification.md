@@ -6152,3 +6152,643 @@ token, a component or a prop.
 - **Push, pull request, merge, tag creation, release-workflow execution,
   GitHub Release, package publication and consumer integration each remain
   separate actions**, and none is authorized here.
+
+---
+
+## STYLES FOUNDATION V0.2.0 CONTRACT RULING — 2026-09-24
+
+**Decided by:** human design/product owner · **Date:** 2026-09-24
+**Status: APPROVED.** This is an **owner decision**. It is **not** a numbered
+Token Table decision, it is **not** Decision 17, and it **changes no token
+identifier, value, count, generated artifact or export**.
+
+**No CSS was written. No font binary was added. No `OFL.txt` was added. No
+`@font-face`, reset, body rule, focus rule or keyframe was implemented. No
+build script, manifest, workflow or generated artifact was modified. Styles
+implementation has not begun.**
+
+### What this ruling is, and what authorizes it
+
+The **Scoped Token Foundation V1 Owner Sign-off** of 2026-09-18 withheld
+authorization for exactly this area. Its §6 states that the sign-off does not
+authorize *"Styles — `@font-face` implementation · `font-display` or
+`font-synthesis` application · global body and page rules · resets ·
+container classes · the overlay-root technique · global RTL utilities ·
+global focus styles."*
+
+Those were **deferrals, not gaps**. The deferral rule in
+[`canonical-document-registry.md`](canonical-document-registry.md) is
+explicit: *"A deferred or unresolved decision is a decision the owner has not
+yet made… No implementer, reference kit, consumer implementation or AI agent
+may fill one."*
+
+**This ruling is the owner making four of them.** It closes the reset
+contract, the global body contract, the focus-visible contract and the
+reduced-motion contract, and it **allocates** the overlay-root and Portal
+question to v0.3.0 without deciding it.
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 of the
+registry's authority levels. **It supersedes no part of UI System
+Specification v0.2**: v0.2 §7 places `reset, global, keyframes` under
+`styles/` but states no reset rule, no body rule and no focus mechanism, so
+there is nothing in v0.2 for this ruling to replace. Where v0.2 does state a
+value — §2.2's `text-wrap: pretty` on body, §2.4's reduced-motion duty, §5's
+document-level direction ownership — this ruling **applies** it rather than
+amending it.
+
+---
+
+### D-1 — MINIMAL RESET CONTRACT — APPROVED
+
+**A small authored reset is approved. No dependency and no third-party reset
+is approved.**
+
+#### The authorized reset surface, in full
+
+| # | Selector | Declaration |
+| - | -------- | ----------- |
+| **1** | `*`, `*::before`, `*::after` | `box-sizing: border-box` |
+| **2** | `html`, `body` | `margin: 0` · `padding: 0` |
+| **3** | `button`, `input`, `select`, `textarea` | `font: inherit` |
+
+**Nothing else belongs to the v0.2.0 reset unless separately authorized.**
+
+#### Explicitly NOT authorized
+
+- **normalize.css**;
+- **modern-normalize**;
+- **Josh Comeau's complete reset**;
+- **media-element defaults**;
+- **list-style removal**;
+- **heading or paragraph typography resets**;
+- **link styling**;
+- **image display / max-width rules**;
+- **border removal**;
+- **form appearance resets**;
+- **button background or cursor rules**;
+- **blanket min-width rules**;
+- **any dependency-based reset.**
+
+#### Recorded with this approval
+
+- **`border-box` is load-bearing for the approved control geometry.** Every
+  geometry token in `base.css` — `--control-min-target` 44px,
+  `--control-height-input` 48px, `--control-height-button` 52px,
+  `--app-bar-height` 56px, `--bottom-nav-height` 64px — is a **border-box**
+  measurement. Under the browser default a 52px button with padding is not
+  52px.
+- **Zeroing `margin` and `padding` is what makes §2.3's spacing rule true.**
+  §2.3: *"Spacing is applied with flex/grid `gap`, never per-element
+  margins."* User-agent default margins are per-element margins.
+- **`font: inherit` on form controls is required by §2.2.** §2.2 binds
+  `--text-button` weight **600** to *"All button labels"*. A user-agent
+  default control font defeats that before any component runs.
+- **The reset introduces no colour, no size and no spacing value**, and
+  therefore **cannot** introduce a raw literal.
+- **Zero runtime dependencies is unchanged.** The reset is authored CSS in
+  this package.
+
+---
+
+### D-2 — GLOBAL BODY CONTRACT — APPROVED
+
+**The following body-level responsibilities are approved.**
+
+| Declaration | Source of the value |
+| ----------- | ------------------- |
+| `font-family: var(--font-ui)` | Owner Font Contract and Delivery Ruling — *"global body font application"* is a **Styles** responsibility |
+| `font-synthesis: none` | Owner Font Contract and Delivery Ruling — *"`font-synthesis` must be disabled by the Styles contract"* |
+| `background: var(--background)` | Decision 14; §2.1 *"White is page and card"* |
+| `color: var(--text-primary)` | §2.1 *"All ink"* |
+| `font-size: var(--text-body-size)` | §2.2 Body step |
+| `line-height: var(--text-body-line-height)` | §2.2; §5 *"line height never below 1.5 (1.68 for body)"* |
+| `font-weight: var(--text-body-weight)` | §2.2; Decision 7 resolved the 400–500 band to **400** |
+| `text-wrap: pretty` | §2.2 *"`text-wrap: pretty` on body"* — stated verbatim |
+
+**Every one of the eight resolves through an existing public token. No new
+token, no new identifier and no raw literal is introduced.**
+
+#### Explicitly excluded from the body contract
+
+- **global `font-variant-numeric: tabular-nums`** — §2.2 scopes tabular
+  figures to *"money, dimensions, scores, countdowns and codes"*. It is a
+  component responsibility, not a page default;
+- **`-webkit-font-smoothing`**;
+- **`-moz-osx-font-smoothing`**;
+- **`text-rendering`**;
+- **forced `direction`**;
+- **forced `lang`**;
+- **dark-mode rules**;
+- **responsive or container rules.**
+
+#### Direction ownership — restated, not changed
+
+**The package must not set `direction: rtl`.**
+
+**Applications retain ownership of `<html lang="fa" dir="rtl">`.** This
+restates UI System Specification v0.2 §5 — *"`dir="rtl"` and `lang="fa"` are
+set once on the document; no component sets or reads direction on itself"* —
+and the Owner Font Contract and Delivery Ruling's ownership table, which
+assigns *"framework document/head integration"* to Applications. **Nothing is
+changed by restating it.**
+
+**Global RTL correctness remains a Styles authoring duty:** every rule this
+package writes uses logical properties, and no physical `left` or `right`
+appears in package CSS. That is §5's existing requirement and is not a new
+rule.
+
+---
+
+### D-3 — FOCUS-VISIBLE CONTRACT — APPROVED
+
+**Decision 3b fixed the focus indicator's value on 2026-09-15. It did not fix
+how that value is applied. This ruling fixes the application.**
+
+#### Approved
+
+- **Selector: `:focus-visible`.**
+- **The approved two-layer visual contract is unchanged:**
+
+  ```text
+  CONTROL  ->  2px WHITE  ->  2px NAVY  ->  PAGE
+  ```
+
+- **Both layers must be painted.** A transparent `outline-offset` gap is
+  **not** an acceptable representation of the white layer: a gap shows the
+  page through, so on `--surface-subtle` or any approved soft tint the "white"
+  layer would not be white and Decision 3b's contrast evidence would not hold.
+- **Implementation mechanism: two box-shadow rings**, derived **only** from
+  the four existing focus-indicator tokens —
+  `--focus-indicator-inner-color`, `--focus-indicator-outer-color`,
+  `--focus-indicator-inner-width`, `--focus-indicator-outer-width`.
+- **The browser's default outline may be replaced only inside the same
+  `:focus-visible` rule that installs the approved visible replacement.**
+- **No global `:focus:not(:focus-visible) { outline: none }`.**
+- **No focus removal without an immediately effective approved replacement.**
+- **Package-owned Styles and primitives must not introduce an
+  `overflow: hidden` ancestor that clips the approved focus indicator.**
+
+#### Verification owed by the later implementation
+
+The focus treatment **must be verified rendered** on:
+
+- `--surface` `#FFFFFF`;
+- `--surface-subtle` `#F7F9F5`;
+- **all approved soft tints** — `--brand-green-soft` `#F0F8E7`,
+  `--brand-blue-soft` `#EAF5FC`, `--brand-red-soft` `#FDEBEC`.
+
+Decision 3b's recorded ratios for those five surfaces are the expected
+outcome; this ruling adds no new contrast claim and relaxes none.
+
+**No raw colour literal may be used.**
+
+#### What D-3 does not do
+
+- **It does not change Decision 3b's value**, its widths, its colours or its
+  contrast evidence.
+- **It does not reopen** the retired `--focus-ring` or `--focus-ring-green`.
+- **It creates no token.** All four required properties already ship in
+  Token Foundation V1.
+- **It states no per-component focus behaviour** — focus trapping, Escape
+  handling and focus return remain **primitive** duties under Decision 15's
+  ownership boundary and §6.
+
+---
+
+### D-4 — KEYFRAME REPRESENTATION — DELEGATED TO ADR 0004
+
+**Keyframe names are representation, not value.** Under the value-authority
+versus representation-authority split recorded in the registry and in
+[`../adr/README.md`](../adr/README.md), *how* something is named is an **ADR**
+question. **This ruling therefore records no keyframe name.**
+
+**ADR 0004 — Styles Keyframe Representation Contract** is authorized and
+carries the contract:
+[`../adr/0004-styles-keyframe-representation-contract.md`](../adr/0004-styles-keyframe-representation-contract.md).
+
+**It freezes exactly four public keyframe names and nothing else.** It
+**invents no motion value**, and where an exact keyframe behaviour is not
+defined by an authoritative document it **records the gap rather than filling
+it** — the same discipline ADR 0003 applied to the pill radius, the keyframe
+names and the 40px geometry.
+
+**ADR 0003 gap 2 — *"the four keyframes have meanings but no canonical
+names"* — is closed by ADR 0004 for the names only.** The **bodies** of the
+four keyframes remain partly undefined and are recorded as open in that ADR.
+**Keyframe implementation therefore remains blocked** until an owner supplies
+the missing behavioural values.
+
+> **Superseded 2026-09-25 — the bodies only.** The two sentences above are
+> preserved as the position at their own date, and the local draft was
+> correct to record the gap rather than fill it. **The owner supplied every
+> missing behavioural value on 2026-09-25**, before anything was published.
+> **No behavioural field for the four keyframes remains unresolved**, and
+> **ADR 0004 §8 now carries the exact contracts**; see the **Styles Keyframe
+> Behaviour and Procedural Ratification** record at the end of this file.
+> The names, the ownership rules and the Tailwind position are unchanged.
+> **Implementation is still not authorized** — it becomes eligible only
+> after that record is independently audited, and it remains a separate
+> task.
+
+---
+
+### D-5 — REDUCED-MOTION CONTRACT — APPROVED
+
+**Reduced-motion support is approved for v0.2.0.**
+
+Recorded:
+
+- **Every package-owned animation must be suppressed when
+  `prefers-reduced-motion: reduce` matches.**
+- **Suppression must leave the element in its static end state.** This is
+  §2.4's existing requirement — *"Every animation must be suppressed under
+  `prefers-reduced-motion: reduce`, leaving the end state"* — and §6's
+  *"suppresses shimmer, slide and fade, leaving end states"*.
+- **This requirement is coupled to ADR 0004's end-state rule.** Suppression
+  can only leave the end state if each keyframe's final frame **is** the
+  element's normal static state. The two rules are a pair and neither works
+  alone.
+- **The later implementation must not use an arbitrary ultra-short-duration
+  workaround merely to simulate suppression.** A forced near-zero duration
+  runs the animation rather than suppressing it, and it is not the approved
+  mechanism.
+- **Consumer-owned animation remains the consumer's responsibility**, unless
+  it invokes a package-owned keyframe — in which case the package's
+  suppression applies.
+
+**No motion value, duration, easing or press-scale changes.** The approved
+Motion set — `--duration-fast`, `--duration-base`, `--duration-slow`,
+`--duration-shimmer`, `--easing-standard`, `--press-scale` — is untouched.
+
+---
+
+### D-6 — OVERLAY-ROOT ALLOCATION — APPROVED AS AN EXCLUSION
+
+**All overlay-root and Portal techniques are excluded from v0.2.0.**
+
+**Their decision work is allocated to v0.3.0, alongside the five primitives.**
+
+The deferral includes:
+
+- **shared overlay-root selectors**;
+- **Portal implementation**;
+- **overlay container styling**;
+- **simultaneous / nested overlay policy**;
+- **body scroll locking**;
+- **inert-background mechanics**;
+- **pointer-event policy.**
+
+**No implementation technique is approved by this allocation.** Decision 15's
+position is unchanged and is restated rather than amended: *"The constraint is
+approved; no specific implementation technique is… It is not claimed that a
+Portal or shared overlay root is already mandated, implemented or canonically
+selected."*
+
+**Reason recorded with this allocation.** The only package-owned surface that
+consumes an overlay root is **BottomSheet**, which is one of the frozen five
+primitives and is allocated to **v0.3.0**; **Modal is Tier 2** and
+application-owned. Deciding a selector contract in v0.2.0 with nothing in the
+package to consume it would be a technique chosen without a subject.
+
+**The three stacking integers are unaffected and already ship.** `--z-chrome`
+10, `--z-scrim` 20 and `--z-dialog` 30 are public Token Foundation V1
+properties, so an application can honour *"ordinary content < Application
+Chrome < Scrim < Dialog Surface"* today, with or without an overlay root.
+
+#### Supersession of record
+
+**This allocation supersedes, for the overlay-root technique only**, the
+sentence in the **Token Foundation v0.1.0 Release-Sequence Ruling** of
+2026-09-20 which reads: *"Font delivery, `@font-face`, resets, global body
+rules, focus styles and the overlay-root technique all arrive with Styles at
+v0.2.0."* **Font delivery, `@font-face`, resets, global body rules and focus
+styles still arrive with Styles at v0.2.0. The overlay-root technique does
+not; it moves to v0.3.0.**
+
+**That dated record is preserved unchanged**, as the position at its own date.
+Nothing else in it is superseded.
+
+---
+
+### Deferrals this ruling closes
+
+| Deferral | Source | Closed by |
+| -------- | ------ | --------- |
+| Reset policy | Sign-off §6 — *"resets"* | **D-1** |
+| Global body and page rules | Sign-off §6 — *"global body and page rules"* | **D-2** |
+| Global focus styles | Sign-off §6 — *"global focus styles"* | **D-3** |
+| `font-display` / `font-synthesis` application | Sign-off §6 | **D-2** for `font-synthesis`; `font-display: swap` was already approved by the Owner Font Contract and Delivery Ruling |
+| Global RTL utilities | Sign-off §6 — *"global RTL utilities"* | **D-2**, by declining to create any: direction stays with the document and logical-property authoring is §5's existing rule |
+| The four keyframe **names** | ADR 0003 gap 2 | **ADR 0004** |
+
+### Deferrals that remain open
+
+**Every one of these remains a binding deferral and may not be invented during
+Styles implementation:**
+
+- **the overlay-root and Portal technique**, and everything D-6 lists with it
+  — now allocated to **v0.3.0**;
+- **the four keyframe bodies**, to the extent ADR 0004 records them as
+  undefined — **closed 2026-09-25**, see the supersession note under D-4
+  above; every behavioural field is now owner-decided and ADR 0004 §8 is
+  closed;
+- **`--radius-pill`** — no approved literal (ADR 0003 gap 1);
+- **the 40px small-control geometry and the Button sm 40-versus-44 conflict**
+  — **primitive scope** (ADR 0003 gap 3);
+- **container classes**, and **Decision 16b**'s desktop/web contract,
+  breakpoints and container values;
+- **Decision 4b**'s three general shadow tiers; **Decision 6b**'s Modal
+  radius; **Decision 11**'s final ScaleSelect behaviour;
+- **the banner accent contract**; **Chip state coverage**; the **Checkbox
+  visible-square dimension**; the **BottomNav badge-size defect**; **non-Card
+  Surface bindings**;
+- **typography role assignment** for error text, banner prose and ListRow
+  metadata; **border widths**;
+- **the visited-link colour**; **dark mode**; **LTR direction**;
+- **`--shadow-none` representation**;
+- **any sixth primitive**, and **any fourth public subpath**.
+
+### Boundaries retained, recorded explicitly
+
+- **The Vazirmatn font decisions frozen by the Owner Font Contract and
+  Delivery Ruling of 2026-09-18 are unchanged** — family, fallback stack,
+  Delivery Model A, the pinned `rastikerdar/vazirmatn` **v33.003** variable
+  WOFF2 at commit `83629f8`, the weight contract 400/500/600/700,
+  `font-display: swap`, the licensing basis and the sixteen implementation
+  acceptance gates. **This ruling reopens none of them and adds none.**
+- **`--radius-pill` remains unresolved and unimplemented.**
+- **The 40px-versus-44px small-control decision remains primitive scope.**
+- **Token Foundation remains 118 / 39 / 1.**
+- **No token identifier or value changes.**
+- **Icons and the five primitives remain allocated to v0.3.0.**
+- **Styles remains allocated to v0.2.0.**
+- **Phase 6 · Harden remains allocated to v1.0.0.**
+- **`zakhmban-therapists` migration remains deferred until v0.2.0 is
+  tagged.**
+- **CI/CD, server infrastructure and the behavioural C4 proof remain
+  deferred.**
+- **`zakhmban-ui` repository visibility is unchanged by this ruling.**
+
+### Relationship to prior decisions
+
+- **Decision 3b: unchanged.** D-3 applies its value and changes none of it.
+- **Decision 7 and Decision 8: unchanged.** D-2 references Decision 7's Body
+  weight; it does not reopen either band.
+- **Decision 14: unchanged.** D-2 applies `--background` to `body` exactly as
+  Decision 14 distinguishes page from surface.
+- **Decision 15: unchanged and restated.** D-6 adopts its own statement that
+  no technique is approved.
+- **Decisions 1, 1·A1, 1·A2, 2, 3a, 4a, 5, 6a, 9, 10, 12a–c, 13, 16a:
+  unchanged.**
+- **Decisions 4b, 6b, 11 and 16b: still deferred.**
+- **The Owner Contrast Ruling, the Incidental Accessibility Findings Ruling,
+  the Owner Font Contract and Delivery Ruling, the Owner Interaction Ladder
+  Mapping Ruling and the Typography Alias Ruling: unchanged.**
+- **ADR 0001, ADR 0002 and ADR 0003: unchanged.** ADR 0003's gap 2 is closed
+  for names only, by ADR 0004, and **no ADR 0003 text is amended**.
+- **The Scoped Token Foundation V1 Owner Sign-off: its §6 Styles clause is
+  discharged in part**, by D-1, D-2, D-3 and D-5. Its §4 deferral of the
+  overlay-root technique is **allocated, not closed**, by D-6.
+
+**No prior approved decision is superseded or reopened, other than the single
+overlay-root allocation sentence identified under D-6.**
+
+### Scope
+
+- **This ruling authorizes documentation only.**
+- **Implementation requires a separate task.** No reset, body rule, focus
+  rule, `@font-face`, font binary, licence file, keyframe or reduced-motion
+  block is created by this ruling.
+- **Version bump, tag creation, release-workflow execution, GitHub Release,
+  package publication and consumer migration each remain separate owner
+  actions**, and none is authorized here.
+- **No implementation file and no token value changed.** `src/`, `dist/`,
+  `scripts/`, `tests/`, `package.json`, `pnpm-lock.yaml` and `.github/` are
+  untouched by this ruling.
+- **The package remains `0.1.0` and `private`.**
+- **The Token Table as a whole is still not signed off.**
+
+---
+
+## STYLES KEYFRAME BEHAVIOUR AND PROCEDURAL RATIFICATION — 2026-09-25
+
+**Decided by:** human design/product owner · **Date:** 2026-09-25
+**Status: APPROVED.** This is an **owner decision**. It is **not** a numbered
+Token Table decision, and it **changes no token identifier, value, count,
+generated artifact or export**. **The boundary remains 118 / 39 / 1.**
+
+**Nothing is implemented by it.** No CSS, no `@keyframes` rule, no font
+binary, no `OFL.txt`, no build change, no manifest change and no consumer
+change accompanies it.
+
+### Part 1 — Procedural ratification of the local draft
+
+A read-only audit of the local draft commit
+`6a6eae84c1694120d83212ba73761f566a69f636` reported one blocker: whether the
+uppercase **STOP** in the authoring instruction required work to halt before
+that commit existed, once the four keyframe behaviours were found to be
+undefined.
+
+**The owner clarifies the disputed instruction as follows:**
+
+- **STOP prohibited inventing or silently filling undefined behavioural
+  values.**
+- **STOP required implementation to remain blocked while those values were
+  unresolved.**
+- **STOP did not prohibit documenting the gap, completing the documentation
+  review, or creating the local draft commit.**
+- **The previous agent disclosed the ambiguity and invented no value.**
+
+**Therefore the substantive content of commit `6a6eae84` is procedurally
+ratified.** Recorded with that ratification:
+
+- **no value was invented before owner approval** — the draft listed each
+  undefined field rather than supplying one;
+- **nothing had been pushed, merged, tagged, released or published** — the
+  draft was local to one branch with no upstream and no remote ref;
+- **this clarification resolves the sole procedural blocker the audit
+  raised**;
+- **it does not itself authorize implementation**;
+- **the exact keyframe behaviour in Part 2 is a separate owner decision**,
+  recorded by the same amendment.
+
+**No new ADR is created for this procedural clarification.** It settles how an
+instruction was to be read; it decides no value and no representation.
+
+### Part 2 — The four exact keyframe behavioural contracts
+
+**Every value below is supplied by the owner.** ADR 0004 records them
+verbatim in its §8 and adds none.
+[`../adr/0004-styles-keyframe-representation-contract.md`](../adr/0004-styles-keyframe-representation-contract.md).
+
+**No token is created by any of them.** Where an existing public duration
+token resolves to the approved value, that token is used; where none does,
+the value is an **authored-Styles value** and stays out of the token layer.
+
+#### 2.1 · `zakhmban-shimmer`
+
+| | Approved contract |
+| --- | --- |
+| Animated property | **`background-position`** |
+| Start | `background-position: 200% 0` |
+| End | `background-position: -200% 0` |
+| Duration | **`var(--duration-shimmer)`** — currently **1400ms** |
+| Timing function | **`linear`** |
+| Iteration | **`infinite`**, only while a real loading state is active |
+| Direction | the physical coordinate movement is **invariant under document direction and is not mirrored for RTL** |
+
+**The owner-authorized surface it animates:**
+
+```text
+base:              var(--surface-subtle)
+highlight:         var(--surface)
+gradient:          linear-gradient(
+                     90deg,
+                     var(--surface-subtle) 0%,
+                     var(--surface) 50%,
+                     var(--surface-subtle) 100%
+                   )
+background-size:   200% 100%
+background-repeat: no-repeat
+background-color:  var(--surface-subtle)
+```
+
+**Correction of record — the last two declarations, approved 2026-09-25.**
+The scoped read-only audit of local draft commit
+`0f31f4f34e7be7434eb54136f21a9225e1faf015` found that neither
+`background-repeat` nor a base fill was stated, and that the omission let two
+conforming implementations differ visibly. **The owner closed it with exactly
+two declarations**, changing no other field of the contract.
+
+- **`background-repeat: no-repeat` is mandatory.** **The CSS default,
+  `background-repeat: repeat`, is NOT conforming and is explicitly
+  rejected.**
+- **Exactly one central highlight band crosses the element per 1400ms
+  cycle.** At `background-size: 200% 100%` the image is twice the element
+  width, so CSS resolves `200%` to `-2W` and `-200%` to `+2W` — a **4W**
+  sweep against a **2W** tile. Un-repeated, the single highlight passes
+  **once**; tiled, a second copy follows and the element shimmers roughly
+  **twice** per cycle. **One pass per cycle is the approved result.**
+- **`background-color: var(--surface-subtle)` is the permanent base fill**,
+  and is **a declaration in its own right, not merely the gradient's `0%`
+  and `100%` colour stops**. A 200%-wide `no-repeat` image sits **partly or
+  wholly outside the painting area for most of the cycle**; the base colour
+  is what keeps the skeleton at `--surface-subtle` throughout rather than
+  letting the page show through.
+- **It must stop when loading ends.**
+- **It must not be used as permanent decoration.**
+- **Reduced-motion fallback:** when `prefers-reduced-motion: reduce` disables
+  the animation and the moving gradient, **the same
+  `background-color: var(--surface-subtle)` remains as the flat static
+  skeleton**. The fallback therefore needs no further decision and no guess
+  at implementation time.
+- **Unchanged by this correction:** `background-position: 200% 0 → -200% 0`
+  · `background-size: 200% 100%` · the approved gradient ·
+  `var(--duration-shimmer)`, currently 1400ms · `linear` timing · physical,
+  unmirrored movement under RTL · repetition only during a real loading
+  state. **`zakhmban-fade-up`, `zakhmban-slide-up` and `zakhmban-spin` are
+  untouched.**
+- **No colour token and no motion token is created.** Every colour is an
+  already-approved public token.
+
+#### 2.2 · `zakhmban-fade-up`
+
+| | Approved contract |
+| --- | --- |
+| Start | `opacity: 0` · `transform: translateY(8px)` |
+| End | `opacity: 1` · `transform: translateY(0)` |
+| Duration | **200ms**, applied as **`var(--duration-base)`** — the existing public token resolves to exactly 200ms, so **no token name is invented** |
+| Timing function | **`var(--easing-standard)`** |
+| Iteration count | **exactly 1** |
+| Fill behaviour | must leave the element in the **final static state** |
+
+The 8px travel is v0.2 §2.4 and §3.4, unchanged.
+
+#### 2.3 · `zakhmban-slide-up`
+
+| | Approved contract |
+| --- | --- |
+| Start | `transform: translateY(100%)` |
+| End | `transform: translateY(0)` |
+| Duration | **320ms**, applied as **`var(--duration-slow)`** — the existing public token resolves to exactly 320ms, so **no token name is invented** |
+| Timing function | **`var(--easing-standard)`** |
+| Iteration count | **exactly 1** |
+| Opacity | **none** — no opacity animation belongs to this keyframe |
+| Fill behaviour | must leave the element in its **final static state** |
+
+#### 2.4 · `zakhmban-spin`
+
+| | Approved contract |
+| --- | --- |
+| Start | `transform: rotate(0deg)` |
+| End | `transform: rotate(360deg)` |
+| Duration | **1000ms**, an **owner-approved authored-Styles value** |
+| Timing function | **`linear`** |
+| Iteration | **`infinite`**, only while a real loading or in-progress state is active |
+
+- **It must stop when that state ends.**
+- **It must not be used as permanent decoration.**
+- **`360deg` is visually equivalent to the static `0deg` resting state.**
+- **No token is added for 1000ms.**
+
+#### 2.5 · Repetition rule
+
+**The "looping decoration" ambiguity is resolved explicitly:**
+
+- **`zakhmban-fade-up` and `zakhmban-slide-up` are one-shot transitions.**
+- **`zakhmban-shimmer` and `zakhmban-spin` may repeat only while
+  communicating a real loading or in-progress state.**
+- **Functional progress feedback is not decorative looping.**
+- **Permanent, ambient or ornamental looping remains prohibited.**
+
+#### 2.6 · Reduced-motion rule, refined without weakening
+
+- **All package-owned animation is disabled when
+  `prefers-reduced-motion: reduce` matches.**
+- **One-shot animations leave the element in their final usable static
+  state.**
+- **Repeating loading indicators use their explicitly documented static
+  fallback** — §2.1's flat `var(--surface-subtle)` surface for shimmer, and
+  the `0deg` resting state for spin.
+- **No ultra-short-duration workaround is allowed.**
+- **Consumers remain responsible for consumer-owned animation** unless it
+  invokes a package-owned keyframe.
+- **No content, control or status may become unavailable when motion is
+  suppressed.**
+
+This **refines and does not weaken** D-5 of the Styles Foundation v0.2.0
+Contract Ruling of 2026-09-24.
+
+### Part 3 — Two scoped supersessions of v0.2 §2.4
+
+Recorded explicitly, because the global supersession rule requires the exact
+earlier rule and the new effective rule to be named.
+
+| v0.2 §2.4 as written | Effective rule from 2026-09-25 | Scope |
+| --- | --- | --- |
+| the three durations *"on `cubic-bezier(.2,0,0,1)`"*, which `src/tokens/motion.css` restates as *"the only curve in the system"* | **`linear` is approved for `zakhmban-shimmer` and `zakhmban-spin`** | **those two keyframes only.** `--easing-standard` remains the only curve for every transition and for both one-shot keyframes. A continuously repeating animation on an ease curve pulses at each restart, which is the reason for the exception |
+| the closed set of three durations — 120 / 200 / 320ms | **1000ms is approved for `zakhmban-spin` as an authored-Styles value** | **that one keyframe only**, and **it is not a token.** The three-duration token set is **not reopened**; `--duration-shimmer` already established that a keyframe-internal duration need not join it |
+
+**Nothing else in §2.4 is superseded.** *"Four keyframes exist and no more"*,
+the prohibition on bounce, spring and parallax, the countdown rule and the
+reduced-motion duty all stand. **Neither exception may be generalised.**
+
+### Status after this decision
+
+- **No behavioural field for the four keyframes remains unresolved.**
+- **ADR 0004 §8 is closed.** A Styles implementation commit may not vary a
+  duration, curve, frame or iteration count in it.
+- **The four names are unchanged**, as are ADR 0004's ownership, publicity,
+  authored-versus-generated and Tailwind positions. **No `--animate-*` key is
+  authorized and the Tailwind preset is unchanged.**
+- **The overlay-root and Portal technique stays excluded from v0.2.0** and
+  allocated to **v0.3.0**, per D-6. This decision does not touch it.
+- **`--radius-pill` remains unresolved and unimplemented**, and the **40px
+  small-control geometry remains primitive scope.**
+- **Token Foundation remains 118 / 39 / 1**; **no token identifier or value
+  changes**; the package remains **`0.1.0`** and **`private`**.
+- **Styles is still not implemented, not tagged and not released.**
+- **Implementation becomes eligible only after this record is independently
+  audited**, and **version bump, tag, release-workflow execution, GitHub
+  Release, package publication and consumer migration each remain separate
+  owner actions.**
