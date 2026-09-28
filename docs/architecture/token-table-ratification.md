@@ -6677,11 +6677,32 @@ two declarations**, changing no other field of the contract.
   letting the page show through.
 - **It must stop when loading ends.**
 - **It must not be used as permanent decoration.**
-- **Reduced-motion fallback:** when `prefers-reduced-motion: reduce` disables
-  the animation and the moving gradient, **the same
-  `background-color: var(--surface-subtle)` remains as the flat static
-  skeleton**. The fallback therefore needs no further decision and no guess
-  at implementation time.
+- **Reduced-motion fallback — corrected by owner ruling, 2026-09-28
+  (Route A).** The earlier wording of this bullet implied the flat fallback
+  followed automatically from suppressing movement. **It does not.** The
+  fallback takes **two** declarations, one on each side of the package
+  boundary:
+
+  1. **Package** — the conditional static `@keyframes zakhmban-shimmer`
+     **stops the movement**.
+  2. **Consumer** — the application-owned `Skeleton` / `SkeletonCard` that
+     applies the shimmer surface **must also set `background-image: none`
+     under `@media (prefers-reduced-motion: reduce)`**, on the same element
+     that carries the shimmer background.
+
+  **Stopping movement does not remove the gradient**: a frozen
+  `background-position` still paints the 200%-wide image, leaving a static
+  ramp from `--surface-subtle` to `--surface`. Removing the image is what
+  lets the already-applied **`background-color: var(--surface-subtle)`
+  remain as the flat static skeleton**.
+
+  **The consumer declaration is mandatory, not optional.** Its **property
+  and value are fully decided** — `background-image: none`, under
+  `prefers-reduced-motion: reduce` — so **no consumer design choice
+  remains**; **only the selector is application-owned.** **No package
+  selector and no public class is authorized** to carry it, **the package
+  ships no Skeleton class**, and **no `animation-duration` or `0.01ms`
+  workaround is permitted.**
 - **Unchanged by this correction:** `background-position: 200% 0 → -200% 0`
   · `background-size: 200% 100%` · the approved gradient ·
   `var(--duration-shimmer)`, currently 1400ms · `linear` timing · physical,
@@ -6749,7 +6770,11 @@ The 8px travel is v0.2 §2.4 and §3.4, unchanged.
   state.**
 - **Repeating loading indicators use their explicitly documented static
   fallback** — §2.1's flat `var(--surface-subtle)` surface for shimmer, and
-  the `0deg` resting state for spin.
+  the `0deg` resting state for spin. **Shimmer's fallback needs two
+  declarations** (owner ruling, 2026-09-28): the package's conditional
+  static keyframe stops the movement, and the consumer that owns the
+  shimmer surface must also set `background-image: none` under the same
+  media query. §2.1 states it in full. Spin needs no consumer declaration.
 - **No ultra-short-duration workaround is allowed.**
 - **Consumers remain responsible for consumer-owned animation** unless it
   invokes a package-owned keyframe.

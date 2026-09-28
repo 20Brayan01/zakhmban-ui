@@ -54,10 +54,22 @@ describe("D-4 · the four public keyframes", () => {
   it("defines exactly the four approved names and no fifth", () => {
     // v0.2 §2.4: "Four keyframes exist and no more." A fifth needs an owner
     // decision against that sentence before it needs an ADR.
-    const names = [...motion.matchAll(/@keyframes\s+([A-Za-z0-9_-]+)/g)].map(
-      (match) => match[1],
+    //
+    // Scanned across the WHOLE file rather than the pre-media slice: a fifth
+    // keyframe appended after the reduced-motion block would otherwise be
+    // caught only incidentally by the suppression name-list below.
+    const declared = [...source.matchAll(/@keyframes\s+([A-Za-z0-9_-]+)/g)].map(
+      (match) => match[1]!,
     );
-    expect(names).toEqual(APPROVED);
+    expect([...new Set(declared)].sort()).toEqual([...APPROVED].sort());
+    // Four in the normal cascade, four again under reduced motion, and no
+    // other definition anywhere.
+    expect(declared.length).toBe(APPROVED.length * 2);
+    expect(
+      [...motion.matchAll(/@keyframes\s+([A-Za-z0-9_-]+)/g)].map(
+        (match) => match[1],
+      ),
+    ).toEqual(APPROVED);
   });
 
   it("prefixes every name, because the CSS namespace is global", () => {
@@ -102,8 +114,12 @@ describe("D-4 · the four public keyframes", () => {
   });
 });
 
-describe("the shimmer surface contract", () => {
-  it("states the base fill, the no-repeat rule and the size", () => {
+describe("documented consumer obligations — shimmer surface", () => {
+  // These assertions read the file's prose, not its executable CSS. The
+  // shimmer surface is applied by an application-owned Tier 2 Skeleton
+  // (v0.2 §9; ADR 0004 §1, §3), so the package documents the pairing and
+  // ships no selector. They are documentation guards by design.
+  it("documents the consumer-owned base fill, no-repeat rule and sizing", () => {
     // A @keyframes block holds frames only; the surface is applied by the
     // element, which in v0.2.0 is always an application-owned Tier 2
     // component. The file states the pairing each consumer owes.
@@ -124,20 +140,20 @@ describe("the shimmer surface contract", () => {
     }
   });
 
-  it("records the one-pass geometry and rejects the CSS default", () => {
+  it("documents the one-pass consumer geometry and rejects the CSS default", () => {
     const file = readFileSync(`${stylesDir}/keyframes.css`, "utf8");
     expect(file).toContain("NOT conforming");
     expect(file).toContain("exactly once per cycle");
   });
 
-  it("records the physical, unmirrored RTL behaviour", () => {
+  it("documents the physical, unmirrored RTL behaviour", () => {
     const file = readFileSync(`${stylesDir}/keyframes.css`, "utf8");
     expect(file).toContain("not mirrored for RTL");
   });
 });
 
-describe("the pairing contracts for duration, timing and iteration", () => {
-  it("states each approved pairing", () => {
+describe("documented consumer obligations — animation pairing", () => {
+  it("documents the consumer-owned duration, timing and iteration pairing", () => {
     const file = readFileSync(`${stylesDir}/keyframes.css`, "utf8");
     for (const pairing of [
       "var(--duration-shimmer) linear infinite",
@@ -149,6 +165,21 @@ describe("the pairing contracts for duration, timing and iteration", () => {
     }
   });
 
+  it("documents the mandatory reduced-motion background-image removal", () => {
+    // Owner ruling, 2026-09-28 (Route A). The package's conditional static
+    // keyframe stops the movement; it does not remove the gradient. The
+    // consumer that owns the shimmer surface must also set
+    // `background-image: none` under the same media query, and that value is
+    // fixed — only the selector is application-owned.
+    const file = readFileSync(`${stylesDir}/keyframes.css`, "utf8");
+    expect(file).toContain("background-image: none");
+    expect(file).toContain("prefers-reduced-motion: reduce");
+    expect(file).toContain("MUST also set");
+    // The package must not be described as doing it itself.
+    expect(file).toContain("APPLIED BY THE CONSUMER");
+    expect(file).toContain("no Skeleton class and no component selector");
+  });
+
   it("creates no duration token for spin's authored 1000ms", () => {
     // The three-duration token set is not reopened; 1000ms stays an authored
     // Styles value.
@@ -156,7 +187,7 @@ describe("the pairing contracts for duration, timing and iteration", () => {
     expect(/--duration-[a-z]+\s*:/.test(source)).toBe(false);
   });
 
-  it("restricts repetition to a real loading state", () => {
+  it("documents the loading-state lifecycle the consumer must honour", () => {
     const file = readFileSync(`${stylesDir}/keyframes.css`, "utf8");
     expect(file).toContain("real loading or in-progress state");
     expect(file).toContain("must stop when that state ends");

@@ -33,6 +33,13 @@
  *                      )
  *                      background-size: 200% 100%
  *                      background-repeat: no-repeat
+ *                      @media (prefers-reduced-motion: reduce)
+ *                        background-image: none
+ *
+ * Every declaration above is APPLIED BY THE CONSUMER, not by this package.
+ * This package publishes the keyframe bodies below and nothing else: it ships
+ * no Skeleton class and no component selector, because v0.2 §9 makes Skeleton
+ * Tier 2 and frozen §2.1 limits this package to five primitives.
  *
  *   zakhmban-fade-up   var(--duration-base) var(--easing-standard) 1
  *   zakhmban-slide-up  var(--duration-slow) var(--easing-standard) 1
@@ -118,7 +125,9 @@
  *
  * Each package-owned keyframe is REDEFINED to its static end state, so an
  * element that uses one stops moving while every other property it carries is
- * untouched. Suppression is therefore exact:
+ * untouched — which is why shimmer needs the consumer declaration recorded
+ * below: this package deliberately does not reach the element's
+ * `background-image`. Suppression is therefore exact:
  *
  *   - it reaches only the four package-owned keyframes, so consumer-owned
  *     animation remains the consumer's responsibility unless it invokes one
@@ -130,10 +139,18 @@
  *
  * Each redefinition is the approved static state, not a new design choice:
  *
- *   shimmer   no movement. The element keeps its flat
- *             `background-color: var(--surface-subtle)` base, which this
- *             keyframe never touches, so the skeleton stays a flat approved
- *             surface with no moving gradient.
+ *   shimmer   movement stops — and that alone is NOT the flat skeleton.
+ *             A frozen `background-position` still paints the 200%-wide
+ *             image, leaving a static ramp from `--surface-subtle` to
+ *             `--surface`. Reaching the approved flat surface takes a
+ *             second declaration the consumer owns: it MUST also set
+ *             `background-image: none` under the same media query, on the
+ *             element that carries the shimmer background. Removing the
+ *             image is what lets the already-applied
+ *             `background-color: var(--surface-subtle)` remain as the flat
+ *             static skeleton. The obligation is mandatory and its value is
+ *             fixed — only the selector is application-owned (owner ruling,
+ *             2026-09-28, Route A; ADR 0004 §8.1).
  *   fade-up   `opacity: 1` / `translateY(0)` — its approved end state.
  *   slide-up  `translateY(0)` — its approved end state.
  *   spin      `rotate(0deg)` — the resting state, which ADR 0004 §8.4 records
