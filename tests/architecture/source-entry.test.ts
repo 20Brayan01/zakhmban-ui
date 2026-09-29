@@ -94,6 +94,24 @@ describe("source entry", () => {
     }
   });
 
+  it("admits only approved non-TypeScript assets, and only under src/styles/fonts/", () => {
+    // Styles v0.2.0 brings the first binary into src/. It is package payload
+    // a consumer installs verbatim, so the inventory is an allow-list rather
+    // than a convention: exactly the font binary and its licence, exactly in
+    // the directory ADR 0003 §16 names. An asset anywhere else, or of any
+    // other type, is something nobody reviewed reaching four applications.
+    for (const file of walk(srcDir)) {
+      if (/\.(ts|tsx|css)$/.test(file)) {
+        continue;
+      }
+      const relative = file.slice(srcDir.length + 1);
+      expect(
+        /^styles\/fonts\/[^/]+\.(woff2|txt)$/.test(relative),
+        `src/${relative} is not an approved package asset`,
+      ).toBe(true);
+    }
+  });
+
   it("keeps every stylesheet under src/tokens/ or src/styles/", () => {
     // ADR 0003 §18: the blanket .css prohibition is replaced by a placement
     // rule. Token CSS is authored under src/tokens/; the public stylesheet

@@ -1,0 +1,192 @@
+/**
+ * Keyframes — authored Styles CSS. This file is a source of truth.
+ *
+ * ADR 0004 freezes exactly four public `@keyframes` identifiers and the owner
+ * decision of 2026-09-25 fixes their behaviour. A fifth is prohibited without
+ * a new decision (v0.2 §2.4: "Four keyframes exist and no more").
+ *
+ * ADR 0004 §4: these are AUTHORED Styles CSS, not generated token output.
+ * `scripts/generate-tokens.mjs` neither reads nor validates them, no keyframe
+ * appears in the typed token object, and ADR 0004 §7 authorizes NO
+ * `--animate-*` Tailwind key — the preset is unchanged.
+ *
+ * ADR 0004 §2: the `zakhmban-` prefix is load-bearing. CSS `@keyframes`
+ * identifiers are global to the document and collide silently, so an
+ * unprefixed `spin` arriving from any other stylesheet would replace the
+ * package's definition with no build error and no runtime warning.
+ *
+ * WHAT A CONSUMER PAIRS WITH EACH KEYFRAME
+ *
+ * A `@keyframes` block holds frames only. Duration, timing function and
+ * iteration are applied by the element, and in v0.2.0 that element is always
+ * application-owned: Skeleton, Modal and the loading indicator are Tier 2
+ * (v0.2 §9), and BottomSheet is a v0.3.0 primitive. The contracts below are
+ * therefore the pairing each consumer owes, quoted from ADR 0004 §8.
+ *
+ *   zakhmban-shimmer   var(--duration-shimmer) linear infinite
+ *                      background-color: var(--surface-subtle)
+ *                      background-image: linear-gradient(
+ *                        90deg,
+ *                        var(--surface-subtle) 0%,
+ *                        var(--surface) 50%,
+ *                        var(--surface-subtle) 100%
+ *                      )
+ *                      background-size: 200% 100%
+ *                      background-repeat: no-repeat
+ *                      @media (prefers-reduced-motion: reduce)
+ *                        background-image: none
+ *
+ * Every declaration above is APPLIED BY THE CONSUMER, not by this package.
+ * This package publishes the keyframe bodies below and nothing else: it ships
+ * no Skeleton class and no component selector, because v0.2 §9 makes Skeleton
+ * Tier 2 and frozen §2.1 limits this package to five primitives.
+ *
+ *   zakhmban-fade-up   var(--duration-base) var(--easing-standard) 1
+ *   zakhmban-slide-up  var(--duration-slow) var(--easing-standard) 1
+ *   zakhmban-spin      1000ms linear infinite
+ *
+ * `background-repeat: no-repeat` is mandatory and the CSS default `repeat` is
+ * NOT conforming. With `background-size: 200% 100%` the image is twice the
+ * element's width, so CSS resolves `200%` to an offset of -2W and `-200%` to
+ * +2W: a 4W sweep against a 2W tile. Un-repeated, the single central
+ * highlight enters and leaves the element exactly once per cycle. Tiled, a
+ * second copy follows it and the element shimmers roughly twice.
+ *
+ * `background-color: var(--surface-subtle)` is the permanent base fill and a
+ * declaration in its own right, not merely the gradient's `0%` and `100%`
+ * stops: a 200%-wide `no-repeat` image is partly or wholly outside the
+ * painting area for most of the cycle, and without the base colour the
+ * skeleton would fall through to whatever sits behind it.
+ *
+ * Shimmer's movement is expressed in physical coordinates and is INVARIANT
+ * under document direction — it is not mirrored for RTL.
+ *
+ * 1000ms for `zakhmban-spin` is an owner-approved authored value and is
+ * deliberately NOT a token; the three-duration token set is not reopened.
+ * `linear` for shimmer and spin is the owner's scoped supersession of v0.2
+ * §2.4's single-curve rule, for those two keyframes only — every transition
+ * and both one-shot keyframes keep `--easing-standard`.
+ *
+ * REPETITION. fade-up and slide-up are one-shot transitions. shimmer and spin
+ * may repeat ONLY while communicating a real loading or in-progress state,
+ * must stop when that state ends, and must not be used as permanent
+ * decoration. Functional progress feedback is not decorative looping;
+ * permanent, ambient or ornamental looping remains prohibited.
+ *
+ * END STATE. ADR 0004 §6: each keyframe ends in the element's normal static
+ * end state, which is what makes the reduced-motion block below leave the end
+ * state rather than strand the start state.
+ */
+
+@keyframes zakhmban-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes zakhmban-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zakhmban-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes zakhmban-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/**
+ * Reduced motion — D-5, refined by the owner decision of 2026-09-25.
+ *
+ * Each package-owned keyframe is REDEFINED to its static end state, so an
+ * element that uses one stops moving while every other property it carries is
+ * untouched — which is why shimmer needs the consumer declaration recorded
+ * below: this package deliberately does not reach the element's
+ * `background-image`. Suppression is therefore exact:
+ *
+ *   - it reaches only the four package-owned keyframes, so consumer-owned
+ *     animation remains the consumer's responsibility unless it invokes one
+ *     of these names;
+ *   - no `!important`, no `*` selector and no blanket `animation: none`,
+ *     either of which would reach past the package's own surface;
+ *   - NO ultra-short-duration workaround. A forced near-zero duration runs
+ *     the animation rather than suppressing it, and the ruling prohibits it.
+ *
+ * Each redefinition is the approved static state, not a new design choice:
+ *
+ *   shimmer   movement stops — and that alone is NOT the flat skeleton.
+ *             A frozen `background-position` still paints the 200%-wide
+ *             image, leaving a static ramp from `--surface-subtle` to
+ *             `--surface`. Reaching the approved flat surface takes a
+ *             second declaration the consumer owns: it MUST also set
+ *             `background-image: none` under the same media query, on the
+ *             element that carries the shimmer background. Removing the
+ *             image is what lets the already-applied
+ *             `background-color: var(--surface-subtle)` remain as the flat
+ *             static skeleton. The obligation is mandatory and its value is
+ *             fixed — only the selector is application-owned (owner ruling,
+ *             2026-09-28, Route A; ADR 0004 §8.1).
+ *   fade-up   `opacity: 1` / `translateY(0)` — its approved end state.
+ *   slide-up  `translateY(0)` — its approved end state.
+ *   spin      `rotate(0deg)` — the resting state, which ADR 0004 §8.4 records
+ *             as visually equivalent to the 360deg end frame.
+ *
+ * No content, control or status may become unavailable when motion is
+ * suppressed: a loading state stays perceivable through the `aria-busy`
+ * region and its single announcement that v0.2 §6 already requires.
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes zakhmban-shimmer {
+    from,
+    to {
+      background-position: 0 0;
+    }
+  }
+
+  @keyframes zakhmban-fade-up {
+    from,
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes zakhmban-slide-up {
+    from,
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes zakhmban-spin {
+    from,
+    to {
+      transform: rotate(0deg);
+    }
+  }
+}

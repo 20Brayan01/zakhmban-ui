@@ -8,14 +8,16 @@
  * change produces a one-line artifact change. A bundler would also be a second
  * tool whose determinism `pnpm verify:dist` has to trust.
  *
- * Steps: generate the derived token artifacts, clear dist/, compile, copy CSS.
+ * Steps: generate the derived token artifacts, clear dist/, compile, copy the
+ * Styles assets.
  *
  * The generator runs first and before `tsc`, because `src/tokens/index.ts` is
  * its output and the compiler's input (UI System Specification v0.2 §2's
- * strict order; ADR 0003 §14). The CSS copy runs last: `tsc` emits only
+ * strict order; ADR 0003 §14). The asset copy runs last: `tsc` emits only
  * TypeScript, and ADR 0003 §15 requires each authored stylesheet to reach
  * dist/ byte-for-byte at the same relative path, so a URL authored in src/
- * resolves identically in dist/.
+ * resolves identically in dist/. The font binary and its licence travel the
+ * same path for the same reason.
  *
  * The icon generator is added to this file by the commit that introduces it.
  */
@@ -28,13 +30,24 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const src = join(root, "src");
 const dist = join(root, "dist");
 
-function stylesheets(dir) {
+/**
+ * The file types `src/` may contribute to `dist/`, as an explicit allow-list
+ * rather than a pattern. `.css` is the authored stylesheet; `.woff2` is the
+ * approved font binary and `.txt` its OFL licence, which ADR 0003 §16 places
+ * under `src/styles/fonts/` so the `@font-face` URL never crosses a
+ * directory. Anything else is not package payload and is not copied.
+ */
+const COPIED_EXTENSIONS = [".css", ".woff2", ".txt"];
+
+function assets(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      return stylesheets(full);
+      return assets(full);
     }
-    return entry.name.endsWith(".css") ? [full] : [];
+    return COPIED_EXTENSIONS.some((extension) => entry.name.endsWith(extension))
+      ? [full]
+      : [];
   });
 }
 
@@ -58,8 +71,8 @@ execFileSync(
   { cwd: root, stdio: "inherit" },
 );
 
-const copied = stylesheets(src);
-console.log(`[build] copying ${copied.length} stylesheet(s) to dist/`);
+const copied = assets(src);
+console.log(`[build] copying ${copied.length} asset(s) to dist/`);
 for (const file of copied) {
   const target = join(dist, relative(src, file));
   mkdirSync(dirname(target), { recursive: true });

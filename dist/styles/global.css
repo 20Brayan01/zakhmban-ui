@@ -1,0 +1,78 @@
+/**
+ * Global body defaults and the focus indicator — authored Styles CSS. This
+ * file is a source of truth.
+ *
+ * Styles Foundation v0.2.0 Contract Ruling, 2026-09-24, D-2 and D-3.
+ *
+ * Every value resolves through an existing public token. No token is created
+ * here, no raw colour literal appears, and no raw-palette or `--_` source is
+ * referenced — Decision 1 constraint 2 forbids reaching past the semantic
+ * layer.
+ *
+ * D-2 excludes, deliberately: global `font-variant-numeric` (v0.2 §2.2 scopes
+ * tabular figures to money, dimensions, scores, countdowns and codes, which is
+ * a component concern), `-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
+ * `text-rendering`, forced `direction`, forced `lang`, dark-mode rules, and
+ * responsive or container rules.
+ *
+ * Direction ownership is unchanged: v0.2 §5 sets `dir="rtl"` and `lang="fa"`
+ * once on the document, and the font ruling assigns framework document/head
+ * integration to applications. The package must not set `direction: rtl`.
+ * Every rule here is written with logical properties; no physical `left` or
+ * `right` appears in package CSS.
+ */
+
+body {
+  font-family: var(--font-ui);
+
+  /* Owner Font Contract and Delivery Ruling: browser-synthesised weight is
+   * prohibited, and disabling it belongs to the Styles contract rather than
+   * to the `@font-face` block — `font-synthesis` is a normal property, not a
+   * descriptor. With the 400–700 descriptor range in `fonts.css`, a request
+   * outside that range clamps to a real weight instead of being faked. */
+  font-synthesis: none;
+
+  background: var(--background);
+  color: var(--text-primary);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line-height);
+  font-weight: var(--text-body-weight);
+
+  /* v0.2 §2.2, stated verbatim: "`text-wrap: pretty` on body". */
+  text-wrap: pretty;
+}
+
+/**
+ * D-3 · the focus indicator.
+ *
+ * Decision 3b fixed the value on 2026-09-15 — CONTROL -> 2px WHITE -> 2px
+ * NAVY -> PAGE, worst adjacency 3.94:1 — and D-3 fixes how it is applied.
+ *
+ * Both layers are PAINTED. A transparent `outline-offset` gap is not an
+ * acceptable representation of the white layer: a gap shows the page through,
+ * so on `--surface-subtle` or any approved soft tint the "white" layer would
+ * not be white and Decision 3b's contrast evidence would not hold. Two
+ * box-shadow rings paint both.
+ *
+ * The four widths and colours are the only inputs, exactly as D-3 requires.
+ * The outer ring's radius is the inner width plus the outer width, so the two
+ * rings sit flush and the outer one reads as 2px against the page.
+ *
+ * `outline: none` appears ONLY inside this rule, which installs the visible
+ * replacement in the same declaration block. There is no global
+ * `:focus:not(:focus-visible) { outline: none }`, and focus is never removed
+ * without an immediately effective approved replacement.
+ *
+ * Package-owned Styles and primitives must not introduce an `overflow:
+ * hidden` ancestor that would clip this indicator.
+ */
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--focus-indicator-inner-width) var(--focus-indicator-inner-color),
+    0 0 0
+      calc(
+        var(--focus-indicator-inner-width) + var(--focus-indicator-outer-width)
+      )
+      var(--focus-indicator-outer-color);
+}

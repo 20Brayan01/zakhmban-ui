@@ -209,7 +209,12 @@ loading indicator cannot be suppressed the same way:
   animation has no end frame to land on, so each carries an **explicitly
   documented static fallback** in §8 instead: a flat
   `var(--surface-subtle)` skeleton surface, and a non-rotating indicator at
-  its `0deg` resting state.
+  its `0deg` resting state. **For shimmer that fallback is reached by two
+  declarations, not one** — the package's conditional static keyframe stops
+  the movement, and the consumer that owns the shimmer surface must also set
+  `background-image: none` under the same media query, which §8.1 states in
+  full. `zakhmban-spin` needs no consumer declaration: `rotate(0deg)` is
+  itself the resting appearance.
 - **No ultra-short-duration workaround** is permitted, in either shape.
 - **No content, control or status may become unavailable when motion is
   suppressed.** A loading state must still be perceivable — through the
@@ -311,10 +316,38 @@ decision.
   merely the gradient's `0%` and `100%` colour stops.
 - **It must stop when loading ends.**
 - **It must not be used as permanent decoration.**
-- **Reduced-motion fallback:** no animation and no moving gradient; **the
-  same `background-color: var(--surface-subtle)` remains as the flat static
-  skeleton surface**. Nothing further needs deciding at implementation time —
-  suppressing the animation leaves the base fill already in place.
+- **Reduced-motion fallback — corrected by owner ruling, 2026-09-28
+  (Route A).** It takes **two** declarations, one on each side of the
+  package boundary, and the earlier wording of this bullet was wrong to
+  imply the second was unnecessary.
+
+  1. **The package** publishes the conditional static `@keyframes
+     zakhmban-shimmer` in `src/styles/keyframes.css`, which **stops the
+     movement**.
+  2. **The application-owned consumer** that applies the shimmer surface —
+     `Skeleton` / `SkeletonCard`, Tier 2 under v0.2 §9 — **must also set
+     `background-image: none` under `@media (prefers-reduced-motion:
+     reduce)`** on the same element that carries the shimmer background.
+
+  **Stopping the movement does not remove the gradient.** A frozen
+  `background-position` still paints the 200%-wide image, so the element
+  would show a static ramp from `--surface-subtle` to `--surface` rather
+  than a flat surface. Only removing the image lets the already-applied
+  **`background-color: var(--surface-subtle)` remain as the flat static
+  skeleton**.
+
+  **The consumer obligation is mandatory, not optional**, and **its value is
+  fully decided**: the property is `background-image`, the value is `none`,
+  and the media query is `prefers-reduced-motion: reduce`. **No consumer
+  design choice remains** — **only the selector is application-owned**,
+  because it names an element this package does not ship.
+
+  **The package ships no Skeleton class and no component selector**, and
+  **no package selector or public class is authorized** to carry this: v0.2
+  §9 makes Skeleton Tier 2, frozen §2.1 limits the package to five
+  primitives, and the Scoped Sign-off §6 does not authorize container or
+  component classes. **No `animation-duration` workaround and no `0.01ms`
+  workaround is permitted** on either side.
 - **Unchanged by this correction:** the gradient, `background-position: 200%
   0 → -200% 0`, `background-size: 200% 100%`,
   `var(--duration-shimmer)` at 1400ms, `linear` timing, the physical

@@ -1,0 +1,44 @@
+/**
+ * Reset — authored Styles CSS. This file is a source of truth.
+ *
+ * Styles Foundation v0.2.0 Contract Ruling, 2026-09-24, D-1: three rules and
+ * no more. A small authored reset is approved; no dependency-based reset is.
+ * normalize.css, modern-normalize and Josh Comeau's complete reset are each
+ * explicitly not authorized, as are media-element defaults, list-style
+ * removal, heading or paragraph typography resets, link styling, image
+ * display/max-width rules, border removal, form appearance resets, button
+ * background or cursor rules and blanket min-width rules.
+ *
+ * Each rule is load-bearing, and the ruling records why:
+ *
+ *   1 · every approved control-geometry token — 44, 48, 52, 56, 64px — is a
+ *       border-box measurement. Under the browser default a 52px button with
+ *       padding is not 52px.
+ *   2 · v0.2 §2.3: "Spacing is applied with flex/grid `gap`, never
+ *       per-element margins." User-agent default margins are per-element
+ *       margins.
+ *   3 · v0.2 §2.2 binds `--text-button` weight 600 to "All button labels". A
+ *       user-agent default control font defeats that before any component
+ *       runs.
+ *
+ * Nothing else belongs to the v0.2.0 reset unless separately authorized.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
