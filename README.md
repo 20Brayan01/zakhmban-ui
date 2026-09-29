@@ -14,15 +14,15 @@ string.
 place, and the first three capability areas have shipped. Every remaining
 capability arrives in its own commit.
 
-| Area                                                                     | State                                                                                        |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                                     |
-| Formatting utilities (`./utils/format`)                                  | shipped                                                                                      |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                                                                      |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                            |
-| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — in the source tree on `main`; **supported consumption is a pin to a `v0.2.0` tag** |
-| Icons · the five primitives · overlay-root and Portal                    | not yet — allocated `v0.3.0`                                                                 |
-| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                                         |
+| Area                                                                     | State                                                                              |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                           |
+| Formatting utilities (`./utils/format`)                                  | shipped                                                                            |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                                                            |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                  |
+| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); consume it by pinning that tag |
+| Icons · the five primitives · overlay-root and Portal                    | not yet — allocated `v0.3.0`                                                       |
+| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                               |
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -87,30 +87,32 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.1.0` is the Token Foundation release and
-is used here as the worked example, not as a standing recommendation** — pin
-whichever tag carries the capability the application needs, and check
+Consumers install from a tag. **Styles Foundation is released as `v0.2.0`**,
+and that is the tag the supported Styles installation pins — pin whichever tag
+carries the capability the application needs, and check
 `git ls-remote --tags origin` for what exists:
 
 ```jsonc
-"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.1.0"
+"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.2.0"
 ```
 
-**Styles Foundation is implemented in the source tree on `main`**, and the
-manifest is versioned **`0.2.0`** for it. **The supported, versioned way to
-consume it is a pin to an annotated `v0.2.0` tag** (as of **2026-09-29** no
-such tag exists, so the newest released tag is `v0.1.0` —
-`git ls-remote --tags origin` is the current answer). No GitHub Release
-object and no npm publication exists for any version — the tag _is_ the
-release under frozen §2.2. **Icons, the five primitives and the
-overlay-root/Portal technique have not begun** and remain allocated to
-`v0.3.0`.
+**Styles Foundation is released as `v0.2.0`.** It is an **annotated tag**,
+created by the owner-triggered Release workflow and pointing at commit
+**`bd495bf493c519334a2525588d8d80edb0c6ac68`**; the run validated that commit
+and the tag was read back from the remote and confirmed to be annotated and to
+point at it. **The supported, versioned way to consume Styles is a pin to
+`v0.2.0`.** As with `v0.1.0`, **no GitHub Release object and no npm
+publication exists** — the tag _is_ the release under frozen §2.2.
+`git ls-remote --tags origin` is the live answer to what exists. **Icons, the
+five primitives and the overlay-root/Portal technique have not begun** and
+remain allocated to `v0.3.0`.
 
-**What `@zakhmban/ui/styles` carries depends on which ref you read.** Current
-`main` carries the approved font delivery, the three-rule reset, the body
-defaults, the `:focus-visible` rings and the four keyframes. **The released
-`v0.1.0` tag still carries its original token-only Styles surface** and is
-unchanged by any of this.
+**What `@zakhmban/ui/styles` carries depends on which tag you pin.** The
+**`v0.2.0` tag** carries the token CSS **and** the Styles layer: the approved
+font delivery, the three-rule reset, the body defaults, the `:focus-visible`
+rings and the four keyframes. **The `v0.1.0` tag is the earlier, historical
+Token Foundation release; its `./styles` surface is token-only** — it predates
+Styles and is unchanged by the `v0.2.0` release.
 
 Where the design values stand, precisely:
 
@@ -122,10 +124,11 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. Its consumer relationship has been **audited**: it
-  declares no `@zakhmban/ui` dependency yet, holds no local substitute and
-  needs no legacy annotation. Integration waits for a published, tagged
-  release.
+  Therapist application. As verified on **2026-09-30**, it pins
+  `github:20Brayan01/zakhmban-ui#v0.1.0` and **has not yet migrated to Styles
+  `v0.2.0`**, so it still receives the token-only `./styles` surface.
+  Migrating it is a separate change in that repository, not part of this
+  package; its own `package.json` is the live answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
   ecosystem**, not the Therapist consumer. Their Phase 1 design-system legacy
   annotations are **valid** and exist in **local, unpushed** documentation
@@ -137,27 +140,26 @@ Where the design values stand, precisely:
   generated typed object and Tailwind artifact, and the three public
   subpaths. It is **tagged and released as `v0.1.0`** through the
   owner-triggered tag workflow.
-- **Styles Foundation is implemented in the source tree on `main`** — the
+- **Styles Foundation is implemented and released as `v0.2.0`** — the
   approved Vazirmatn `@font-face` and its binary, the D-1 reset, the D-2 body
   defaults, the D-3 `:focus-visible` rings and the four D-4 keyframes with
-  their D-5 reduced-motion definitions. The manifest is versioned **`0.2.0`**
-  for it; **the supported consumption path is a pin to a `v0.2.0` tag** once
-  that tag exists.
+  their D-5 reduced-motion definitions. **The supported consumption path is a
+  pin to the annotated `v0.2.0` tag.**
 - The **Typography Alias Ruling** (2026-09-19) fixes each of the eight
   typography aliases as a **Semantic Typography Size Alias**, authored
   `--text-<step>: var(--text-<step>-size)`. It changed no identifier, no
   value and no count, and required no correction to the implementation.
 - **Implementation and publication authorizations are recorded canonically**
   (2026-09-19 and 2026-09-20), and sign-off condition 3 is discharged.
-- **Nothing has been tagged or released**, no package has been published, and
-  no consumer repository has been changed.
+- **No package has been published to npm and no GitHub Release object exists**
+  for any version — the annotated tags are the releases.
 - **`pnpm smoke:tailwind` is a required gate in the pre-tag and post-tag
   validation modes**, guarded by `release-gate.test.ts`. ADR 0001's obligation was already
   discharged by the implementing commit; the workflow makes the proof
   repeatable and, in the manual mode, genuinely pre-tag.
-- **The first tag needs three things**: this branch reviewed and merged, a
-  separate owner-reviewed version-bump pull request, and the owner starting
-  the workflow with the approved version and SHA.
+- **A release tag needs the change reviewed and merged to `main`, the manifest
+  version bumped, and the owner starting the workflow** with the approved
+  version and exact SHA (see Releasing).
 
 The record is `docs/architecture/token-table-ratification.md`, with precedence
 in `docs/architecture/canonical-document-registry.md`.
@@ -166,12 +168,14 @@ in `docs/architecture/canonical-document-registry.md`.
 
 The package is installed as an external dependency pinned to an **exact git
 tag**, never a range, never `workspace:`, never `file:` or `link:`. The tag
-below is the **Token Foundation** release, shown as the form the pin takes;
-substitute the tag that carries the capability the application needs.
+below is the **Styles Foundation** release, `v0.2.0`, which carries the Styles
+layer; substitute a later tag only when it carries a capability the
+application needs. (`v0.1.0` is the earlier Token Foundation release, whose
+`./styles` surface is token-only.)
 
 ```jsonc
 "dependencies": {
-  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.1.0"
+  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.2.0"
 }
 ```
 
@@ -211,13 +215,13 @@ Declared subpaths, and what each ships today. The list below is the
 `exports` map in `package.json`; `exports-contract.test.ts`, `root-export.test.ts`
 and `format-export.test.ts` fail the build if either drifts.
 
-| Subpath                               | Ships today                                                                                                                                                                                                                               |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` — the two ADR 0002 capabilities, and nothing else                                                                                                                                    |
-| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                        |
-| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. On current `main` it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The released `v0.1.0` tag carries the token CSS only |
-| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                          |
-| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                              |
+| Subpath                               | Ships today                                                                                                                                                                                                                                   |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` — the two ADR 0002 capabilities, and nothing else                                                                                                                                        |
+| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                            |
+| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. At the `v0.2.0` tag it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The historical `v0.1.0` tag carries the token CSS only |
+| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                              |
+| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                  |
 
 These four are the whole of the public surface. There is no fifth subpath and
 no `@zakhmban/ui/fonts`: font binaries are internal assets referenced by
@@ -244,21 +248,22 @@ gets every token:
 @import "@zakhmban/ui/styles";
 ```
 
-**What that import provides depends on the ref.** On current `main` it
-provides the approved token custom properties **and** the Styles layer: the
-Vazirmatn `@font-face`, the reset, the body defaults, the `:focus-visible`
-rings, the four keyframes and their reduced-motion definitions. **At the
-released `v0.1.0` tag it provides the token custom properties and nothing
-else** — that tag predates Styles and is unchanged.
+**What that import provides depends on the tag you pin.** At the **`v0.2.0`
+tag** it provides the approved token custom properties **and** the Styles
+layer: the Vazirmatn `@font-face`, the reset, the body defaults, the
+`:focus-visible` rings, the four keyframes and their reduced-motion
+definitions. **At the historical `v0.1.0` tag (Token Foundation) it provides
+the token custom properties and nothing else** — that tag predates Styles and
+is unchanged.
 
-**Being in the source tree is not the same as being released.** The Styles
-layer is in `main` and the manifest is versioned `0.2.0` for it, but frozen
-§2.2 and v0.2 §7.3 fix consumption at an **exact tag** — never a range, never
+**Being in the source tree is not the same as being released.** Frozen §2.2
+and v0.2 §7.3 fix consumption at an **exact tag** — never a range, never
 `workspace:`, never `file:` or `link:`. **The supported way to consume the
-Styles layer is therefore a pin to a `v0.2.0` tag once it exists**; a raw
-commit SHA is technically resolvable by git but is **not a released version
-and is not the supported path**. As of **2026-09-29** the newest released tag
-is `v0.1.0`, whose Styles surface is token-only.
+Styles layer is a pin to the annotated `v0.2.0` tag**, which points at commit
+`bd495bf493c519334a2525588d8d80edb0c6ac68`; a raw commit SHA is technically
+resolvable by git but is **not a released version and is not the supported
+path**. Later work on `main` is not released until a later tag carries it —
+`git ls-remote --tags origin` is the live answer.
 
 The allocation, corrected 2026-09-25 by the Styles Foundation v0.2.0 Contract
 Ruling's **D-6**:
@@ -298,9 +303,12 @@ is in ADR 0004 §8.1 and the Token Table §2.1 (owner ruling, 2026-09-28).
 degrades an accessibility path silently.
 
 **Carry this as an explicit item on the future `zakhmban-therapists`
-migration / Skeleton checklist.** That repository still pins `v0.1.0`, has no
-Skeleton, and is **not modified by this package's work**; when a real Skeleton
-is built there, its reduced-motion rule must be tested in that repository.
+migration / Skeleton checklist.** The obligation is **future-facing**: as
+verified on 2026-09-30 that repository pins `v0.1.0`, has not migrated to
+Styles `v0.2.0` and has no Skeleton or shimmer, so it has nothing to satisfy
+yet. It is **not modified by this package's work**; it becomes live when that
+repository both moves to a tag that carries the shimmer keyframe and builds a
+Skeleton, and its reduced-motion rule must then be tested in that repository.
 
 ### Rendered verification — what was checked, and one observation
 
@@ -378,7 +386,7 @@ pnpm install
 Releases are **owner-triggered**. The owner runs the **Release** workflow from
 the Actions tab and supplies:
 
-- `version` — `0.1.0`, with **no** leading `v`, and it must already equal the
+- `version` — for example `0.2.0`, with **no** leading `v`, and it must already equal the
   `version` in `package.json` on `main`;
 - `commit_sha` — the exact 40-character lowercase SHA of the `main` tip.
 
