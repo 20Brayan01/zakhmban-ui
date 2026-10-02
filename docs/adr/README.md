@@ -61,6 +61,7 @@ read it rather than inferring an order from this file.
 | [0002](0002-validation-helpers-contract.md) | Validation Helpers Public Contract | Accepted | 2026-09-13 |
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
 | [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
+| [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | **Proposed** | 2026-10-02 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
 Table had accumulated — names, CSS custom properties, TypeScript exports,
@@ -96,6 +97,55 @@ position are unchanged; **no token was created**. The §8 values are the
 owner's, recorded verbatim — including two deliberately narrow supersessions
 of v0.2 §2.4 that belong to the owner and not to the ADR. **Implementation
 remains unauthorized and is a separate task.**
+
+**ADR 0005 is proposed, not accepted.** It is the first documentation step of
+the `v0.3.0` allocation — **Icons and the five primitives** — and covers
+**Icons only**. It records how the Icon abstraction that UI System
+Specification v0.2 §3.1, §5, §7 and §9 already decide is **represented**:
+a generated, committed, parity-checked glyph registry carrying an explicit
+per-glyph mirroring flag; Lucide glyph data obtained by a **build-time
+generator from an exactly-pinned devDependency**, so `dependencies` stays
+`{}` and no consumer gains a transitive dependency; the vendored ISC licence
+notice travelling beside the artifact on the `OFL.txt` precedent; and `Icon`,
+`IconProps` and `IconName` reaching consumers through the **existing root
+entry with no fourth public subpath**. It proposes an **eleven-name initial
+inventory** under two stated admission rules — canonical evidence for the
+glyph, and a specified surface that consumes it — recording per name whether
+that evidence is a **named** glyph or a **surface that requires one**, and it
+**makes no claim about the future ZakhmBan glyph set** of v0.2 §9 unknown 4.
+Its §3 is explicit that **no Lucide package is installed or locked in this
+repository**, so the upstream distribution, its data shape and its licence
+text are **implementation facts to establish, not findings**: the ADR states
+a verbatim-copy rule and claims no licence has been copied or verified.
+
+**§1.1 settles the Icon colour question without an owner decision.** v0.2
+§3.1's approved prop list is `name†` `size` `color` `strokeWidth` — no `tone`,
+unlike Text, Button, StatusBadge and IconButton — so the initial Icon defines
+only the **bound navy default** (`--text-primary`, per the Token Table) and
+takes every other colour from the **use site** through `color`. A semantic
+active/destructive mapping is therefore **not required by the initial API**
+and is left as a **future owner decision**; owner finding **IA-6** already
+records that §3.1's contract *"names navy, green and red only"* with no icon
+role bound to the latter two, and scopes that gap to **InfoBanner and
+ErrorBanner** — Tier 2 — so **no Tier 1 primitive is blocked**. §5 additionally
+records the **raw-palette usage guard** that finding **IA-5** makes due with
+the first component implementation commit.
+
+It also reconciles the `react` / `react-dom` **peer timing**: v0.2 §7 and
+§7.2 state the peer relationship unconditionally and name no trigger, while
+`ARCHITECTURE.md`'s unguarded C1 row and `vitest.config.ts`'s comment both
+forecast "the first primitive". §6 reads the operative rationale — *"the
+package's code needs nothing at this commit"* — as the trigger, notes that
+v0.2 §9 lists Icon as a **Foundation** rather than a primitive, and treats the
+wording as a **correction owed to two subordinate documents** rather than a
+rule to reinterpret silently. A peer dependency is not a runtime dependency,
+and **the zero-runtime-dependency rule is unchanged**.
+
+It **creates no design value**, **invents nothing for the deferred
+decisions** — the overlay-root/Portal technique, the Button `sm`
+40-versus-44 geometry and the pill radius are each left exactly as the owner
+left them — and **nothing is implemented by it**: no source file, generator,
+licence file, manifest change, guard change or export change accompanies it.
 
 ## Format
 
