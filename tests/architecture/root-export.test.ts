@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 const manifest: Record<string, unknown> = JSON.parse(
@@ -16,11 +18,46 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the two ADR 0002 capabilities, and nothing else", async () => {
+  it("exports exactly the ADR 0002 and ADR 0005 capabilities, and nothing else", async () => {
     const entry = await import("@zakhmban/ui");
     expect(Object.keys(entry).sort()).toEqual(
-      ["isValidIranianNationalId", "normalizeIranianMobile"].sort(),
+      ["Icon", "isValidIranianNationalId", "normalizeIranianMobile"].sort(),
     );
+  });
+
+  it("renders a real glyph through the built artifact, not just the source", async () => {
+    // tests/icons/ covers behaviour against src/. This proves the compiled
+    // artifact a consumer actually installs renders the same thing — the
+    // half a source-only test cannot reach.
+    const { Icon } = await import("@zakhmban/ui");
+    const markup = renderToStaticMarkup(createElement(Icon, { name: "back" }));
+
+    expect(markup).toContain('viewBox="0 0 24 24"');
+    expect(markup).toContain('stroke="var(--text-primary)"');
+    expect(markup).toContain('stroke-width="1.8"');
+    expect(markup).toContain('aria-hidden="true"');
+    expect(markup).toContain('<g transform="translate(24, 0) scale(-1, 1)">');
+    expect(markup).toContain('d="m15 18-6-6 6-6"');
+  });
+
+  it("publishes no runtime glyph list and no registry", async () => {
+    // ADR 0005 §4: the registry object, the glyph data and any runtime name
+    // array stay internal. A published list invites an application to iterate
+    // the set, which turns every later addition into a visible behaviour
+    // change. `IconName` is a type and carries no runtime key.
+    const entry: Record<string, unknown> = await import("@zakhmban/ui");
+    for (const leaked of [
+      "ICON_REGISTRY",
+      "iconNames",
+      "IconName",
+      "icons",
+      "registry",
+    ]) {
+      expect(
+        entry[leaked],
+        `${leaked} must not be a runtime export`,
+      ).toBeUndefined();
+    }
   });
 
   it("produces correct, real output when called through that same import", async () => {

@@ -19,7 +19,10 @@
  * resolves identically in dist/. The font binary and its licence travel the
  * same path for the same reason.
  *
- * The icon generator is added to this file by the commit that introduces it.
+ * The icon generator runs alongside the token generator and for the same
+ * reason: `src/icons/registry.ts` is its output and the compiler's input, and
+ * `src/icons/LUCIDE-LICENSE.txt` is a verbatim copy of the pinned upstream
+ * notice that the asset copy below then carries into dist/ (ADR 0005 §2, §3).
  */
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, rmSync } from "node:fs";
@@ -53,6 +56,12 @@ function assets(dir) {
 
 console.log("[build] generate-tokens");
 execFileSync(process.execPath, [join(root, "scripts", "generate-tokens.mjs")], {
+  cwd: root,
+  stdio: "inherit",
+});
+
+console.log("[build] generate-icons");
+execFileSync(process.execPath, [join(root, "scripts", "generate-icons.mjs")], {
   cwd: root,
   stdio: "inherit",
 });

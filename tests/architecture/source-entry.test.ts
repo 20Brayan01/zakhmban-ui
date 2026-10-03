@@ -24,35 +24,38 @@ describe("source entry", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the Validation Helpers capability, and nothing else", async () => {
-    // ADR 0002 (docs/adr/0002-validation-helpers-contract.md): the root
-    // barrel widens only by a reviewed diff. This is that diff's guard for
-    // the Validation Helpers commit — exactly these two names, no default
-    // export, and no fifth name arriving unnoticed alongside them.
+  it("exports exactly the Validation Helpers and Icon capabilities, and nothing else", async () => {
+    // ADR 0002 and ADR 0005: the root barrel widens only by a reviewed diff.
+    // `Icon` joined it with the Icon Foundation; `IconName` and `IconProps`
+    // are types and so have no runtime key here. No default export, and no
+    // further name arriving unnoticed alongside them.
     const entry = await import("../../dist/index.js");
     expect(Object.keys(entry).sort()).toEqual(
-      ["isValidIranianNationalId", "normalizeIranianMobile"].sort(),
+      ["Icon", "isValidIranianNationalId", "normalizeIranianMobile"].sort(),
     );
 
     const source = readFileSync(`${srcDir}/index.ts`, "utf8");
     expect(source).not.toMatch(/^export default\b/m);
   });
 
-  it("ships no component or icon at this commit", () => {
+  it("ships no primitive at this commit", () => {
     // The scope boundary, enforced rather than trusted. Each of these arrives
     // in its own commit with its own tests; none may ride along in a
     // foundation change.
     //
     // "tokens" and "tailwind" left this list with Token Foundation V1, which
     // ships src/tokens/ and the generated Tailwind artifact (ADR 0003 §18).
+    // "Icon" left it with the Icon Foundation, which the Icon Foundation
+    // Implementation Authorization of 2026-10-03 permits. The five frozen
+    // primitives stay — including `Select`, which this list had omitted.
     const files = walk(srcDir);
 
     for (const forbidden of [
       "Button",
       "TextField",
+      "Select",
       "OtpInput",
       "BottomSheet",
-      "Icon",
     ]) {
       expect(
         files.some((file) =>
@@ -63,10 +66,13 @@ describe("source entry", () => {
     }
 
     for (const file of files) {
+      if (!file.endsWith(".tsx")) {
+        continue;
+      }
       expect(
-        file.endsWith(".tsx"),
-        `${file} is a component — primitives land in their own commit`,
-      ).toBe(false);
+        file.startsWith(`${srcDir}/icons/`),
+        `${file} is a component outside src/icons/ — primitives land in their own commit`,
+      ).toBe(true);
     }
   });
 
@@ -94,19 +100,26 @@ describe("source entry", () => {
     }
   });
 
-  it("admits only approved non-TypeScript assets, and only under src/styles/fonts/", () => {
-    // Styles v0.2.0 brings the first binary into src/. It is package payload
-    // a consumer installs verbatim, so the inventory is an allow-list rather
-    // than a convention: exactly the font binary and its licence, exactly in
-    // the directory ADR 0003 §16 names. An asset anywhere else, or of any
-    // other type, is something nobody reviewed reaching four applications.
+  it("admits only approved non-TypeScript assets, at exactly two addresses", () => {
+    // Styles v0.2.0 brought the first binary into src/; the Icon Foundation
+    // brings the second asset, the vendored Lucide notice. Package payload a
+    // consumer installs verbatim, so the inventory is an allow-list rather
+    // than a convention: the font binary and its licence in the directory
+    // ADR 0003 §16 names, and the glyph notice beside the registry it covers
+    // (ADR 0005 §3). An asset anywhere else, or of any other type, is
+    // something nobody reviewed reaching four applications.
+    const APPROVED_ASSETS = [
+      /^styles\/fonts\/[^/]+\.(woff2|txt)$/,
+      /^icons\/LUCIDE-LICENSE\.txt$/,
+    ];
+
     for (const file of walk(srcDir)) {
       if (/\.(ts|tsx|css)$/.test(file)) {
         continue;
       }
       const relative = file.slice(srcDir.length + 1);
       expect(
-        /^styles\/fonts\/[^/]+\.(woff2|txt)$/.test(relative),
+        APPROVED_ASSETS.some((pattern) => pattern.test(relative)),
         `src/${relative} is not an approved package asset`,
       ).toBe(true);
     }
