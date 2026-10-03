@@ -1,7 +1,23 @@
 # ADR 0005 — Icon Representation and Glyph Delivery Contract
 
-- **Status:** Proposed
-- **Date:** 2026-10-02
+- **Status:** Accepted
+- **Date:** 2026-10-02 · **accepted 2026-10-03** by the Icon Foundation
+  Implementation Authorization, which also authorizes a limited
+  implementation. **No clause of this ADR changes on acceptance**: the
+  representation contract, the eleven-name inventory, the mirroring flags and
+  every recorded deferral stand exactly as written.
+- **Upstream facts, verified before acceptance.** §3 deliberately recorded
+  three facts as unverified. They were checked read-only against
+  **`lucide@1.51.0`** (`license: ISC`; `dist.shasum`
+  `942068b228d8068baa1f302ad48b6d82cd4fae82`) and all three hold: every one of
+  the eleven approved glyphs exists as pure `[tag, attrs]` data under
+  `dist/esm/icons/`; the package-root `LICENSE` carries **both** the ISC
+  notice and the **Feather MIT** attribution in one file, so a single verbatim
+  copy covers the set; and the data supports a deterministic build-time
+  generator with **no runtime dependency**. **§3's stop rule is discharged.**
+  §3's expectation paragraph is therefore confirmed at that exact version and
+  is **no longer merely an expectation** — but it remains version-scoped, and
+  a later version must be re-checked rather than assumed.
 - **Scope:** the **representation** of the Icon abstraction whose existence,
   geometry, colour contract, API shape, accessibility default and
   registry-owned mirroring rule UI System Specification v0.2 already fixes —

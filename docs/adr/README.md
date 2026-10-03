@@ -61,7 +61,7 @@ read it rather than inferring an order from this file.
 | [0002](0002-validation-helpers-contract.md) | Validation Helpers Public Contract | Accepted | 2026-09-13 |
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
 | [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
-| [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | **Proposed** | 2026-10-02 |
+| [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | Accepted | 2026-10-02 · accepted 2026-10-03 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
 Table had accumulated — names, CSS custom properties, TypeScript exports,
@@ -98,7 +98,7 @@ owner's, recorded verbatim — including two deliberately narrow supersessions
 of v0.2 §2.4 that belong to the owner and not to the ADR. **Implementation
 remains unauthorized and is a separate task.**
 
-**ADR 0005 is proposed, not accepted.** It is the first documentation step of
+**ADR 0005 is accepted, 2026-10-03.** It is the first documentation step of
 the `v0.3.0` allocation — **Icons and the five primitives** — and covers
 **Icons only**. It records how the Icon abstraction that UI System
 Specification v0.2 §3.1, §5, §7 and §9 already decide is **represented**:
@@ -113,10 +113,26 @@ inventory** under two stated admission rules — canonical evidence for the
 glyph, and a specified surface that consumes it — recording per name whether
 that evidence is a **named** glyph or a **surface that requires one**, and it
 **makes no claim about the future ZakhmBan glyph set** of v0.2 §9 unknown 4.
-Its §3 is explicit that **no Lucide package is installed or locked in this
-repository**, so the upstream distribution, its data shape and its licence
-text are **implementation facts to establish, not findings**: the ADR states
-a verbatim-copy rule and claims no licence has been copied or verified.
+As written, its §3 was explicit that **no Lucide package was installed or
+locked in this repository**, so the upstream distribution, its data shape and
+its licence text were recorded as **implementation facts to establish, not
+findings** — the same discipline ADR 0003 and ADR 0004 applied to the values
+they could not derive.
+
+**Upstream verified before acceptance, 2026-10-03.** A read-only check against
+exactly pinned **`lucide@1.51.0`** (`license: ISC`; `dist.shasum`
+`942068b228d8068baa1f302ad48b6d82cd4fae82`) closed all three: **all eleven**
+approved glyphs exist as pure `[tag, attrs]` data under `dist/esm/icons/`;
+the package-root `LICENSE` carries **both** the ISC notice and the **Feather
+MIT** attribution in one file, so one verbatim copy covers the set; and the
+data supports a deterministic build-time generator with **no runtime
+dependency**. **§3's stop rule is discharged**, and **no name, mirroring flag,
+export, admission rule or deferral in the ADR changed** as a result. Two
+upstream renames are recorded rather than worked around: the glyphs behind
+`alert` and `trash` are canonically `circle-alert` and `trash` at this
+version, with `alert-circle` and `trash-2` surviving only as alias exports.
+The verification is **version-scoped** — a later Lucide version must be
+re-checked, not assumed.
 
 **§1.1 settles the Icon colour question without an owner decision.** v0.2
 §3.1's approved prop list is `name†` `size` `color` `strokeWidth` — no `tone`,

@@ -162,6 +162,7 @@ reference kit, a consumer implementation or an AI agent.**
 | ADR 0002 | `docs/adr/0002-validation-helpers-contract.md` | **Accepted** | Validation Helpers public contract |
 | ADR 0003 | `docs/adr/0003-token-representation-and-artifact-contract.md` | **Accepted** — 2026-09-18 | token representation and artifact contract |
 | ADR 0004 | `docs/adr/0004-styles-keyframe-representation-contract.md` | **Accepted** — 2026-09-24 · **behaviour resolved 2026-09-25** | the four public keyframe names, their ownership, publicity and versioning rules, and the owner-decided behavioural contract each carries |
+| ADR 0005 | `docs/adr/0005-icon-representation-contract.md` | **Accepted** — 2026-10-03 | the Icon registry's generated-and-committed representation and its per-glyph mirroring flag, the glyph-delivery method and licence rule, the eleven public names, and the root-export surface for `Icon` / `IconProps` / `IconName` |
 | `ARCHITECTURE.md` | repository root | pointer | where each rule lives |
 | `README.md` | repository root | orientation | consumption and commands |
 | `tests/architecture/README.md` | `tests/architecture/` | orientation | guard traceability |
@@ -187,6 +188,7 @@ in full in the Token Table.
 | **Token Foundation v0.1.0 Release-Sequence Ruling** | 2026-09-20 | allocates Token Foundation **v0.1.0**, Styles **v0.2.0**, Icons and the five primitives **v0.3.0**; Phase 6's **v1.0.0** target unchanged | **nothing in v0.2** — v0.2 §8's Phase 6 `v1.0.0` exit criterion is untouched. It supersedes only the two `README.md` roadmap placeholders (Styles → v0.1.0, Icons/primitives → v0.2.0), which were never ADR-frozen and never a consumer commitment. **No token, value, count, artifact or export changes.** |
 | **Styles Foundation v0.2.0 Contract Ruling** | 2026-09-24 | the **reset contract** (D-1), the **global body contract** (D-2), the **focus-visible contract** (D-3), the **reduced-motion contract** (D-5), and the **allocation of the overlay-root and Portal question to v0.3.0** (D-6). Keyframe naming (D-4) is delegated to **ADR 0004** as representation. | **nothing in v0.2** — v0.2 §7 places `reset, global, keyframes` under `styles/` but states no reset rule, no body rule and no focus mechanism, so there is nothing for this ruling to replace; where v0.2 does state a value (§2.2's `text-wrap: pretty`, §2.4's reduced-motion duty, §5's document-level direction ownership) the ruling **applies** it. It supersedes, **for the overlay-root technique only**, the Release-Sequence Ruling's sentence placing that technique in v0.2.0. **No token identifier, value, count, artifact or export changes.** |
 | **Styles Keyframe Behaviour and Procedural Ratification** | 2026-09-25 | **Part 1** procedurally ratifies the substantive content of local draft commit `6a6eae84`, clarifying that the disputed **STOP** barred inventing or silently filling undefined behavioural values and required implementation to stay blocked, but did not bar documenting the gap or creating the local draft. **Part 2** supplies the exact behavioural contract for all four keyframes — start and end frames, durations, timing functions, iteration, RTL invariance, static fallbacks — plus the repetition rule and a refined reduced-motion rule. | **two scoped clauses of v0.2 §2.4**, and nothing else: the single-curve statement is superseded **for `zakhmban-shimmer` and `zakhmban-spin` only**, which use `linear`; and the closed three-duration set is supplemented by **1000ms for `zakhmban-spin` only**, as an authored-Styles value that is **not a token** and does **not** reopen the set. Neither exception may be generalised. **No token identifier, value, count, artifact or export changes**, and **no keyframe name changes.** |
+| **Icon Foundation Implementation Authorization** | 2026-10-03 | accepts **ADR 0005** and authorizes **preparation** of the eleven-name Icon foundation only — component, generated registry, pinned Lucide devDependency, verbatim licence, React peers, root exports, the mapped guard amendments and the IA-5 raw-palette guard | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** in this registry, the Token Table and `README.md` saying Icons have not begun. **Merging any implementation pull request, the other primitives, BottomSheet/Portal, a semantic active/destructive colour mapping, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -237,6 +239,7 @@ reader learns what replaced part of it.
 | **0002** | Validation Helpers Public Contract | **Accepted** — 2026-09-13 | representation / public contract |
 | **0003** | Token Representation and Artifact Contract | **Accepted** — 2026-09-18 | representation |
 | **0004** | Styles Keyframe Representation Contract | **Accepted** — 2026-09-24 | representation / public contract |
+| **0005** | Icon Representation and Glyph Delivery Contract | **Accepted** — 2026-10-03 | representation / public contract |
 
 **ADR 0003 is accepted, 2026-09-18.** It settles the representation of the
 Token Foundation V1 values the Scoped Token Foundation V1 Owner Sign-off froze
@@ -296,6 +299,45 @@ v0.2 §2.4** that belong to the owner, not to the ADR — `linear` for the two
 repeating keyframes, and 1000ms for `zakhmban-spin` as an authored-Styles
 value — each narrow, each non-generalisable, and both recorded in the Token
 Table. **Implementation remains unauthorized.**
+
+**ADR 0005 is accepted, 2026-10-03.** It settles the **representation** of
+the Icon abstraction whose existence, geometry, colour contract, API shape,
+accessibility default and registry-owned mirroring rule UI System
+Specification v0.2 §3.1, §5, §7 and §9 already fix: a **generated, committed,
+`--check`-parity-verified** glyph registry on ADR 0003's precedent, each entry
+carrying its RTL mirroring decision as an **explicit boolean**; glyph data
+obtained by a **build-time generator from an exactly pinned Lucide
+devDependency**, so `dependencies` stays `{}`; a **verbatim licence copy**
+travelling to `dist/` beside the artifact on the `OFL.txt` precedent; and
+`Icon`, `IconProps` and `IconName` reaching consumers through the **existing
+root entry with no fourth public subpath**. Its inventory is **eleven public
+names** — `back`, `chevron`, `search`, `close`, `check`, `alert`, `info`,
+`camera`, `trash`, `plus`, `star` — of which **only `back` and `chevron`
+mirror**.
+
+**It creates and changes no design value.** Its §1.1 reads v0.2 §3.1's
+approved prop list — `name†` `size` `color` `strokeWidth`, with **no `tone`**,
+unlike Text, Button, StatusBadge and IconButton — and concludes that the
+initial Icon defines only the **bound navy default** (`--text-primary`, per
+the Token Table) and takes every other colour from the **use site** through
+`color`. **No semantic active/destructive colour mapping is proposed or
+approved**, and that mapping stays a **future owner decision**; finding
+**IA-6** already scopes the unbound-icon-role gap to **InfoBanner and
+ErrorBanner**, both Tier 2. ADR 0005 likewise invents nothing for the
+overlay-root and Portal technique, the Button `sm` 40-versus-44 geometry or
+`--radius-pill`, each of which it names in its own still-deferred list.
+
+**Upstream verified before acceptance.** §3 recorded three facts as
+unverified rather than asserting them. A read-only check against exactly
+pinned **`lucide@1.51.0`** (`license: ISC`; `dist.shasum`
+`942068b228d8068baa1f302ad48b6d82cd4fae82`) closed all three — all eleven
+glyphs present as pure `[tag, attrs]` data, one package-root `LICENSE`
+carrying **both** the ISC notice and the **Feather MIT** attribution, and a
+deterministic generator feasible with no runtime dependency — so **§3's stop
+rule is discharged** and **no clause of the ADR changed**. The verification is
+**version-scoped**: a later Lucide version must be re-checked. **Nothing is
+implemented by the ADR**; implementation is authorized separately and
+narrowly by the record below.
 
 ## Token Table status
 
@@ -681,6 +723,94 @@ still not implemented, not tagged and not released.** **Implementation
 becomes eligible only after this record is independently audited**, and the
 version bump, tag, release-workflow execution, GitHub Release, package
 publication and consumer migration each remain **separate owner actions**.
+
+### Icon Foundation Implementation Authorization — 2026-10-03
+
+**Authority kind: ADR acceptance plus a scoped implementation authorization,
+owner tier.** Level 3 — approved owner rulings. **ADR 0005 itself carries
+representation authority only (level 5) and is not made authority for any
+design value by this record.**
+
+**The owner accepts ADR 0005 and authorizes preparation of the Icon
+Foundation. Scope: the accepted eleven-name Icon foundation only.** ADR 0005
+entered `main` as **Proposed** through pull request #15, merge commit
+`45341f015ae5b59629a2440705c575e91617e87a`; **a merge is not an acceptance**,
+and this record is.
+
+**Verified before authorization.** The three upstream facts ADR 0005 §3
+recorded as unverified were checked read-only against **`lucide@1.51.0`**
+(`license: ISC`; `dist.shasum` `942068b228d8068baa1f302ad48b6d82cd4fae82`):
+all eleven approved glyphs exist as pure `[tag, attrs]` data under
+`dist/esm/icons/`; the package-root `LICENSE` carries **both** the ISC notice
+and the **Feather MIT** attribution in one file; and the data supports a
+deterministic build-time generator with no runtime dependency. **§3's stop
+rule is discharged and no clause of ADR 0005 changes.** The check is
+**version-scoped** — a later Lucide version must be re-checked, not assumed.
+
+**Authorized, and limited to it:**
+
+- `src/icons/` — the `Icon` component, its **internal** registry and internal
+  barrel;
+- the **eleven** public names ADR 0005 §7 admits — `back`, `chevron`,
+  `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`,
+  `star` — with **`back` and `chevron` mirrored** and the other nine not. The
+  registry stores the LTR-authored base glyph **plus** an explicit mirroring
+  boolean; **storing a pre-mirrored glyph in place of the flag is not
+  authorized**, because v0.2 §5 makes mirroring a declared property;
+- a deterministic **build-time generator** and its `--check` parity mode,
+  reading an **exactly pinned** Lucide source package held as a
+  **devDependency**;
+- a **verbatim copy** of that package's `LICENSE` into `src/icons/`, reaching
+  `dist/icons/` byte-for-byte, attribution intact and unedited;
+- **`react` and `react-dom` as `peerDependencies`** — the relationship v0.2 §7
+  and §7.2 already state unconditionally — with ranges chosen from actual
+  consumer compatibility and **not** claimed to be frozen by ADR 0005; plus
+  the exactly pinned devDependencies needed to typecheck, render and test a
+  React-bearing module;
+- the three root exports — **`Icon`, `IconProps`, `IconName`** — through the
+  **existing** entry, with `IconName` a closed union;
+- the narrow amendments ADR 0005 §5 maps to `scripts/build.mjs`,
+  `vitest.config.ts`, `eslint.config.mjs` and the architecture guards,
+  **keeping every one of the five primitive names forbidden**;
+- the **mechanical raw-palette usage guard** that finding **IA-5** makes due
+  with the first component implementation commit, scoped to catch prohibited
+  raw-palette use **without** rejecting the approved token definitions,
+  documentation or generated data;
+- the subordinate wording correction from *"the first primitive"* to **"the
+  first React-bearing module"** in `ARCHITECTURE.md` and `vitest.config.ts`,
+  **and nowhere else**;
+- a branch, local commits, a normal push, and **one reviewable pull request**
+  against `main`.
+
+**Merging is not authorized by this record.** Preparing the work and opening
+the pull request is as far as this goes: **each merge remains a separate
+manual owner decision**, taken after review and after the required checks
+pass. A green pipeline is evidence, not approval.
+
+**Not authorized, and unchanged by this record:** `Button` · `TextField` ·
+`Select` · `OtpInput` · `BottomSheet` · `Portal` or `FocusTrap` · any
+overlay-root, scroll-lock, inert-background or pointer-event technique ·
+`Skeleton` or any other Tier 2 component · a sixth primitive · a `./icons`
+subpath or any fourth public subpath · a published runtime `iconNames` array ·
+a **runtime Lucide dependency**, which stays prohibited and leaves
+`dependencies` equal to `{}` · a `tone`, `state` or `variant` prop on `Icon` ·
+any **semantic active/destructive colour mapping** · any new token, keyframe
+or Tailwind key · distributed standalone `.svg` files · version change · tag ·
+release · GitHub Release · package publication · `zakhmban-therapists` or any
+other consumer-repository change · deployment · repository-visibility change.
+
+**Still deferred, and untouched:** the overlay-root and Portal technique and
+everything **D-6** lists with it · the 40px small-control geometry and the
+**Button `sm` 40-versus-44** conflict · `--radius-pill` · Decision 6b's Modal
+radius · Decision 4b's shadows · the banner accent contract (**IA-6**), which
+still blocks InfoBanner and ErrorBanner · typography role assignment for error
+text · border widths · every other open Token Table entry. **D-6 and Button
+`sm` remain unresolved owner decisions and are neither settled nor implied
+here.**
+
+**The package stays `0.2.0` and `private`,** with `v0.1.0` and `v0.2.0`
+unchanged and **no new tag**. **No token, value, count, artifact or design
+decision changes under this authorization.**
 
 ## Missing design-system document — scoped disposition
 
