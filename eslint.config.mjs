@@ -107,6 +107,65 @@ export default tseslint.config(
   },
 
   {
+    // Package payload only. v0.2 §3.1 makes the Icon abstraction permanent
+    // and "a direct icon-library import in app code is a spec violation";
+    // the same rule binds the package, whose whole point is that the glyph
+    // source is swappable behind the registry (§8 Phase 7). Lucide reaches
+    // src/ as generated data and never as an import. scripts/ is deliberately
+    // outside this block: the generator is where that import belongs.
+    //
+    // Flat config merges `rules` by key and the last block wins, so the four
+    // patterns from the general block are repeated here rather than extended.
+    // Dropping them would silently relieve src/ of the boundary rules, which
+    // is the opposite of what this block is for.
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["next", "next/*"],
+              message:
+                "@zakhmban/ui is framework-free (frozen v1.1 §2.1: no routing). Next.js belongs to the consuming application.",
+            },
+            {
+              group: ["react-router", "react-router-dom", "react-router/*"],
+              message:
+                "@zakhmban/ui is framework-free (frozen v1.1 §2.1: no routing).",
+            },
+            {
+              group: ["axios", "axios/*", "node-fetch", "ky", "superagent"],
+              message:
+                "@zakhmban/ui contains no data fetching (frozen v1.1 §2.1). Transport belongs to @zakhmban/api-client.",
+            },
+            {
+              group: ["@zakhmban/*"],
+              message:
+                "@zakhmban/ui depends on no application and no sibling package. The dependency points one way (UI System Specification v0.2 §7.3, directional rule).",
+            },
+            {
+              group: [
+                "lucide",
+                "lucide/*",
+                "lucide-react",
+                "lucide-static",
+                "@lucide/*",
+                "react-icons",
+                "react-icons/*",
+                "@heroicons/*",
+                "feather-icons",
+              ],
+              message:
+                "Glyph data reaches src/ only as generated registry data (ADR 0005 §2). An icon library imported here would defeat the permanent Icon abstraction of v0.2 §3.1 and the wholesale Phase 7 swap.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
     // Architecture test fixtures stand in for a consuming application, so a
     // fixture resolves the package through its own published specifier —
     // that self-reference is the thing under test (ADR 0003 §11 assertion

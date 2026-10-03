@@ -13,7 +13,7 @@
  *   validation  → phone normalisation, national-ID checksum          (below)
  *   tokens      → generated typed token object         (deep entry /tokens)
  *   styles      → token CSS and static styles          (deep entry /styles)
- *   icons       → the permanent Icon abstraction and its registry
+ *   icons       → the permanent Icon abstraction and its registry   (below)
  *   primitives  → Button, TextField, Select, OtpInput, BottomSheet —
  *                 exactly five, frozen by Technical Architecture v1.1 §2.
  *                 A sixth requires an ADR in this repository.
@@ -27,4 +27,11 @@
  * docs/adr/0002-validation-helpers-contract.md, not restated here.
  */
 export { normalizeIranianMobile, isValidIranianNationalId, } from "./validation/index.js";
+/**
+ * Icons — ADR 0005. Three names and no fourth: the glyph registry, its node
+ * types and every upstream detail stay package-internal, and `IconName` is a
+ * closed union so an unknown glyph is a compile error in the consuming
+ * application rather than an empty box at runtime.
+ */
+export { Icon } from "./icons/index.js";
 //# sourceMappingURL=index.js.map

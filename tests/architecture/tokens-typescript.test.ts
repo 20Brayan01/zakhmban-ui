@@ -395,10 +395,15 @@ describe("typed token artifact — ADR 0003 §11", () => {
   });
 
   it("does not widen the root export", async () => {
+    // ADR 0003 §11: tokens reach consumers through `./tokens`, never through
+    // the root barrel. `Icon` is on this list because ADR 0005 put it there
+    // in a reviewed diff — no token, type or registry rode along with it.
     const root = await import("@zakhmban/ui");
     expect(Object.keys(root).sort()).toEqual([
+      "Icon",
       "isValidIranianNationalId",
       "normalizeIranianMobile",
     ]);
+    expect(Object.keys(root)).not.toContain("tokens");
   });
 });
