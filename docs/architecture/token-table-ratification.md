@@ -339,6 +339,16 @@ Also still open, and **not** closed by any decision above:
   and `FocusTrap` internal and unexported. **The shared overlay-root selector
   and every other representation question remain open and are reserved for
   ADR 0006, which does not yet exist**;
+- ~~**whether a `BottomSheet` whose pinned footer alone leaves no usable
+  scrolling region may scroll as a whole** — in that state the footer would
+  not be pinned, which departs from §3.4's *"sticky footer action"*~~ —
+  **CLOSED 2026-10-04** by the constrained-height fallback clarification in
+  the BottomSheet Height Ruling: the footer stays sticky in normal
+  operation, and **if pinning it would make any part of the title, content
+  or footer unreachable or inoperable the whole bounded sheet may scroll**,
+  the footer ceasing to be sticky in that condition only. **A fallback for
+  access, not an alternative default layout**, and **no threshold, token,
+  height, prop or general permission to unpin is created**;
 - **whether each stacking role is public or package-internal**, reserved for
   ADR 0003;
 - **the positive desktop/web token contract — Decision 16b** — which V2
@@ -7225,3 +7235,294 @@ any source, test, script, guard, manifest or artifact change · a sixth
 primitive · a public `Portal` or `FocusTrap` · a new export subpath · a new
 token or design value · version change · tag · release · publication ·
 consumer-repository change · deployment.
+
+---
+
+## BOTTOMSHEET HEIGHT RULING — 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 —
+approved owner design/product rulings. **It creates no token**, changes no
+count and authorizes no implementation.
+
+**What it closes.** `BottomSheet`'s block size was specified nowhere — not in
+v0.2 §3.4, not in §2.3's control-geometry list, not in this register, and
+**not on the deferral list either**. It was an unrecorded gap rather than a
+recorded deferral, and it blocked implementation: §3.4 requires a **"sticky
+footer action"**, which presupposes a bounded sheet with a scrolling content
+region, and without a bound a long filter list pushes the footer out of
+reach — the exact failure a sticky footer exists to prevent.
+
+### The rule
+
+**The sheet grows with its content, up to a maximum block size of**
+
+```text
+calc(100dvh - var(--control-min-target))
+```
+
+- **Content-driven below the maximum.** A short sheet is as tall as its
+  content and no taller.
+- **`--control-min-target` is the existing public token**, authored in
+  `src/tokens/base.css`, resolved value **`44px`**, one of the approved 118.
+  **No new token is created, no value is invented, and the Token Foundation
+  boundary stays 118 / 39 / 1.**
+- **Long content scrolls inside the sheet**, while **the title and the footer
+  remain reachable** at every height.
+- **The sheet must not overflow the dynamic viewport.** `dvh` rather than
+  `vh` so collapsing browser chrome on a phone cannot push the footer off
+  screen.
+- **No part of the title, the content or the footer may be clipped or made
+  unreachable, at any viewport size or text-enlargement level.** This is not
+  a new rule: it is v0.2 §6's *"Layouts survive 200% text zoom without
+  clipping"* applied to this component, under §6's own framing that
+  *"a component that cannot be operated by keyboard and screen reader is not
+  done."* **Reachable** means reachable by scrolling and by sequential
+  keyboard navigation — not merely present in the DOM.
+- **Only the footer is required to be pinned.** v0.2 §3.4 names a **"sticky
+  footer action"** and says nothing about the title, which is therefore
+  **not required to be pinned** and **may scroll with the content**. This is
+  a reading of the existing contract rather than an addition, and it is what
+  keeps a usable scrolling region at constrained heights: the pinned area is
+  the footer alone, not the title plus the footer.
+
+### Why the cap is independent of the AppBar
+
+The reserved strip is sized by the **tap minimum**, not by whatever chrome
+happens to sit above the sheet. Two reasons, and both are properties of the
+sheet rather than of a screen:
+
+1. **The exposed scrim is a dismissal target.** v0.2 §3.4 makes scrim click
+   close the sheet, and §6 requires **44 × 44px minimum for anything
+   tappable**. Sizing the reserved strip with `--control-min-target` is
+   therefore the token's **own** role applied to a real target, not a value
+   borrowed from an unrelated one. The inline axis is the full viewport
+   width, so the block axis is the only one that needed a rule.
+2. **No coupling to `Screen`.** A cap written against `--app-bar-height`
+   would make the sheet's geometry depend on an application-owned surface
+   that may or may not be present on a given screen — `Screen`'s app bar is
+   Tier 2, and v0.2 §4.1 makes it optional in some flows. The sheet would
+   then be taller or shorter depending on someone else's layout. The tap
+   minimum is constant.
+
+### What this ruling does not claim
+
+**A 44px visible strip does not by itself prove any accessibility
+requirement.** It establishes the **reserved space**; it does not prove that
+the exposed scrim is perceivable, that it is actually hittable on a given
+device, that it is not obscured by browser chrome or a system gesture area,
+or that the footer stays reachable at large text sizes. **Those are rendered
+behaviours and must be verified in a browser**, against a real layout, at
+the approved text-zoom level. This ruling records the geometry, not a
+conformance claim.
+
+### A layout squeeze is accepted; a loss of access is not
+
+**These are two different things and the ruling does not accept them
+equally.**
+
+**A squeeze is accepted.** At **200% text enlargement on a short viewport**,
+the scrolling region can become small while the title, the content and the
+footer all remain reachable. That is a **layout quality** matter: **any cap
+has this property and no cap is worse**, it is accepted, and it is a
+**required browser-test case** rather than an assumption.
+
+**A loss of access is never accepted.** If any part of the title, the
+content or the footer were **clipped or unreachable**, the component would be
+in breach of the rule above and of v0.2 §6 — **a contract failure, not a
+degraded layout**, and not something browser testing may sign off.
+
+**What makes the squeeze survivable** is the pinning rule above: because only
+the **footer** is pinned and the **title scrolls with the content**, the
+space the scrolling region must share is the footer's alone. The ordinary
+constrained case therefore resolves inside the existing contract, with no
+exception.
+
+### Browser verification — both states, not one
+
+**Both layouts must be verified in a real browser before this ruling can be
+treated as met:**
+
+1. **the ordinary sticky-footer layout** — the footer pinned, the title and
+   content scrolling, at the maximum height and below it; and
+2. **the constrained fallback** — the whole bounded sheet scrolling with the
+   footer no longer pinned.
+
+**Each must be checked at 200% text enlargement, on a short viewport, with
+keyboard navigation**, and each must show the **title, the content and the
+footer all reachable and operable**. The **exposed scrim region** and the
+**approved maximum block size** are verified in both states too.
+
+**No claim of complete accessibility conformance follows from these
+checks.** They verify the specific behaviours named here and nothing wider;
+a full §6 audit is Phase 6 work and is not discharged by them.
+
+#### Constrained-height fallback — a narrow dated clarification of v0.2 §3.4, 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**The footer remains sticky during normal operation.** **If keeping it
+pinned would make any part of the title, the content or the footer
+unreachable or inoperable, the entire bounded sheet may scroll vertically;
+in that condition the footer may cease to be sticky so the action remains
+reachable.**
+
+**This is a fallback for access, not an alternative default layout.** It is
+reached only when the pinned layout would otherwise break the reachability
+rule above, and it is **not** a general permission to unpin the footer, nor
+a second layout an implementation may choose between.
+
+**What this clarification does NOT add:** no numeric threshold for when the
+fallback applies · no new token · no height, minimum or maximum · no new
+prop · no general permission to unpin. **The trigger is the reachability
+rule itself** — the fallback engages exactly when the pinned layout would
+clip or strand the title, the content or the footer, and not before.
+
+**Scope.** It is a **narrow clarification of v0.2 §3.4's *"sticky footer
+action"*** for this one condition. §3.4 is otherwise unchanged: the sticky
+footer stands as the component's normal composition, and nothing here
+touches the radius, shadow, scrim, motion or dialog duties that sentence
+sits among.
+
+**It closes** the open item the previous record raised — *"whether a
+`BottomSheet` whose pinned footer alone leaves no usable scrolling region may
+scroll as a whole"* — which is struck and marked closed in this register's
+open list.
+
+### Boundaries
+
+- **No new token, no new value, no change to any count, artifact or export.**
+- **Decision 16b is not reopened.** It owns breakpoints, container roles,
+  container maximum widths and responsive gutters; a viewport-relative
+  maximum on one component is none of those, and no breakpoint or container
+  token is created here.
+- **§6's zoom rule is unchanged** — *"no fixed heights on text containers"*.
+  This is a **maximum** on the sheet, not a fixed height, and not on a text
+  container.
+- **Decision 6a's sheet radius, `--shadow-sheet`, `--overlay`, `--z-scrim`,
+  `--z-dialog` and `zakhmban-slide-up` are untouched.**
+- **It authorizes no implementation.** The package stays `0.2.0` and
+  `private`, with `v0.1.0` and `v0.2.0` unchanged and no new tag.
+
+---
+
+## BOTTOMSHEET IMPLEMENTATION AUTHORIZATION — 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**Authority kind: implementation authorization, owner tier.** Level 3 —
+approved owner rulings. **It decides no design value and creates no token.**
+
+**Scope: `BottomSheet` only.** Every other primitive is outside it.
+
+**Preconditions, all now met.** Decision A of the Overlay-Root and Button sm
+Contract Ruling is effective; the Overlay Failure-Signalling Channel
+Correction has settled §A.4 against §A.9; **ADR 0006 is Accepted** and
+entered in the registry as representation authority; and the BottomSheet
+Height Ruling above closes the last open value.
+
+### Authorized, and limited to it
+
+- a **branch**, local **implementation commits**, a **normal push**, and
+  **one reviewable pull request** against `main`;
+- `src/` work implementing **`BottomSheet`** against the approved contract:
+  v0.2 §3.4's five props — **`open†` `title†` `onClose†` `footer`
+  `children`** — the dialog semantics of §3.4 and §6, Decision A, Accepted
+  ADR 0006, and the height ruling above;
+- the **development dependencies** this first *interactive* primitive
+  genuinely needs for interaction testing, **exactly pinned**, confined to
+  `devDependencies`, each justified in the pull request. **`dependencies`
+  stays `{}`.**
+- the **amendment of the architecture guard that currently blocks
+  overlay-related Styles code**, `tests/architecture/styles-contract.test.ts`,
+  **only in the same commit that supplies the approved contract and its
+  tests** — never ahead of them;
+- the other guard amendments the work genuinely requires, each a reviewed
+  diff, **keeping the four remaining primitive names forbidden**.
+
+**Merging is not authorized.** Preparing the work and opening the pull
+request is as far as this record goes: **the merge is a separate manual owner
+decision**, taken after review and after the required checks pass. A green
+pipeline is evidence, not approval.
+
+### Required implementation boundary
+
+- **Consume the application-supplied overlay root and the marked background
+  scope exactly as Accepted ADR 0006 defines them** — the two boolean
+  attributes, the six structural obligations, the four invalid structures.
+  **Create no public `Portal` or `FocusTrap`, no sixth primitive, no new
+  export subpath, no new token and no new design value.**
+- **Never silently render an inline sheet** when the required root or
+  background structure is invalid. **The failure must be observable to the
+  application developer**; the **signalling channel is an internal
+  implementation choice**, per §A.9 as corrected.
+- **Enforce the single package-owned `BottomSheet` policy.** **Do not claim
+  the package can enforce the application-owned `Modal` policy** — §A.5 makes
+  that the application's responsibility and no package mechanism can
+  guarantee it.
+- **Provide real modal behaviour:** an accessible name taken from the
+  required `title`, `role="dialog"` with `aria-modal`, focus entry and
+  containment, **Escape** and **scrim-click** dismissal, focus return to the
+  opener, and background unavailability to **pointer and keyboard**.
+  **`aria-hidden` plus `pointer-events` is not a substitute for keyboard
+  exclusion** — a background reachable by sequential focus navigation is not
+  inert, whatever the attributes say.
+- **Apply and reliably restore body scroll locking** and any other temporary
+  document effect **on close and on unmount, including interrupted lifecycle
+  paths** — an unmount while open, a parent that disappears, a route change
+  mid-transition, a second open before the first close settles.
+- **Preserve RTL inheritance** and the approved **scrim, surface, radius,
+  shadow, stacking and motion** contracts; **respect reduced motion**, which
+  leaves `zakhmban-slide-up`'s `translateY(0)` end state. **Do not infer
+  correct paint order from DOM order alone** — ADR 0006 records that
+  document-level placement escapes the `Screen`'s ancestors but does not by
+  itself prove layering.
+- **Keep package CSS reachable through the existing `./styles` entry.** **No
+  fifth public subpath**, and no `exports`, `files` or `sideEffects` change.
+
+### Acceptance outcomes
+
+- **Test the built package, not only source** — the architecture suite's
+  existing discipline, extended to the new surface.
+- **Meaningful interaction tests**, not restatements of the implementation:
+  keyboard operation and focus containment · Escape and scrim-click
+  dismissal · focus return to the opener · background unavailable to pointer
+  **and** sequential keyboard navigation · each of ADR 0006's **four invalid
+  structures** producing no inline sheet and an observable failure · **a
+  second package-owned sheet refused** · scroll-lock applied and restored,
+  **including an unmount-while-open path**.
+- **A rendered-browser check is required later** for what source cannot
+  prove: **actual layering** against real application chrome, **RTL**
+  direction on the portalled sheet, **focus** behaviour in a real engine,
+  **scroll** locking and restoration, and the **height ruling in both of its
+  states** — the ordinary sticky-footer layout **and** the constrained
+  fallback in which the whole bounded sheet scrolls — covering the reserved
+  scrim strip and a reachable, operable title, content and footer at the
+  maximum height, on a short viewport, at **200% text enlargement** and
+  under keyboard navigation. **No claim of complete accessibility
+  conformance follows from these checks.**
+- **Consumer-integration verification is identified now** and belongs to the
+  consuming application, not here: that its shell renders one valid overlay
+  root, that **marking is complete** across every application-controlled
+  interactive region including its own portal mounts, and that layering holds
+  in its real layout.
+
+### Not authorized, and unchanged
+
+**Merging any pull request** · `TextField` · `Select` · `OtpInput` ·
+`Button` · **Decision B §B.4's Button `md` token representation** · any Tier 2
+component · a sixth primitive · a public `Portal` or `FocusTrap` · a new
+export subpath · a new token or design value · a runtime dependency —
+`dependencies` stays `{}` · **version change · `v0.3.0` tag · release ·
+GitHub Release · package publication · `zakhmban-therapists` or any other
+consumer-repository change · deployment · repository-visibility change.**
+
+**Still deferred and untouched:** `--radius-pill` · the banner accent
+contract (IA-6) · Decision 6b's Modal radius · Decision 4b's shadows ·
+typography role assignment for error text · border widths · the Checkbox
+square dimension · Chip state coverage · Decision 16b · v0.2 §9 unknown 12
+for `Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
+
+**The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
+unchanged and **no new tag**.
