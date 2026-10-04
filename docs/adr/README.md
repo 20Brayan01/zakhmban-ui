@@ -62,6 +62,7 @@ read it rather than inferring an order from this file.
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
 | [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
 | [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | Accepted | 2026-10-02 · accepted 2026-10-03 |
+| [0006](0006-overlay-root-representation-contract.md) | Overlay-Root Representation Contract | **Proposed** | 2026-10-04 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
 Table had accumulated — names, CSS custom properties, TypeScript exports,
@@ -162,6 +163,37 @@ decisions** — the overlay-root/Portal technique, the Button `sm`
 40-versus-44 geometry and the pill radius are each left exactly as the owner
 left them — and **nothing is implemented by it**: no source file, generator,
 licence file, manifest change, guard change or export change accompanies it.
+
+**ADR 0006 is proposed, not accepted.** It supplies the **cross-boundary
+representation** that **Decision A** of the Overlay-Root and Button sm
+Contract Ruling (2026-10-04) reserved for it, and nothing else. It names two
+boolean attributes the application and the package must agree on —
+**`data-zakhmban-overlay-root`** on the document-level root the application
+renders, and **`data-zakhmban-overlay-background`** on the content
+`BottomSheet` must make unavailable — fixes **six structural obligations** on
+the consumer, states **exactly what counts as invalid structure** and that an
+invalid one yields **no inline sheet** and a developer-observable failure, and
+routes the overlay styling through the **existing `./styles` entry** on the
+ADR 0004 precedent, with **no fifth subpath and no `package.json` change**.
+Direction needs no package rule: a `<body>`-child root inherits `dir="rtl"`
+from the document, so owner **D-2** stays intact.
+
+**It decides no design value and leaves every internal mechanism open** — the
+React portal technique, the inertness and scroll-lock mechanisms, the
+focusable-element enumeration and the overlay stylesheet's file path are all
+implementation under §A.9, because Decision A already fixes their observable
+outcomes. **It creates no token, no export, no subpath, no sixth primitive
+and no public `Portal` or `FocusTrap`**, and it does not touch Decision B's
+Button `md` token-naming question.
+
+**It is subordinate to Decision A**, which governs wherever the two could be
+read differently. **Nothing is implemented by it, and accepting it would not
+authorize implementation** — `BottomSheet` would still need a separate owner
+implementation authorization, on the pattern of the Icon Foundation
+Implementation Authorization of 2026-10-03. One point is flagged for the owner
+to confirm at acceptance: §A.4 and §A.9 read differently on whether the
+failure-signalling mechanism belongs to this ADR, and it follows §A.9 as the
+narrower and later clause.
 
 ## Format
 
