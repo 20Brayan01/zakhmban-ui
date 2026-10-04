@@ -1043,17 +1043,39 @@ would tie the sheet's geometry to an **application-owned surface that is
 sometimes absent**, making the sheet taller or shorter depending on someone
 else's layout. The tap minimum is constant.
 
+**Reachability is absolute, and a squeeze is not the same thing.** **No part
+of the title, the content or the footer may be clipped or made unreachable**
+at any viewport size or text-enlargement level — v0.2 §6's *"Layouts survive
+200% text zoom without clipping"* applied to this component, with
+**reachable** meaning reachable by scrolling **and** by sequential keyboard
+navigation. A **layout squeeze**, where the scrolling region becomes small
+while everything stays reachable, is **accepted** and is a **required
+browser-test case**; a **loss of access is a contract failure**, not a
+degraded layout, and browser testing may not sign it off.
+
+**Only the footer is required to be pinned.** §3.4 names a *"sticky footer
+action"* and says nothing about the title, which is therefore **not required
+to be pinned and may scroll with the content**. That reading — not an
+addition — is what keeps a usable scrolling region at constrained heights,
+because the pinned area is the footer alone rather than the title plus the
+footer.
+
 **What it does not claim.** **A 44px visible strip does not by itself prove
 any accessibility requirement.** It reserves space; it does not prove the
 exposed scrim is perceivable or hittable on a given device, that browser
 chrome or a system gesture area does not obscure it, or that the footer
 stays reachable at large text sizes. **Those are rendered behaviours and
 must be verified in a browser**, against a real layout and at the approved
-text-zoom level. One edge is recorded rather than waved away: at **200% text
-enlargement on a short viewport**, a tall title plus a tall footer can
-squeeze the scrolling region. The scroll region still keeps the footer
-reachable, **every cap has this property and no cap is worse**, and it
-becomes a **required browser-test case**.
+text-zoom level.
+
+**One residual case is left open, not filled.** If the pinned footer alone
+leaves no usable scrolling region, preserving access would require
+**scrolling the whole bounded sheet**, and the footer would then **not be
+pinned** — a narrow departure from §3.4's *"sticky footer action"*. **This
+ruling does not authorize it.** The question is recorded in the Token
+Table's open list; it does **not** block implementation for realistic title
+and footer sizes, and the degenerate case must be **reported rather than
+improvised around**.
 
 **Boundaries.** **Decision 16b is not reopened** — it owns breakpoints,
 container roles, container maximum widths and responsive gutters, and a

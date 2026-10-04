@@ -339,6 +339,13 @@ Also still open, and **not** closed by any decision above:
   and `FocusTrap` internal and unexported. **The shared overlay-root selector
   and every other representation question remain open and are reserved for
   ADR 0006, which does not yet exist**;
+- **whether a `BottomSheet` whose pinned footer alone leaves no usable
+  scrolling region may scroll as a whole** — in that state the footer would
+  not be pinned, which departs from §3.4's *"sticky footer action"*. Raised
+  by the BottomSheet Height Ruling of 2026-10-04, which **records it rather
+  than filling it**. It does **not** block implementation for realistic
+  title and footer sizes; it governs only the degenerate case, which an
+  implementation must **report rather than improvise around**;
 - **whether each stacking role is public or package-internal**, reserved for
   ADR 0003;
 - **the positive desktop/web token contract — Decision 16b** — which V2
@@ -7263,6 +7270,19 @@ calc(100dvh - var(--control-min-target))
 - **The sheet must not overflow the dynamic viewport.** `dvh` rather than
   `vh` so collapsing browser chrome on a phone cannot push the footer off
   screen.
+- **No part of the title, the content or the footer may be clipped or made
+  unreachable, at any viewport size or text-enlargement level.** This is not
+  a new rule: it is v0.2 §6's *"Layouts survive 200% text zoom without
+  clipping"* applied to this component, under §6's own framing that
+  *"a component that cannot be operated by keyboard and screen reader is not
+  done."* **Reachable** means reachable by scrolling and by sequential
+  keyboard navigation — not merely present in the DOM.
+- **Only the footer is required to be pinned.** v0.2 §3.4 names a **"sticky
+  footer action"** and says nothing about the title, which is therefore
+  **not required to be pinned** and **may scroll with the content**. This is
+  a reading of the existing contract rather than an addition, and it is what
+  keeps a usable scrolling region at constrained heights: the pinned area is
+  the footer alone, not the title plus the footer.
 
 ### Why the cap is independent of the AppBar
 
@@ -7294,14 +7314,39 @@ behaviours and must be verified in a browser**, against a real layout, at
 the approved text-zoom level. This ruling records the geometry, not a
 conformance claim.
 
-### Known edge, recorded rather than waved away
+### A layout squeeze is accepted; a loss of access is not
 
-At **200% text enlargement on a short viewport**, a tall title plus a tall
-footer can approach the cap and squeeze the scrolling content region. The
-scroll region keeps the footer reachable, which is the contract's purpose,
-but the usable content area can become small. **Any cap has this property
-and no cap is worse**; the ruling accepts it and makes it a **required
-browser-test case** rather than an assumption.
+**These are two different things and the ruling does not accept them
+equally.**
+
+**A squeeze is accepted.** At **200% text enlargement on a short viewport**,
+the scrolling region can become small while the title, the content and the
+footer all remain reachable. That is a **layout quality** matter: **any cap
+has this property and no cap is worse**, it is accepted, and it is a
+**required browser-test case** rather than an assumption.
+
+**A loss of access is never accepted.** If any part of the title, the
+content or the footer were **clipped or unreachable**, the component would be
+in breach of the rule above and of v0.2 §6 — **a contract failure, not a
+degraded layout**, and not something browser testing may sign off.
+
+**What makes the squeeze survivable** is the pinning rule above: because only
+the **footer** is pinned and the **title scrolls with the content**, the
+space the scrolling region must share is the footer's alone. The ordinary
+constrained case therefore resolves inside the existing contract, with no
+exception.
+
+**One residual case is NOT resolved here, and is recorded as an open owner
+question rather than filled.** If the pinned footer alone leaves no usable
+scrolling region — a footer approaching the capped height by itself — then
+preserving access would require **scrolling the whole bounded sheet**, and in
+that state **the footer would no longer be pinned**. That is a narrow
+departure from §3.4's *"sticky footer action"*, so **this ruling does not
+authorize it.** The question, and the smallest decision that would settle
+it, is recorded in the open-questions summary of this register. **Until it is
+decided, an implementation that meets the rule above for every realistic
+title and footer satisfies this ruling**; the degenerate case must be
+reported, not improvised around.
 
 ### Boundaries
 
