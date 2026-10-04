@@ -149,15 +149,44 @@ single element marks that element. More than one is permitted because v0.2
 chrome outside its main wrapper would otherwise be forced into a wrapper this
 contract has no business requiring.
 
+**Completeness is the application's duty, and it is the most consequential
+obligation in this contract.** Marking **one** element satisfies the
+*validity* check of §5; it does **not** satisfy §A.2. **The application must
+mark every region of application-controlled interactive content that must
+become unavailable while a sheet is open** — the `Screen` wrapper, any chrome
+rendered outside it, and **the application's own other portal or overlay
+mounts**, including the mount its Tier 2 `Modal` uses, a toast or notification
+mount, and any persistent affordance rendered at document level. §A.5 already
+makes coordinating the application's own `Modal` with `BottomSheet` the
+application's responsibility; marking that mount is the representational half
+of the same duty.
+
+**What an unmarked interactive background region means for conformance.** It
+is a **conformance defect in the application**, not a package failure, and it
+has a specific consequence: that region stays operable behind the scrim, so
+the background is **not** genuinely unavailable, and the
+`role="dialog"` + `aria-modal="true"` the package declares becomes an untrue
+claim — exactly what §A.3 forbids. **The correctness of the package's
+`aria-modal` declaration is contingent on complete marking**, and that
+contingency is stated here rather than left implicit.
+
+**The package cannot detect this, and does not try.** It has no way to tell a
+deliberately unmarked region from a forgotten one, and **it must not attempt
+to discover or control DOM it does not own** — another library's portal, an
+analytics or error-reporting mount, a browser extension's injection. §5's
+validity check therefore catches *absence of any marking*, which is
+mechanical, and **cannot** catch *incomplete marking*, which is not. Like the
+Route A shimmer obligation, this is a duty the package states and documents
+and a consumer must honour; the future verification plan in §10 puts the test
+for it in the consuming application, where the markup lives.
+
 **Why marking, rather than "everything except the overlay root".** The
 package would then also disable nodes the application did not put there and
-does not control — a portal from another library, an analytics or
-error-reporting mount, a browser extension's injection. Decision 15 names what
-the scrim must cover: *"ordinary page content · TopAppBar · BottomNav · docked
-action blocks · all other Application Chrome"*. That is the application's
-content, and only the application can delimit it. Explicit marking also makes
-the obligation visible in the consumer's own source, which a negative rule
-never is.
+does not control. Decision 15 names what the scrim must cover: *"ordinary
+page content · TopAppBar · BottomNav · docked action blocks · all other
+Application Chrome"*. That is the application's content, and only the
+application can delimit it. Explicit marking also makes the obligation
+visible in the consumer's own source, which a negative rule never is.
 
 ### 4 · Structural obligations on the application
 
@@ -165,7 +194,9 @@ These are the **only** obligations this contract places on a consumer, and
 each exists because the package cannot satisfy it from inside:
 
 1. **Exactly one** element carries `data-zakhmban-overlay-root`.
-2. **At least one** element carries `data-zakhmban-overlay-background`.
+2. **Every** region of application-controlled interactive content that must
+   become unavailable carries `data-zakhmban-overlay-background` — see §3's
+   completeness rule — and therefore **at least one** element carries it.
 3. The overlay root is a **direct child of `<body>`**.
 4. The overlay root is **not a descendant of any element carrying
    `data-zakhmban-overlay-background`**.
@@ -174,17 +205,37 @@ each exists because the package cannot satisfy it from inside:
 6. The application **renders the overlay root unconditionally** — it is part
    of the shell, not something mounted when a sheet opens.
 
-**Why each is needed.** (3) is what takes the root out of every stacking and
-clipping context the `Screen` creates, which is §A.1's requirement and the
-Decision 15 hazard above; a root nested anywhere inside the application tree
-reintroduces exactly the trap. (4) is what guarantees the sheet is never
-inside the subtree being made unavailable — without it the package would
-disable its own dialog, and §A.3's truthful-semantics rule would be
-unsatisfiable. (5) gives a deterministic paint order and a sequential focus
-order that reaches the sheet after the background, so the contract does not
-depend on the two sides' z-index being correct for basic correctness. (6)
-means `BottomSheet` can validate the structure on open rather than racing the
-application's mount.
+**Why each is needed.**
+
+**(3)** takes the root out of every stacking and clipping context the `Screen`
+creates, which is §A.1's requirement and the Decision 15 hazard above; a root
+nested anywhere inside the application tree reintroduces exactly the trap.
+**This is the obligation that makes the approved stacking order usable at
+all**: with the root and the background as siblings in the **root stacking
+context**, Decision 15's integers — already public as `--z-chrome`,
+`--z-scrim` and `--z-dialog` — are being compared within one context, which is
+the only situation in which their relative order means anything. Nothing here
+introduces a new integer or a CSS rule.
+
+**(4)** guarantees the sheet is never inside the subtree being made
+unavailable — without it the package would disable its own dialog, and §A.3's
+truthful-semantics rule would be unsatisfiable.
+
+**(5)** is a **supporting** guarantee and is deliberately not claimed as more.
+**Document order does not establish paint order across stacking levels**: a
+positioned background carrying `--z-chrome` paints above a later sibling at
+`z-index: auto`, so ordering alone cannot stand in for the approved integers,
+and this ADR does not pretend otherwise — **(3) plus the approved integers are
+what establish paint order.** What (5) does buy is narrower and still worth
+requiring: a **predictable sequential-navigation and reading order** in which
+the sheet's content follows the background, and a defined arrangement for the
+moments **before** the sheet's containment engages and **after** it is
+released on close. **Focus containment itself is not a consequence of document
+order** — it is `BottomSheet`'s behavioural duty under §A.2, and it is owned,
+implemented and proven there.
+
+**(6)** means `BottomSheet` can validate the structure on open rather than
+racing the application's mount.
 
 **No wrapper element, no lifecycle hook and no ordering callback is
 required.** The structure is static markup in the shell; the package reads it
@@ -202,19 +253,38 @@ is §A.4, and it is the cross-boundary outcome: a sheet that looks modal while
 trapped by a stacking context, or while leaving the background operable, is an
 accessibility regression that reaches production silently.
 
-**The failure must be observable to the application developer.** Whether it is
-observable by throwing, by a development-mode error, or by another channel is
-**implementation**, and is deliberately not fixed here.
+**The failure must be observable to the application developer.** **This ADR
+does not choose the channel**, and it does not leave a placeholder either —
+the channel is **blocked on an owner correction**, for the reason below.
 
-> **One point for the owner to confirm at acceptance.** Decision A §A.4 says
-> *"The mechanism for making it evident is representation and belongs to ADR
-> 0006"*, while the later and narrower §A.9 lists *"the signalling mechanism
-> for that failure"* among the items **left to implementation**. This ADR
-> follows **§A.9**, as the narrower and later clause of the same ruling, and
-> fixes only **what counts as invalid** and **that the failure is observable
-> and never an inline fallback**. If the owner intends §A.4 to control, the
-> signalling channel is a one-line addition at acceptance and nothing else in
-> this ADR changes.
+> **OPEN — blocks acceptance of this ADR. Decision A contradicts itself on
+> who chooses the failure-signalling channel, and an ADR may not resolve a
+> conflict between two clauses of an owner ruling by inference.**
+>
+> **§A.4:** *"The failure must be evident to the developer rather than degrade
+> an accessibility path in production. **The mechanism for making it evident
+> is representation and belongs to ADR 0006.**"*
+>
+> **§A.9**, under *"Left to implementation, and deliberately NOT frozen by
+> ADR 0006"*: *"**the signalling mechanism for that failure**"*.
+>
+> One clause assigns the channel to this ADR; the other withholds it. **Both
+> are inside the same approved ruling**, so neither the precedence chain nor
+> the global supersession rule separates them, and the registry's deferral
+> rule is explicit that *"a deferred or unresolved decision must not be filled
+> by an implementer, a reference kit, a consumer implementation or an AI
+> agent."* **This ADR therefore specifies no channel**, and **cannot be
+> accepted as complete until the owner corrects one clause.**
+>
+> **The smallest correction** is a one-line amendment to Decision A naming
+> which clause governs: either **strike §A.4's sentence** *"The mechanism for
+> making it evident is representation and belongs to ADR 0006"*, leaving §A.9
+> to control and the channel an implementation choice — or **remove "the
+> signalling mechanism for that failure" from §A.9's not-frozen list**,
+> leaving §A.4 to control, in which case this ADR gains one section naming the
+> channel before acceptance. **Nothing else in this ADR changes either way**:
+> §5's invalid states, the no-inline-fallback rule and the requirement that
+> the failure be observable all stand unaltered under both readings.
 
 ### 6 · Styling delivery — through the existing `./styles` entry
 
@@ -295,7 +365,8 @@ implemented, and these obligations attach to the commit that ships
 | --- | --- |
 | **Root placement** | the sheet renders inside the element carrying `data-zakhmban-overlay-root`, that element is a `<body>` child, and a sheet opened from inside a transformed ancestor still paints above application chrome |
 | **Background identification** | every element carrying `data-zakhmban-overlay-background` is unavailable to pointer **and** to sequential keyboard navigation while open, and fully restored on close and on unmount |
-| **Missing or invalid root** | each of the four invalid structures of §5 produces **no inline sheet** and a developer-observable failure |
+| **Marking completeness** | **a consumer-side test, in the consuming application, not here** — with a sheet open, no application-controlled interactive region remains reachable by pointer or by sequential keyboard navigation, the application's own `Modal` and toast mounts included. The package cannot test this, because it cannot see the application's markup |
+| **Missing or invalid root** | each of the four invalid structures of §5 produces **no inline sheet** and a developer-observable failure. **The channel this is observed through cannot be tested until the owner resolves the §A.4 / §A.9 conflict in §5** |
 | **Styling delivery** | the overlay rules arrive through `@zakhmban/ui/styles`; the `exports` map is unchanged; **no fifth subpath** exists; and an empty overlay root affects neither layout nor hit-testing |
 | **RTL** | with `dir="rtl"` on the document element, the portalled sheet computes `direction: rtl`, and **no package rule sets `direction`** |
 

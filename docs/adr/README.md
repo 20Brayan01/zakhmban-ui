@@ -190,10 +190,16 @@ Button `md` token-naming question.
 read differently. **Nothing is implemented by it, and accepting it would not
 authorize implementation** — `BottomSheet` would still need a separate owner
 implementation authorization, on the pattern of the Icon Foundation
-Implementation Authorization of 2026-10-03. One point is flagged for the owner
-to confirm at acceptance: §A.4 and §A.9 read differently on whether the
-failure-signalling mechanism belongs to this ADR, and it follows §A.9 as the
-narrower and later clause.
+Implementation Authorization of 2026-10-03.
+
+**One item blocks its acceptance, and the ADR does not resolve it.** Decision
+A **§A.4** assigns the failure-signalling mechanism to this ADR while **§A.9**
+lists it among the items left to implementation. Both sit inside the same
+approved ruling, so no precedence rule separates them, and the registry's
+deferral rule forbids an implementer or an agent from filling the gap. The ADR
+therefore **specifies no channel** and records the **smallest owner
+correction** that would unblock it: strike one clause or the other. Every
+other part of the ADR stands unchanged under either reading.
 
 ## Format
 
