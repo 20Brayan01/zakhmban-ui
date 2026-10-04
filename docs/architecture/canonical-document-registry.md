@@ -189,6 +189,7 @@ in full in the Token Table.
 | **Styles Foundation v0.2.0 Contract Ruling** | 2026-09-24 | the **reset contract** (D-1), the **global body contract** (D-2), the **focus-visible contract** (D-3), the **reduced-motion contract** (D-5), and the **allocation of the overlay-root and Portal question to v0.3.0** (D-6). Keyframe naming (D-4) is delegated to **ADR 0004** as representation. | **nothing in v0.2** — v0.2 §7 places `reset, global, keyframes` under `styles/` but states no reset rule, no body rule and no focus mechanism, so there is nothing for this ruling to replace; where v0.2 does state a value (§2.2's `text-wrap: pretty`, §2.4's reduced-motion duty, §5's document-level direction ownership) the ruling **applies** it. It supersedes, **for the overlay-root technique only**, the Release-Sequence Ruling's sentence placing that technique in v0.2.0. **No token identifier, value, count, artifact or export changes.** |
 | **Styles Keyframe Behaviour and Procedural Ratification** | 2026-09-25 | **Part 1** procedurally ratifies the substantive content of local draft commit `6a6eae84`, clarifying that the disputed **STOP** barred inventing or silently filling undefined behavioural values and required implementation to stay blocked, but did not bar documenting the gap or creating the local draft. **Part 2** supplies the exact behavioural contract for all four keyframes — start and end frames, durations, timing functions, iteration, RTL invariance, static fallbacks — plus the repetition rule and a refined reduced-motion rule. | **two scoped clauses of v0.2 §2.4**, and nothing else: the single-curve statement is superseded **for `zakhmban-shimmer` and `zakhmban-spin` only**, which use `linear`; and the closed three-duration set is supplemented by **1000ms for `zakhmban-spin` only**, as an authored-Styles value that is **not a token** and does **not** reopen the set. Neither exception may be generalised. **No token identifier, value, count, artifact or export changes**, and **no keyframe name changes.** |
 | **Icon Foundation Implementation Authorization** | 2026-10-03 | accepts **ADR 0005** and authorizes **preparation** of the eleven-name Icon foundation only — component, generated registry, pinned Lucide devDependency, verbatim licence, React peers, root exports, the mapped guard amendments and the IA-5 raw-palette guard | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** in this registry, the Token Table and `README.md` saying Icons have not begun. **Merging any implementation pull request, the other primitives, BottomSheet/Portal, a semantic active/destructive colour mapping, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
+| **Overlay-Root and Button sm Contract Ruling** | 2026-10-04 | **Decision A** — the overlay-root / `BottomSheet` modal boundary: the application-owned `Screen` supplies a document-level overlay root and identifies the background scope; the package-owned `BottomSheet` portals into it and owns focus entry and containment, Escape and scrim dismissal, focus return, body scroll locking and background unavailability to pointer **and** keyboard, restoring all of it on close and unmount; one sheet at a time; `Portal` and `FocusTrap` stay internal and unexported. **Decision B** — Button `sm` has a **minimum visible block size of 44px**, visible control and interactive target coinciding at ≥ 44 × 44px, as a minimum and not a fixed height | **v0.2 §9**'s *"Modal is expected to reuse the package's focus mechanics"* sentence; **v0.2 §2.3**'s *"small control 40"*; **v0.2 §3.2**'s *"sm 40"*; and **ADR 0003 §5**'s *"overlay composition is application-owned"* **only** where it would place `BottomSheet`'s internal portal behaviour outside the package. **No token identifier, value, count, artifact or export changes.** Implementation, ADR 0006, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -204,6 +205,9 @@ documented in place in the Token Table; this table is the index.
 | **Owner Contrast Ruling** (2026-09-18) | §2.1's `--neutral-status-fg` value `#8A9384` | **`#667085`** (`--neutral-600`); `-bg` unchanged |
 | **Owner Contrast Ruling** (2026-09-18) | §2.1's `--text-muted` token, its §2.1 eligibility clause and §6's *"permitted at 12px captions on white only"* | **retired as a semantic text token**; readable de-emphasis uses `--text-secondary` |
 | **Owner Interaction Ladder Mapping Ruling** (2026-09-18) | §2.1's interaction-family **shape and count** summary — *"`--*-hover` / `--*-press` · 6 tokens"*. The row's **behavioural rule is not superseded**. | **three filled-action tone families** (green, blue, red) × **rest / hover / press** = **nine** logical semantic token identities, recorded in the Token Table |
+| **Overlay-Root and Button sm Contract Ruling · Decision A** (2026-10-04) | §9's Note on Modal and BottomSheet — the sentence *"The application's Modal is expected to reuse the package's focus mechanics rather than re-implement them."* **The rest of the note is not superseded.** | for v0.3.0 the application-owned `Modal` **provides its own focus mechanics**; the package exports none, because `Portal` and `FocusTrap` stay internal to `BottomSheet` |
+| **Overlay-Root and Button sm Contract Ruling · Decision B** (2026-10-04) | §2.3's Control-geometry term **`small control 40`**. The 44px tap minimum and every other entry in that list stand. | Button `sm` has a **minimum visible block size of 44px**; the visible control and the interactive target coincide at **≥ 44 × 44px** |
+| **Overlay-Root and Button sm Contract Ruling · Decision B** (2026-10-04) | §3.2's Button row term **`sm 40`** in *"Sizes sm 40 / md 48 / lg 52"* | **`sm` ≥ 44px minimum**, not a fixed height; **`md` 48 and `lg` 52 unchanged** |
 
 **Nothing else in v0.2 is superseded.** Every rule, value, component and
 section not listed above remains in force exactly as printed.
@@ -811,6 +815,103 @@ here.**
 **The package stays `0.2.0` and `private`,** with `v0.1.0` and `v0.2.0`
 unchanged and **no new tag**. **No token, value, count, artifact or design
 decision changes under this authorization.**
+
+### Overlay-Root and Button sm Contract Ruling — 2026-10-04
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 —
+approved owner design/product rulings. **Representation stays with the ADR
+series**: the ruling names no selector, attribute, class, CSS rule or React
+mechanism, and **creates no token**.
+
+**Two decisions, separately numbered and separately scoped**, issued in one
+dated ruling on the pattern of the Styles Foundation v0.2.0 Contract Ruling.
+**Each carries its own supersession record because their targets differ**, and
+neither depends on the other. **The ruling is recorded in full in the Token
+Table.**
+
+**Decision A — overlay root and `BottomSheet` modal boundary.** The
+application-owned `Screen` supplies a **dedicated overlay root at document
+level, outside the `Screen` content subtree and its stacking and clipping
+contexts**, and **identifies the background content** that must become
+unavailable. The package-owned `BottomSheet` **portals its scrim and surface
+into that root** and owns **focus entry and containment · Escape and
+scrim-click dismissal · focus return to the opener · body scroll locking ·
+making the identified background unavailable to pointer *and* keyboard
+interaction**, restoring every effect **on close and on unmount**. The scrim
+takes pointer interaction and the background does not; **declared modal
+semantics must match actual behaviour**, and **`aria-hidden` plus
+`pointer-events` alone is not a substitute for preventing keyboard interaction
+with the background**. A **missing overlay root or unidentified background
+scope must not silently fall back** to an inline sheet that looks modal while
+trapped by a stacking context or leaving the background operable. **One
+package-owned `BottomSheet` at a time**; simultaneous `BottomSheet` and
+application-owned `Modal`, nested dialogs and multiple scrims are
+**unsupported in v0.3.0**; the package prevents a duplicate package-owned
+sheet, and **coordinating the application's own `Modal` is the application's
+responsibility — no package mechanism can enforce it, and none is claimed
+to**. **`Portal` and `FocusTrap` stay internal to `BottomSheet`**: no sixth
+primitive, no public `Portal` or `FocusTrap`, no new export subpath, no new
+design value.
+
+**Decision B — Button `sm`.** **A minimum visible block size of 44px**, with
+the **visible control and the interactive target coinciding** at **at least
+44 × 44px**. **A minimum, not an exact fixed height** — content, Persian line
+height and text enlargement may make the button taller — and **no invisible
+expanded-target model is created**, exactly as Decision 10 ruled for Chip.
+**`md` 48 and `lg` 52 are unchanged**, **Button is not added to the
+accessibility-exception register**, the 44px minimum resolves through the
+existing **`--control-min-target`** role, **no 40px or other new token is
+created**, and **Token Foundation stays 118 / 39 / 1**.
+
+**What Decision A closes, preserves and narrows.** Of D-6's seven deferred
+items it closes **Portal implementation · simultaneous/nested overlay policy ·
+body scroll locking · pointer-event policy**, closes **overlay container
+styling as to ownership** and **inert-background mechanics as to outcome**,
+and leaves **the shared overlay-root selector open and reserved for ADR
+0006**. **Decision 15's ownership table is preserved unchanged and
+confirmed** — Decision A adds only what Decision 15 never assigned, which
+party renders the overlay-root node; Styles still owns that node's rules.
+**ADR 0003 §5 is reconciled, not left in parallel**: its sentence remains
+correct for `Screen` and for overlay composition and still justifies the
+public stacking integers, and is superseded only where it would place
+`BottomSheet`'s internal portal behaviour outside the package. **v0.2 §9
+unknown 12 is NARROWED, not closed** — answered for **`Portal` and
+`FocusTrap`**, and **still open exactly as written for `Box`, `Stack`,
+`Text`, `Screen` and `VisuallyHidden`**, each of which would still need the
+same ADR as a sixth primitive.
+
+**Reserved for ADR 0006, which does not yet exist.** The overlay-root DOM and
+stylesheet contract, how the background scope is identified and read, the
+inertness and scroll-lock mechanisms, the React portal mechanism, how the
+no-fallback failure is surfaced to a developer, and where the overlay CSS
+lives under `src/styles/` while reaching consumers through the **existing**
+`./styles` entry. **It must preserve the no-new-export boundary.**
+
+**One follow-up recorded and not resolved.** How Button **`md` 48** is
+expressed through an appropriately named token is a **representation question
+for the ADR series**: `--control-height-button` carries 52px and 48px exists
+only as `--control-height-input`, a role named for a different control. **No
+value is invented and no misuse of `--control-height-input` is authorized.**
+It is a genuine blocker for a complete three-size Button.
+
+**Still deferred and untouched:** `--radius-pill` · the banner accent contract
+(IA-6), which still blocks InfoBanner and ErrorBanner · Decision 6b's Modal
+radius · Decision 4b's shadows · typography role assignment for error text,
+banner prose and ListRow metadata · the visible Checkbox square dimension ·
+Chip state coverage · border widths · the BottomNav badge-size defect ·
+non-Card Surface bindings · the visited-link colour · dark mode · LTR
+direction · `--shadow-none` representation · Decision 16b · any sixth
+primitive · any fourth public subpath.
+
+**Authorizes no implementation.** Recording a decision is not an
+implementation authorization, and merging the pull request that records it is
+not one either. **`BottomSheet`** needs **ADR 0006 accepted and
+registry-entered** and then a **separate owner implementation
+authorization**, on the pattern of the Icon Foundation Implementation
+Authorization of 2026-10-03; **`Button`** needs its own authorization and the
+`md` representation answer; **`TextField`, `Select` and `OtpInput`** are
+untouched here and need their own. **The package stays `0.2.0` and
+`private`**, with `v0.1.0` and `v0.2.0` unchanged and **no new tag**.
 
 ## Missing design-system document — scoped disposition
 
