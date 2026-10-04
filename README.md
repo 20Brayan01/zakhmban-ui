@@ -21,7 +21,8 @@ capability arrives in its own commit.
 | Validation helpers (root entry, ADR 0002)                                | shipped                                                                            |
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                  |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); consume it by pinning that tag |
-| Icons · the five primitives · overlay-root and Portal                    | not yet — allocated `v0.3.0`                                                       |
+| Icons (root entry — `Icon`, ADR 0005)                                    | implemented — merged and verified on `main`; **no tag carries it**                 |
+| The five primitives · overlay-root and Portal                            | not yet — allocated `v0.3.0`                                                       |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                               |
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
@@ -103,9 +104,11 @@ and the tag was read back from the remote and confirmed to be annotated and to
 point at it. **The supported, versioned way to consume Styles is a pin to
 `v0.2.0`.** As with `v0.1.0`, **no GitHub Release object and no npm
 publication exists** — the tag _is_ the release under frozen §2.2.
-`git ls-remote --tags origin` is the live answer to what exists. **Icons, the
-five primitives and the overlay-root/Portal technique have not begun** and
-remain allocated to `v0.3.0`.
+`git ls-remote --tags origin` is the live answer to what exists. **Icons are
+implemented and merged on `main` but are not released** — no tag carries
+`Icon`, so a consumer pinned to `v0.2.0` does not receive it, and `v0.3.0`
+does not exist. **The five primitives and the overlay-root/Portal technique
+have not begun** and remain allocated to `v0.3.0`.
 
 **What `@zakhmban/ui/styles` carries depends on which tag you pin.** The
 **`v0.2.0` tag** carries the token CSS **and** the Styles layer: the approved
@@ -124,11 +127,14 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. As verified on **2026-09-30**, it pins
-  `github:20Brayan01/zakhmban-ui#v0.1.0` and **has not yet migrated to Styles
-  `v0.2.0`**, so it still receives the token-only `./styles` surface.
-  Migrating it is a separate change in that repository, not part of this
-  package; its own `package.json` is the live answer.
+  Therapist application. As verified on **2026-10-04**, its `main` pins
+  `github:20Brayan01/zakhmban-ui#v0.2.0` and **has migrated to Styles
+  `v0.2.0`**, so it receives the full `./styles` surface; its lockfile
+  resolves that pin to the `v0.2.0` tag object
+  `957a397b2dc919459772344a3ea8b612ef4378a8`. It does **not** receive `Icon`,
+  which no tag carries. Any later bump is a separate change in that
+  repository, not part of this package; its own `package.json` is the live
+  answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
   ecosystem**, not the Therapist consumer. Their Phase 1 design-system legacy
   annotations are **valid** and exist in **local, unpushed** documentation
@@ -197,7 +203,12 @@ Two things bite on first integration:
 ## Public API
 
 ```ts
-import { normalizeIranianMobile, isValidIranianNationalId } from "@zakhmban/ui";
+import {
+  Icon,
+  normalizeIranianMobile,
+  isValidIranianNationalId,
+} from "@zakhmban/ui";
+import type { IconName, IconProps } from "@zakhmban/ui";
 import {
   toPersianDigits,
   formatJalaliDate,
@@ -215,13 +226,13 @@ Declared subpaths, and what each ships today. The list below is the
 `exports` map in `package.json`; `exports-contract.test.ts`, `root-export.test.ts`
 and `format-export.test.ts` fail the build if either drifts.
 
-| Subpath                               | Ships today                                                                                                                                                                                                                                   |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` — the two ADR 0002 capabilities, and nothing else                                                                                                                                        |
-| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                            |
-| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. At the `v0.2.0` tag it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The historical `v0.1.0` tag carries the token CSS only |
-| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                              |
-| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                  |
+| Subpath                               | Ships today                                                                                                                                                                                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` — the two ADR 0002 capabilities — plus `Icon` and its `IconName` / `IconProps` types (ADR 0005), **on `main` only; no tag carries `Icon`**. Nothing else. The glyph registry stays internal |
+| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                               |
+| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. At the `v0.2.0` tag it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The historical `v0.1.0` tag carries the token CSS only    |
+| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                                 |
+| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                     |
 
 These four are the whole of the public surface. There is no fifth subpath and
 no `@zakhmban/ui/fonts`: font binaries are internal assets referenced by
@@ -302,13 +313,13 @@ is in ADR 0004 §8.1 and the Token Table §2.1 (owner ruling, 2026-09-28).
 **Nothing in this repository can enforce it**, and a consumer that omits it
 degrades an accessibility path silently.
 
-**Carry this as an explicit item on the future `zakhmban-therapists`
-migration / Skeleton checklist.** The obligation is **future-facing**: as
-verified on 2026-09-30 that repository pins `v0.1.0`, has not migrated to
-Styles `v0.2.0` and has no Skeleton or shimmer, so it has nothing to satisfy
-yet. It is **not modified by this package's work**; it becomes live when that
-repository both moves to a tag that carries the shimmer keyframe and builds a
-Skeleton, and its reduced-motion rule must then be tested in that repository.
+**Carry this as an explicit item on the `zakhmban-therapists` Skeleton
+checklist.** The obligation is **still future-facing, for one reason only**:
+as verified on 2026-10-04 that repository now pins `v0.2.0`, so it **does**
+receive the shimmer keyframe, but it has **no Skeleton and no shimmer
+consumer**, so there is nothing there to satisfy the rule yet. It is **not
+modified by this package's work**; it becomes live the moment that repository
+builds a Skeleton, and its reduced-motion rule must then be tested there.
 
 ### Rendered verification — what was checked, and one observation
 
