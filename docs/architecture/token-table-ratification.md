@@ -6995,20 +6995,40 @@ sixth primitive.
 #### A.9 — Reserved for ADR 0006, provisionally numbered
 
 **A separate representation ADR must be accepted before `BottomSheet`
-implementation.** It defines, and this ruling deliberately does not:
+implementation.** Its subject is the **cross-boundary contract** — what the
+application and the package must agree on, and what a consumer can observe.
+
+**Mandatory in ADR 0006, because each of these crosses the boundary:**
 
 - the overlay-root **DOM and stylesheet contract** — the selector, attribute
   or class a consumer renders, and how the package's Styles layer targets it;
 - how the **background scope** is identified by the application and read by
-  the package;
-- the **inertness mechanism** and the **scroll-lock mechanism**;
-- the **React portal mechanism**;
-- how the **A.4 failure** is surfaced to a developer;
-- where the overlay CSS lives under `src/styles/`, and how it reaches
-  consumers through the **existing** `./styles` entry.
+  the package, **including any marking the application must apply** for the
+  package to make it unavailable;
+- that the **A.4 failure is observable to the application developer** rather
+  than silent. **The signalling mechanism itself is implementation**;
+- that the overlay CSS reaches consumers through the **existing** `./styles`
+  entry and adds **no** public subpath.
+
+**Left to implementation, and deliberately NOT frozen by ADR 0006:** the
+**React portal mechanism** · the **inertness mechanism** · the **scroll-lock
+mechanism** · **where the overlay CSS file sits** under `src/styles/`, which
+ADR 0003 §18 already governs.
+
+**Decision A fixes the observable outcome of each of those in A.2, A.3 and
+A.10**, and that is the part an owner must approve. An internal mechanism no
+application can see is a reviewed implementation choice, not a value — and
+freezing one in an ADR would bind a future maintainer to a technique for a
+reason no document could later recover.
+
+**The one exception is interoperability.** If a mechanism turns out to
+require something of the application — a wrapper element, an attribute, an
+ordering guarantee, a lifecycle hook — **that part stops being internal and
+belongs in the mandatory contract above**, and ADR 0006 must record it.
 
 **ADR 0006 must preserve the no-new-export boundary of A.6.** **It does not
-exist yet**, and nothing in this ruling may be read as if it did.
+exist yet**, and nothing in this ruling may be read as if it did. **No
+mechanism is selected by this ruling.**
 
 #### A.10 — Behavioural outcomes a later implementation must prove
 

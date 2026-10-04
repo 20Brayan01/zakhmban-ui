@@ -880,12 +880,22 @@ unknown 12 is NARROWED, not closed** — answered for **`Portal` and
 `Text`, `Screen` and `VisuallyHidden`**, each of which would still need the
 same ADR as a sixth primitive.
 
-**Reserved for ADR 0006, which does not yet exist.** The overlay-root DOM and
-stylesheet contract, how the background scope is identified and read, the
-inertness and scroll-lock mechanisms, the React portal mechanism, how the
-no-fallback failure is surfaced to a developer, and where the overlay CSS
-lives under `src/styles/` while reaching consumers through the **existing**
-`./styles` entry. **It must preserve the no-new-export boundary.**
+**Reserved for ADR 0006, which does not yet exist — and scoped to the
+cross-boundary contract only.** **Mandatory:** the overlay-root DOM and
+stylesheet contract; how the background scope is identified by the
+application and read by the package, including any marking the application
+must apply; that the no-fallback failure is **observable** to the application
+developer rather than silent; and that the overlay CSS reaches consumers
+through the **existing** `./styles` entry, adding **no** public subpath.
+**Left to implementation and not frozen by ADR 0006:** the React portal
+mechanism, the inertness mechanism, the scroll-lock mechanism, the signalling
+mechanism for that failure, and where the overlay CSS file sits under
+`src/styles/`, which ADR 0003 §18 already governs — **Decision A fixes the
+observable outcome of each**, which is the part an owner approves. **The one
+exception is interoperability:** a mechanism that turns out to require
+something of the application stops being internal and joins the mandatory
+contract. **ADR 0006 must preserve the no-new-export boundary, and no
+mechanism is selected by this ruling.**
 
 **One follow-up recorded and not resolved.** How Button **`md` 48** is
 expressed through an appropriately named token is a **representation question
