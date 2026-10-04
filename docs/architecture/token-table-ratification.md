@@ -339,13 +339,16 @@ Also still open, and **not** closed by any decision above:
   and `FocusTrap` internal and unexported. **The shared overlay-root selector
   and every other representation question remain open and are reserved for
   ADR 0006, which does not yet exist**;
-- **whether a `BottomSheet` whose pinned footer alone leaves no usable
+- ~~**whether a `BottomSheet` whose pinned footer alone leaves no usable
   scrolling region may scroll as a whole** — in that state the footer would
-  not be pinned, which departs from §3.4's *"sticky footer action"*. Raised
-  by the BottomSheet Height Ruling of 2026-10-04, which **records it rather
-  than filling it**. It does **not** block implementation for realistic
-  title and footer sizes; it governs only the degenerate case, which an
-  implementation must **report rather than improvise around**;
+  not be pinned, which departs from §3.4's *"sticky footer action"*~~ —
+  **CLOSED 2026-10-04** by the constrained-height fallback clarification in
+  the BottomSheet Height Ruling: the footer stays sticky in normal
+  operation, and **if pinning it would make any part of the title, content
+  or footer unreachable or inoperable the whole bounded sheet may scroll**,
+  the footer ceasing to be sticky in that condition only. **A fallback for
+  access, not an alternative default layout**, and **no threshold, token,
+  height, prop or general permission to unpin is created**;
 - **whether each stacking role is public or package-internal**, reserved for
   ADR 0003;
 - **the positive desktop/web token contract — Decision 16b** — which V2
@@ -7336,17 +7339,56 @@ space the scrolling region must share is the footer's alone. The ordinary
 constrained case therefore resolves inside the existing contract, with no
 exception.
 
-**One residual case is NOT resolved here, and is recorded as an open owner
-question rather than filled.** If the pinned footer alone leaves no usable
-scrolling region — a footer approaching the capped height by itself — then
-preserving access would require **scrolling the whole bounded sheet**, and in
-that state **the footer would no longer be pinned**. That is a narrow
-departure from §3.4's *"sticky footer action"*, so **this ruling does not
-authorize it.** The question, and the smallest decision that would settle
-it, is recorded in the open-questions summary of this register. **Until it is
-decided, an implementation that meets the rule above for every realistic
-title and footer satisfies this ruling**; the degenerate case must be
-reported, not improvised around.
+### Browser verification — both states, not one
+
+**Both layouts must be verified in a real browser before this ruling can be
+treated as met:**
+
+1. **the ordinary sticky-footer layout** — the footer pinned, the title and
+   content scrolling, at the maximum height and below it; and
+2. **the constrained fallback** — the whole bounded sheet scrolling with the
+   footer no longer pinned.
+
+**Each must be checked at 200% text enlargement, on a short viewport, with
+keyboard navigation**, and each must show the **title, the content and the
+footer all reachable and operable**. The **exposed scrim region** and the
+**approved maximum block size** are verified in both states too.
+
+**No claim of complete accessibility conformance follows from these
+checks.** They verify the specific behaviours named here and nothing wider;
+a full §6 audit is Phase 6 work and is not discharged by them.
+
+#### Constrained-height fallback — a narrow dated clarification of v0.2 §3.4, 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**The footer remains sticky during normal operation.** **If keeping it
+pinned would make any part of the title, the content or the footer
+unreachable or inoperable, the entire bounded sheet may scroll vertically;
+in that condition the footer may cease to be sticky so the action remains
+reachable.**
+
+**This is a fallback for access, not an alternative default layout.** It is
+reached only when the pinned layout would otherwise break the reachability
+rule above, and it is **not** a general permission to unpin the footer, nor
+a second layout an implementation may choose between.
+
+**What this clarification does NOT add:** no numeric threshold for when the
+fallback applies · no new token · no height, minimum or maximum · no new
+prop · no general permission to unpin. **The trigger is the reachability
+rule itself** — the fallback engages exactly when the pinned layout would
+clip or strand the title, the content or the footer, and not before.
+
+**Scope.** It is a **narrow clarification of v0.2 §3.4's *"sticky footer
+action"*** for this one condition. §3.4 is otherwise unchanged: the sticky
+footer stands as the component's normal composition, and nothing here
+touches the radius, shadow, scrim, motion or dialog duties that sentence
+sits among.
+
+**It closes** the open item the previous record raised — *"whether a
+`BottomSheet` whose pinned footer alone leaves no usable scrolling region may
+scroll as a whole"* — which is struck and marked closed in this register's
+open list.
 
 ### Boundaries
 
@@ -7453,9 +7495,13 @@ pipeline is evidence, not approval.
 - **A rendered-browser check is required later** for what source cannot
   prove: **actual layering** against real application chrome, **RTL**
   direction on the portalled sheet, **focus** behaviour in a real engine,
-  **scroll** locking and restoration, and the **height ruling** — the
-  reserved scrim strip and a reachable footer at the maximum height, on a
-  short viewport and at **200% text enlargement**.
+  **scroll** locking and restoration, and the **height ruling in both of its
+  states** — the ordinary sticky-footer layout **and** the constrained
+  fallback in which the whole bounded sheet scrolls — covering the reserved
+  scrim strip and a reachable, operable title, content and footer at the
+  maximum height, on a short viewport, at **200% text enlargement** and
+  under keyboard navigation. **No claim of complete accessibility
+  conformance follows from these checks.**
 - **Consumer-integration verification is identified now** and belongs to the
   consuming application, not here: that its shell renders one valid overlay
   root, that **marking is complete** across every application-controlled

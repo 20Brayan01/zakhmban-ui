@@ -1068,14 +1068,27 @@ stays reachable at large text sizes. **Those are rendered behaviours and
 must be verified in a browser**, against a real layout and at the approved
 text-zoom level.
 
-**One residual case is left open, not filled.** If the pinned footer alone
-leaves no usable scrolling region, preserving access would require
-**scrolling the whole bounded sheet**, and the footer would then **not be
-pinned** — a narrow departure from §3.4's *"sticky footer action"*. **This
-ruling does not authorize it.** The question is recorded in the Token
-Table's open list; it does **not** block implementation for realistic title
-and footer sizes, and the degenerate case must be **reported rather than
-improvised around**.
+**Constrained-height fallback — a narrow dated clarification of v0.2 §3.4,
+2026-10-04.** **The footer remains sticky during normal operation.** **If
+keeping it pinned would make any part of the title, the content or the
+footer unreachable or inoperable, the entire bounded sheet may scroll
+vertically; in that condition the footer may cease to be sticky so the
+action remains reachable.** **This is a fallback for access, not an
+alternative default layout** — it is reached only when the pinned layout
+would otherwise break the reachability rule, and it is **not** a general
+permission to unpin the footer. **It adds no numeric threshold, token,
+height, prop or general permission**, because the trigger is the
+reachability rule itself. §3.4 is otherwise unchanged. **This closes** the
+open item the ruling previously raised, which is struck and marked closed in
+the Token Table's open list.
+
+**Browser verification covers both states.** The **ordinary sticky-footer
+layout** and the **constrained fallback** must each be verified in a real
+browser at **200% text enlargement**, on a **short viewport**, under
+**keyboard navigation**, showing the title, content and footer all
+**reachable and operable**, with the exposed scrim region and the approved
+maximum block size holding in both. **No claim of complete accessibility
+conformance follows from these checks.**
 
 **Boundaries.** **Decision 16b is not reopened** — it owns breakpoints,
 container roles, container maximum widths and responsive gutters, and a
