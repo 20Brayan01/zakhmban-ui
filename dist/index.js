@@ -34,4 +34,11 @@ export { normalizeIranianMobile, isValidIranianNationalId, } from "./validation/
  * application rather than an empty box at runtime.
  */
 export { Icon } from "./icons/index.js";
+/**
+ * Primitives — BottomSheet, the first of the frozen five, under the
+ * BottomSheet Implementation Authorization of 2026-10-04. Two names and no
+ * more: the overlay root is the application's, and `Portal` and `FocusTrap`
+ * stay internal to the component (Decision A §A.6).
+ */
+export { BottomSheet } from "./primitives/index.js";
 //# sourceMappingURL=index.js.map

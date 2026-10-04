@@ -20,6 +20,9 @@ const COPIED_ASSETS = [
   "styles/reset.css",
   "styles/global.css",
   "styles/keyframes.css",
+  // The BottomSheet scrim and surface, delivered through the existing
+  // ./styles entry (ADR 0006 §6) and adding no public subpath.
+  "styles/overlay.css",
   "styles/fonts/Vazirmatn-Variable.woff2",
   "styles/fonts/OFL.txt",
   // ADR 0005 §3: the vendored glyph notice travels with the artifact it

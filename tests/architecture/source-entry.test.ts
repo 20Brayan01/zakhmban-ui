@@ -24,14 +24,19 @@ describe("source entry", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the Validation Helpers and Icon capabilities, and nothing else", async () => {
+  it("exports exactly the Validation Helpers, Icon and BottomSheet capabilities, and nothing else", async () => {
     // ADR 0002 and ADR 0005: the root barrel widens only by a reviewed diff.
     // `Icon` joined it with the Icon Foundation; `IconName` and `IconProps`
     // are types and so have no runtime key here. No default export, and no
     // further name arriving unnoticed alongside them.
     const entry = await import("../../dist/index.js");
     expect(Object.keys(entry).sort()).toEqual(
-      ["Icon", "isValidIranianNationalId", "normalizeIranianMobile"].sort(),
+      [
+        "BottomSheet",
+        "Icon",
+        "isValidIranianNationalId",
+        "normalizeIranianMobile",
+      ].sort(),
     );
 
     const source = readFileSync(`${srcDir}/index.ts`, "utf8");
@@ -46,17 +51,13 @@ describe("source entry", () => {
     // "tokens" and "tailwind" left this list with Token Foundation V1, which
     // ships src/tokens/ and the generated Tailwind artifact (ADR 0003 §18).
     // "Icon" left it with the Icon Foundation, which the Icon Foundation
-    // Implementation Authorization of 2026-10-03 permits. The five frozen
-    // primitives stay — including `Select`, which this list had omitted.
+    // Implementation Authorization of 2026-10-03 permits. "BottomSheet" left
+    // it with the BottomSheet Implementation Authorization of 2026-10-04.
+    // The four remaining frozen primitives stay, each still owed its own
+    // authorization before it may appear.
     const files = walk(srcDir);
 
-    for (const forbidden of [
-      "Button",
-      "TextField",
-      "Select",
-      "OtpInput",
-      "BottomSheet",
-    ]) {
+    for (const forbidden of ["Button", "TextField", "Select", "OtpInput"]) {
       expect(
         files.some((file) =>
           file.toLowerCase().includes(forbidden.toLowerCase()),
@@ -70,8 +71,9 @@ describe("source entry", () => {
         continue;
       }
       expect(
-        file.startsWith(`${srcDir}/icons/`),
-        `${file} is a component outside src/icons/ — primitives land in their own commit`,
+        file.startsWith(`${srcDir}/icons/`) ||
+          file.startsWith(`${srcDir}/primitives/`),
+        `${file} is a component outside src/icons/ and src/primitives/ — each primitive lands in its own authorized commit`,
       ).toBe(true);
     }
   });
