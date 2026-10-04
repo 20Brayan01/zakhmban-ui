@@ -207,15 +207,22 @@ each exists because the package cannot satisfy it from inside:
 
 **Why each is needed.**
 
-**(3)** takes the root out of every stacking and clipping context the `Screen`
-creates, which is §A.1's requirement and the Decision 15 hazard above; a root
-nested anywhere inside the application tree reintroduces exactly the trap.
-**This is the obligation that makes the approved stacking order usable at
-all**: with the root and the background as siblings in the **root stacking
-context**, Decision 15's integers — already public as `--z-chrome`,
-`--z-scrim` and `--z-dialog` — are being compared within one context, which is
-the only situation in which their relative order means anything. Nothing here
-introduces a new integer or a CSS rule.
+**(3)** takes the root out of **the stacking and clipping ancestors the
+`Screen` creates**, which is §A.1's requirement and the Decision 15 hazard
+above; a root nested anywhere inside the application tree reintroduces exactly
+the trap. **That escape is the whole of what document-level placement
+guarantees, and this ADR claims no more.**
+
+It does **not** by itself put the overlay and all background content in one
+comparable context, and it does **not** make the published integers order them
+correctly on its own. An application may still establish a stacking context at
+document level — on its background wrapper, on the overlay root itself, or on
+another `<body>` child — and a sheet inside a context whose **own** level sits
+below the background's is ordered by that outer level, not by `--z-dialog`.
+**Actual overlay precedence depends on the stacking contexts that apply in a
+given layout, together with Decision 15's approved layering rules, and must be
+verified in a consumer layout** rather than inferred from the markup shape.
+Nothing here introduces a new integer, a CSS rule or a technique.
 
 **(4)** guarantees the sheet is never inside the subtree being made
 unavailable — without it the package would disable its own dialog, and §A.3's
@@ -225,12 +232,14 @@ truthful-semantics rule would be unsatisfiable.
 **Document order does not establish paint order across stacking levels**: a
 positioned background carrying `--z-chrome` paints above a later sibling at
 `z-index: auto`, so ordering alone cannot stand in for the approved integers,
-and this ADR does not pretend otherwise — **(3) plus the approved integers are
-what establish paint order.** What (5) does buy is narrower and still worth
-requiring: a **predictable sequential-navigation and reading order** in which
-the sheet's content follows the background, and a defined arrangement for the
-moments **before** the sheet's containment engages and **after** it is
-released on close. **Focus containment itself is not a consequence of document
+and this ADR does not pretend otherwise. **Paint order is established by the
+approved layering rules as they apply within whichever stacking contexts a
+consumer layout actually creates — see (3) — never by DOM order, and never by
+DOM order standing in for focus containment.** What (5) does buy is narrower
+and still worth requiring: a **predictable sequential-navigation and reading
+order** in which the sheet's content follows the background, and a defined
+arrangement for the moments **before** the sheet's containment engages and
+**after** it is released on close. **Focus containment itself is not a consequence of document
 order** — it is `BottomSheet`'s behavioural duty under §A.2, and it is owned,
 implemented and proven there.
 
