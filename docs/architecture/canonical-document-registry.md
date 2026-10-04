@@ -192,6 +192,8 @@ in full in the Token Table.
 | **Icon Foundation Implementation Authorization** | 2026-10-03 | accepts **ADR 0005** and authorizes **preparation** of the eleven-name Icon foundation only — component, generated registry, pinned Lucide devDependency, verbatim licence, React peers, root exports, the mapped guard amendments and the IA-5 raw-palette guard | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** in this registry, the Token Table and `README.md` saying Icons have not begun. **Merging any implementation pull request, the other primitives, BottomSheet/Portal, a semantic active/destructive colour mapping, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **Overlay-Root and Button sm Contract Ruling** | 2026-10-04 | **Decision A** — the overlay-root / `BottomSheet` modal boundary: the application-owned `Screen` supplies a document-level overlay root and identifies the background scope; the package-owned `BottomSheet` portals into it and owns focus entry and containment, Escape and scrim dismissal, focus return, body scroll locking and background unavailability to pointer **and** keyboard, restoring all of it on close and unmount; one sheet at a time; `Portal` and `FocusTrap` stay internal and unexported. **Decision B** — Button `sm` has a **minimum visible block size of 44px**, visible control and interactive target coinciding at ≥ 44 × 44px, as a minimum and not a fixed height | **v0.2 §9**'s *"Modal is expected to reuse the package's focus mechanics"* sentence; **v0.2 §2.3**'s *"small control 40"*; **v0.2 §3.2**'s *"sm 40"*; and **ADR 0003 §5**'s *"overlay composition is application-owned"* **only** where it would place `BottomSheet`'s internal portal behaviour outside the package. **No token identifier, value, count, artifact or export changes.** Implementation, ADR 0006, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized. |
 | **Overlay Failure-Signalling Channel Correction** | 2026-10-04 | **withdraws the final sentence of Decision A §A.4** — *"The mechanism for making it evident is representation and belongs to ADR 0006"* — so that **§A.9 governs** and the developer-visible failure-signalling channel is an **internal implementation choice**. The sentence is **struck in place, not deleted** | **nothing in v0.2.** It supersedes **one sentence of Decision A §A.4** and nothing else. **Both requirements §A.4 exists for remain binding**: invalid structure must produce a developer-observable failure and must never silently fall back to an inline sheet. §A.9 is unchanged. **No token, value, count, artifact or export changes**, and no implementation is authorized. |
+| **BottomSheet Height Ruling** | 2026-10-04 | the sheet **grows with its content** up to a maximum block size of **`calc(100dvh - var(--control-min-target))`**; **long content scrolls inside the sheet** while **title and footer stay reachable**; **the sheet must not overflow the dynamic viewport** | **nothing in v0.2** — v0.2 specified no sheet height anywhere, so there is nothing to replace; this closes an **unrecorded gap**, not a listed deferral. **No token is created** — `--control-min-target` is an existing public token at `44px` — and **no count, artifact or export changes**. Decision 16b is **not** reopened. |
+| **BottomSheet Implementation Authorization** | 2026-10-04 | authorizes **`BottomSheet` only** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved Decision A, Accepted ADR 0006 and height-ruling contracts | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying the primitives have not begun. **Merging any pull request, `TextField`, `Select`, `OtpInput`, `Button`, Button `md`'s token representation, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1007,6 +1009,136 @@ any source, test, script, guard, manifest or artifact change · a sixth
 primitive · a public `Portal` or `FocusTrap` · a new export subpath · a new
 token or design value · version change · tag · release · publication ·
 consumer-repository change · deployment.
+
+### BottomSheet Height Ruling — 2026-10-04
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 —
+approved owner design/product rulings. **It creates no token and authorizes
+no implementation.**
+
+**The rule.** The sheet **grows with its content**, up to a maximum block
+size of **`calc(100dvh - var(--control-min-target))`**. **Long content
+scrolls inside the sheet** while **the title and the footer remain
+reachable** at every height, and **the sheet must not overflow the dynamic
+viewport**. `--control-min-target` is the **existing public token** authored
+in `src/tokens/base.css`, resolved value **`44px`**, one of the approved
+118 — **no new token or value is created**, and the Token Foundation
+boundary stays **118 / 39 / 1**.
+
+**What it closes.** `BottomSheet`'s block size was specified nowhere — not in
+v0.2 §3.4, not in §2.3's control-geometry list, not in the Token Table, and
+**not on the deferral list either**. It was an **unrecorded gap** rather than
+a listed deferral, and it blocked implementation: §3.4's **"sticky footer
+action"** presupposes a bounded sheet with a scrolling content region, and
+without a bound a long filter list pushes the footer out of reach.
+
+**Why the cap is independent of the AppBar.** The reserved strip is sized by
+the **tap minimum**, not by whatever chrome sits above the sheet. The
+**exposed scrim is a dismissal target** — §3.4 makes scrim click close the
+sheet and §6 requires 44 × 44px for anything tappable — so
+`--control-min-target` is applied in **its own role**, not borrowed from an
+unrelated one; the inline axis is the full viewport width, so the block axis
+was the only one needing a rule. A cap written against `--app-bar-height`
+would tie the sheet's geometry to an **application-owned surface that is
+sometimes absent**, making the sheet taller or shorter depending on someone
+else's layout. The tap minimum is constant.
+
+**What it does not claim.** **A 44px visible strip does not by itself prove
+any accessibility requirement.** It reserves space; it does not prove the
+exposed scrim is perceivable or hittable on a given device, that browser
+chrome or a system gesture area does not obscure it, or that the footer
+stays reachable at large text sizes. **Those are rendered behaviours and
+must be verified in a browser**, against a real layout and at the approved
+text-zoom level. One edge is recorded rather than waved away: at **200% text
+enlargement on a short viewport**, a tall title plus a tall footer can
+squeeze the scrolling region. The scroll region still keeps the footer
+reachable, **every cap has this property and no cap is worse**, and it
+becomes a **required browser-test case**.
+
+**Boundaries.** **Decision 16b is not reopened** — it owns breakpoints,
+container roles, container maximum widths and responsive gutters, and a
+viewport-relative maximum on one component is none of those. **§6's zoom
+rule is unchanged**: this is a **maximum** on the sheet, not a fixed height
+on a text container. Decision 6a's sheet radius, `--shadow-sheet`,
+`--overlay`, `--z-scrim`, `--z-dialog` and `zakhmban-slide-up` are untouched.
+**No count, artifact or export changes**, the package stays `0.2.0` and
+`private`, and **no implementation is authorized**. The full record is in the
+Token Table.
+
+### BottomSheet Implementation Authorization — 2026-10-04
+
+**Authority kind: implementation authorization, owner tier.** Level 3 —
+approved owner rulings. **It decides no design value and creates no token.
+Scope: `BottomSheet` only.**
+
+**Preconditions, all met:** Decision A of the Overlay-Root and Button sm
+Contract Ruling is effective · the **Overlay Failure-Signalling Channel
+Correction** settles §A.4 against §A.9 · **ADR 0006 is Accepted** and entered
+in this registry as representation authority · the **BottomSheet Height
+Ruling** above closes the last open value.
+
+**Authorized, and limited to it:** a branch · local implementation commits ·
+a normal push · **one reviewable pull request** against `main` · `src/` work
+implementing `BottomSheet` against v0.2 §3.4's five props (**`open†`
+`title†` `onClose†` `footer` `children`**), the dialog duties of §3.4 and
+§6, Decision A, Accepted ADR 0006 and the height ruling · **exactly pinned
+development dependencies** for interaction testing, each justified in the
+pull request, with **`dependencies` staying `{}`** · amendment of
+`tests/architecture/styles-contract.test.ts`'s overlay guard **only in the
+same commit that supplies the approved contract and its tests** · the other
+guard amendments the work genuinely requires, **keeping the four remaining
+primitive names forbidden**.
+
+**Merging is not authorized.** Preparing the work and opening the pull
+request is as far as this record goes: **each merge remains a separate
+manual owner decision**, taken after review and after the required checks
+pass. A green pipeline is evidence, not approval.
+
+**Required boundary:** consume ADR 0006's overlay root and marked background
+scope exactly as defined · **no public `Portal` or `FocusTrap`, no sixth
+primitive, no new export subpath, no new token and no new design value** ·
+**never a silent inline sheet** when the required structure is invalid, with
+the failure **observable to the application developer** and the signalling
+channel an **implementation choice** · enforce the **single package-owned
+sheet** and **claim nothing** about the application-owned `Modal` policy ·
+real modal behaviour — accessible name from the required `title`,
+`role="dialog"` with `aria-modal`, focus entry and containment, **Escape**
+and **scrim-click** dismissal, focus return to the opener, background
+unavailable to **pointer and keyboard**, with **`aria-hidden` plus
+`pointer-events` not a substitute for keyboard exclusion** · body scroll
+locking and other temporary document effects **applied and reliably restored
+on close, on unmount and on interrupted lifecycle paths** · **RTL
+inheritance** and the approved scrim, surface, radius, shadow, stacking and
+motion contracts preserved, **reduced motion respected** · **paint order
+never inferred from DOM order alone** · package CSS reachable through the
+**existing `./styles` entry**, with no fifth subpath.
+
+**Acceptance outcomes:** test the **built** package, not only source ·
+**meaningful interaction tests** rather than restatements of the
+implementation — keyboard operation and focus containment, Escape and
+scrim-click dismissal, focus return, background unavailable to pointer **and**
+sequential keyboard navigation, each of ADR 0006's **four invalid
+structures** producing no inline sheet and an observable failure, **a second
+package-owned sheet refused**, and scroll-lock cleanup **including an
+unmount-while-open path** · a **later rendered-browser check** for what
+source cannot prove: actual **layering** against real application chrome,
+**RTL** on the portalled sheet, **focus** in a real engine, **scroll**
+locking and restoration, and the **height ruling** — the reserved scrim strip
+and a reachable footer at maximum height, on a short viewport and at **200%
+text enlargement** · **consumer-integration verification identified** and
+located in the consuming application: one valid overlay root, **complete**
+background marking across every application-controlled interactive region
+including its own portal mounts, and layering in its real layout.
+
+**Not authorized, and unchanged:** **merging any pull request** ·
+`TextField` · `Select` · `OtpInput` · `Button` · **Decision B §B.4's Button
+`md` token representation** · any Tier 2 component · a sixth primitive · a
+public `Portal` or `FocusTrap` · a new export subpath · a new token or design
+value · a runtime dependency · version change · **`v0.3.0` tag** · release ·
+GitHub Release · package publication · `zakhmban-therapists` or any other
+consumer-repository change · deployment · repository-visibility change.
+**The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
+unchanged and **no new tag**.
 
 ## Missing design-system document — scoped disposition
 
