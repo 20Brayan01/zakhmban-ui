@@ -94,6 +94,42 @@ interface Structure {
 }
 
 /**
+ * `inert` is the mechanism this component uses to make the marked background
+ * unavailable to pointer AND keyboard interaction, which Decision A §A.2
+ * requires and §A.3 insists must be true in operation, not merely declared.
+ *
+ * Where it does not exist, assigning `element.inert = true` creates a plain
+ * expando: the attribute is never reflected and nothing is excluded, so the
+ * background stays fully operable behind a sheet declaring `aria-modal`.
+ * That is precisely the untrue modal claim §A.3 forbids, and it would fail
+ * silently.
+ *
+ * This repository states no supported-browser baseline — there is no
+ * `browserslist`, no `.browserslistrc` and no prose rule here, in Frozen
+ * Technical Architecture v1.1 or in `project-context/` — so no rule excludes
+ * such a browser from scope. The sheet therefore refuses to open and says
+ * why, on the same principle as §A.4's no-silent-fallback: never present
+ * something that looks modal while the background is still operable.
+ *
+ * Providing an exclusion fallback instead would be a larger change than this
+ * correction, and it is not foreclosed — it would simply replace this guard.
+ */
+function assertBackgroundExclusionAvailable(): void {
+  if (
+    typeof HTMLElement === "undefined" ||
+    !("inert" in HTMLElement.prototype)
+  ) {
+    throw new Error(
+      `@zakhmban/ui BottomSheet: this browser does not support the \`inert\` ` +
+        `attribute, so the marked background cannot be made unavailable to ` +
+        `pointer and keyboard interaction. Opening would declare ` +
+        `aria-modal over an operable background, which the dialog contract ` +
+        `forbids (Decision A §A.2, §A.3). The sheet is not rendered.`,
+    );
+  }
+}
+
+/**
  * ADR 0006 §5 — invalid structure is exactly these four, and each must be
  * distinguishable in the message so a developer knows which obligation was
  * missed rather than only that something was.
@@ -165,6 +201,7 @@ export function BottomSheet({
       return;
     }
     try {
+      assertBackgroundExclusionAvailable();
       setStructure(readStructure());
       setFailure(null);
     } catch (error) {

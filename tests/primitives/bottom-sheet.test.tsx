@@ -15,9 +15,54 @@
  * request.
  */
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import { BottomSheet } from "../../src/index.js";
+
+/**
+ * jsdom 29 does not implement `inert` at all — `"inert" in
+ * HTMLElement.prototype` is false, and `element.inert = true` silently
+ * creates an expando that reflects to no attribute. An exclusion assertion
+ * written against the IDL property would therefore pass while proving
+ * nothing, so this suite installs a property that genuinely reflects to the
+ * attribute and the assertions read the ATTRIBUTE.
+ *
+ * Installing it is also what models a supporting browser: the component
+ * refuses to open without `inert`, and that refusal has its own test below,
+ * which removes this shim rather than relying on jsdom's gap by accident.
+ */
+const INERT_DESCRIPTOR: PropertyDescriptor = {
+  configurable: true,
+  get(this: HTMLElement) {
+    return this.hasAttribute("inert");
+  },
+  set(this: HTMLElement, value: boolean) {
+    if (value) {
+      this.setAttribute("inert", "");
+    } else {
+      this.removeAttribute("inert");
+    }
+  },
+};
+
+function installInert(): void {
+  Object.defineProperty(HTMLElement.prototype, "inert", INERT_DESCRIPTOR);
+}
+
+function removeInert(): void {
+  delete (HTMLElement.prototype as unknown as Record<string, unknown>)["inert"];
+}
+
+beforeAll(installInert);
+afterAll(removeInert);
 
 function shell(): { background: HTMLElement; root: HTMLElement } {
   const background = document.createElement("div");
@@ -82,11 +127,13 @@ describe("BottomSheet — background exclusion", () => {
 
     render(<BottomSheet open title="t" onClose={vi.fn()} />);
 
-    // `inert` is what removes the background from sequential focus
-    // navigation as well as from pointer interaction; §A.3 rejects
-    // aria-hidden plus pointer-events as a substitute.
-    expect(background.inert).toBe(true);
-    expect(second.inert).toBe(true);
+    // The ATTRIBUTE, not the IDL property: a property assignment proves
+    // nothing where `inert` is unimplemented. The attribute is what removes
+    // the background from sequential focus navigation as well as from
+    // pointer interaction; §A.3 rejects aria-hidden plus pointer-events as
+    // a substitute.
+    expect(background.hasAttribute("inert")).toBe(true);
+    expect(second.hasAttribute("inert")).toBe(true);
   });
 
   it("restores a background that was already inert to its own value", () => {
@@ -98,7 +145,7 @@ describe("BottomSheet — background exclusion", () => {
     );
     unmount();
 
-    expect(background.inert).toBe(true);
+    expect(background.hasAttribute("inert")).toBe(true);
   });
 
   it("clears inert on close", () => {
@@ -107,7 +154,7 @@ describe("BottomSheet — background exclusion", () => {
       <BottomSheet open title="t" onClose={vi.fn()} />,
     );
     rerender(<BottomSheet open={false} title="t" onClose={vi.fn()} />);
-    expect(background.inert).toBe(false);
+    expect(background.hasAttribute("inert")).toBe(false);
   });
 });
 
@@ -148,7 +195,7 @@ describe("BottomSheet — scroll lock", () => {
     unmount();
 
     expect(document.body.style.overflow).toBe("");
-    expect(background.inert).toBe(false);
+    expect(background.hasAttribute("inert")).toBe(false);
   });
 });
 
@@ -310,6 +357,27 @@ describe("BottomSheet — invalid structure never renders inline", () => {
       expect(document.querySelector("[role='dialog']")).toBeNull();
     });
   }
+});
+
+describe("BottomSheet — a browser without inert", () => {
+  it("refuses to open rather than declaring aria-modal over an operable background", () => {
+    removeInert();
+    try {
+      const { background } = shell();
+
+      expect(() =>
+        render(<BottomSheet open title="t" onClose={vi.fn()} />),
+      ).toThrow(/does not support the `inert` attribute/);
+
+      // The two halves that matter: nothing claims to be modal, and the
+      // background was never touched.
+      expect(document.querySelector("[role='dialog']")).toBeNull();
+      expect(background.hasAttribute("inert")).toBe(false);
+      expect(document.body.style.overflow).toBe("");
+    } finally {
+      installInert();
+    }
+  });
 });
 
 describe("BottomSheet — single package-owned sheet", () => {
