@@ -62,7 +62,7 @@ read it rather than inferring an order from this file.
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
 | [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
 | [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | Accepted | 2026-10-02 · accepted 2026-10-03 |
-| [0006](0006-overlay-root-representation-contract.md) | Overlay-Root Representation Contract | **Proposed** | 2026-10-04 |
+| [0006](0006-overlay-root-representation-contract.md) | Overlay-Root Representation Contract | Accepted | 2026-10-04 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
 Table had accumulated — names, CSS custom properties, TypeScript exports,
@@ -164,7 +164,7 @@ decisions** — the overlay-root/Portal technique, the Button `sm`
 left them — and **nothing is implemented by it**: no source file, generator,
 licence file, manifest change, guard change or export change accompanies it.
 
-**ADR 0006 is proposed, not accepted.** It supplies the **cross-boundary
+**ADR 0006 is accepted, 2026-10-04.** It supplies the **cross-boundary
 representation** that **Decision A** of the Overlay-Root and Button sm
 Contract Ruling (2026-10-04) reserved for it, and nothing else. It names two
 boolean attributes the application and the package must agree on —
@@ -192,14 +192,18 @@ authorize implementation** — `BottomSheet` would still need a separate owner
 implementation authorization, on the pattern of the Icon Foundation
 Implementation Authorization of 2026-10-03.
 
-**One item blocks its acceptance, and the ADR does not resolve it.** Decision
-A **§A.4** assigns the failure-signalling mechanism to this ADR while **§A.9**
-lists it among the items left to implementation. Both sit inside the same
-approved ruling, so no precedence rule separates them, and the registry's
-deferral rule forbids an implementer or an agent from filling the gap. The ADR
-therefore **specifies no channel** and records the **smallest owner
-correction** that would unblock it: strike one clause or the other. Every
-other part of the ADR stands unchanged under either reading.
+**The one item that blocked acceptance is closed.** Decision A **§A.4**
+assigned the failure-signalling mechanism to this ADR while **§A.9** listed it
+among the items left to implementation; both sat inside the same approved
+ruling, so no precedence rule separated them, and the ADR refused to settle a
+conflict between two clauses of an owner ruling by inference. The **Overlay
+Failure-Signalling Channel Correction of 2026-10-04 withdrew §A.4's
+sentence**, leaving **§A.9 to govern**: the channel is an **internal
+implementation choice**, and this ADR selects none. **Both requirements §A.4
+exists for remain binding** — invalid structure must produce a
+developer-observable failure and must never silently fall back to an inline
+sheet. **Its earlier Proposed merge did not accept it**; that merge recorded a
+proposal.
 
 ## Format
 

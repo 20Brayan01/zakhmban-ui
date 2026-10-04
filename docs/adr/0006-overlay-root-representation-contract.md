@@ -1,7 +1,13 @@
 # ADR 0006 — Overlay-Root Representation Contract
 
-- **Status:** Proposed
-- **Date:** 2026-10-04
+- **Status:** Accepted
+- **Date:** 2026-10-04 · **accepted 2026-10-04**, after the Overlay
+  Failure-Signalling Channel Correction of the same date closed the one item
+  that blocked it. **No other clause changes on acceptance**: the attribute
+  names, the six structural obligations, the invalid-structure list, the
+  delivery route and the layering caveat all stand exactly as proposed.
+  **Its earlier Proposed merge did not accept it** — that merge recorded a
+  proposal, and this record is the acceptance.
 - **Scope:** the **cross-boundary representation** that Decision A of the
   Overlay-Root and Button sm Contract Ruling (2026-10-04) reserved for this
   ADR — the DOM contract between the application-owned `Screen` and the
@@ -246,9 +252,19 @@ implemented and proven there.
 **(6)** means `BottomSheet` can validate the structure on open rather than
 racing the application's mount.
 
-**No wrapper element, no lifecycle hook and no ordering callback is
-required.** The structure is static markup in the shell; the package reads it
-and does not ask the application to run anything.
+**No lifecycle hook and no ordering callback is required.** The structure is
+static markup in the shell; the package reads it and does not ask the
+application to run anything.
+
+**On wrapper elements, stated precisely.** This contract **mandates no extra
+wrapper**: an application whose shell already gives **complete marked
+background coverage** — one existing element it can mark, or several it marks
+individually — adds nothing but the attributes. **An application without such
+an element must either add one wrapper or mark every applicable region
+separately**, and which of the two it chooses is the application's decision.
+The contract asks for **coverage**, not for a particular element; §3's
+completeness rule is the obligation, and a wrapper is one ordinary way to
+satisfy it.
 
 ### 5 · Validity, and the observable failure
 
@@ -262,38 +278,26 @@ is §A.4, and it is the cross-boundary outcome: a sheet that looks modal while
 trapped by a stacking context, or while leaving the background operable, is an
 accessibility regression that reaches production silently.
 
-**The failure must be observable to the application developer.** **This ADR
-does not choose the channel**, and it does not leave a placeholder either —
-the channel is **blocked on an owner correction**, for the reason below.
+**The failure must be observable to the application developer.** **The
+channel is an internal implementation choice**, and this ADR does not select
+one — not a throw, not a logged error, not a returned result state.
 
-> **OPEN — blocks acceptance of this ADR. Decision A contradicts itself on
-> who chooses the failure-signalling channel, and an ADR may not resolve a
-> conflict between two clauses of an owner ruling by inference.**
+> **CLOSED 2026-10-04 by the Overlay Failure-Signalling Channel Correction.**
+> As first written, Decision A carried two clauses that could not both be
+> followed: **§A.4** ended *"The mechanism for making it evident is
+> representation and belongs to ADR 0006"*, while **§A.9** listed *"the
+> signalling mechanism for that failure"* among the items **left to
+> implementation**. This ADR recorded the contradiction and refused to settle
+> it, because an ADR may not resolve a conflict between two clauses of an
+> owner ruling by inference. **The owner withdrew §A.4's sentence on
+> 2026-10-04**, leaving **§A.9 to govern**, and the sentence is struck in
+> place rather than deleted so the approved record survives.
 >
-> **§A.4:** *"The failure must be evident to the developer rather than degrade
-> an accessibility path in production. **The mechanism for making it evident
-> is representation and belongs to ADR 0006.**"*
->
-> **§A.9**, under *"Left to implementation, and deliberately NOT frozen by
-> ADR 0006"*: *"**the signalling mechanism for that failure**"*.
->
-> One clause assigns the channel to this ADR; the other withholds it. **Both
-> are inside the same approved ruling**, so neither the precedence chain nor
-> the global supersession rule separates them, and the registry's deferral
-> rule is explicit that *"a deferred or unresolved decision must not be filled
-> by an implementer, a reference kit, a consumer implementation or an AI
-> agent."* **This ADR therefore specifies no channel**, and **cannot be
-> accepted as complete until the owner corrects one clause.**
->
-> **The smallest correction** is a one-line amendment to Decision A naming
-> which clause governs: either **strike §A.4's sentence** *"The mechanism for
-> making it evident is representation and belongs to ADR 0006"*, leaving §A.9
-> to control and the channel an implementation choice — or **remove "the
-> signalling mechanism for that failure" from §A.9's not-frozen list**,
-> leaving §A.4 to control, in which case this ADR gains one section naming the
-> channel before acceptance. **Nothing else in this ADR changes either way**:
-> §5's invalid states, the no-inline-fallback rule and the requirement that
-> the failure be observable all stand unaltered under both readings.
+> **What the correction did not touch, and what this ADR therefore still
+> requires:** invalid structure must produce a **developer-observable
+> failure**, and must **never silently fall back to an inline sheet**. §5's
+> four invalid structures are unchanged. Only the **choice of channel** moved,
+> and it moved to implementation.
 
 ### 6 · Styling delivery — through the existing `./styles` entry
 
@@ -375,7 +379,7 @@ implemented, and these obligations attach to the commit that ships
 | **Root placement** | the sheet renders inside the element carrying `data-zakhmban-overlay-root`, that element is a `<body>` child, and a sheet opened from inside a transformed ancestor still paints above application chrome |
 | **Background identification** | every element carrying `data-zakhmban-overlay-background` is unavailable to pointer **and** to sequential keyboard navigation while open, and fully restored on close and on unmount |
 | **Marking completeness** | **a consumer-side test, in the consuming application, not here** — with a sheet open, no application-controlled interactive region remains reachable by pointer or by sequential keyboard navigation, the application's own `Modal` and toast mounts included. The package cannot test this, because it cannot see the application's markup |
-| **Missing or invalid root** | each of the four invalid structures of §5 produces **no inline sheet** and a developer-observable failure. **The channel this is observed through cannot be tested until the owner resolves the §A.4 / §A.9 conflict in §5** |
+| **Missing or invalid root** | each of the four invalid structures of §5 produces **no inline sheet** and a developer-observable failure. **The channel is an implementation choice**, so the test asserts the two outcomes and the implementation's own chosen signal, not a channel this ADR named |
 | **Styling delivery** | the overlay rules arrive through `@zakhmban/ui/styles`; the `exports` map is unchanged; **no fifth subpath** exists; and an empty overlay root affects neither layout nor hit-testing |
 | **RTL** | with `dir="rtl"` on the document element, the portalled sheet computes `direction: rtl`, and **no package rule sets `direction`** |
 

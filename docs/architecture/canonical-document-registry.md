@@ -163,6 +163,7 @@ reference kit, a consumer implementation or an AI agent.**
 | ADR 0003 | `docs/adr/0003-token-representation-and-artifact-contract.md` | **Accepted** — 2026-09-18 | token representation and artifact contract |
 | ADR 0004 | `docs/adr/0004-styles-keyframe-representation-contract.md` | **Accepted** — 2026-09-24 · **behaviour resolved 2026-09-25** | the four public keyframe names, their ownership, publicity and versioning rules, and the owner-decided behavioural contract each carries |
 | ADR 0005 | `docs/adr/0005-icon-representation-contract.md` | **Accepted** — 2026-10-03 | the Icon registry's generated-and-committed representation and its per-glyph mirroring flag, the glyph-delivery method and licence rule, the eleven public names, and the root-export surface for `Icon` / `IconProps` / `IconName` |
+| ADR 0006 | `docs/adr/0006-overlay-root-representation-contract.md` | **Accepted** — 2026-10-04 | the overlay-root DOM contract between the application-owned `Screen` and the package-owned `BottomSheet` — the two boolean attributes, the six structural obligations, the invalid-structure list, and delivery of the overlay styling through the existing `./styles` entry |
 | `ARCHITECTURE.md` | repository root | pointer | where each rule lives |
 | `README.md` | repository root | orientation | consumption and commands |
 | `tests/architecture/README.md` | `tests/architecture/` | orientation | guard traceability |
@@ -190,6 +191,7 @@ in full in the Token Table.
 | **Styles Keyframe Behaviour and Procedural Ratification** | 2026-09-25 | **Part 1** procedurally ratifies the substantive content of local draft commit `6a6eae84`, clarifying that the disputed **STOP** barred inventing or silently filling undefined behavioural values and required implementation to stay blocked, but did not bar documenting the gap or creating the local draft. **Part 2** supplies the exact behavioural contract for all four keyframes — start and end frames, durations, timing functions, iteration, RTL invariance, static fallbacks — plus the repetition rule and a refined reduced-motion rule. | **two scoped clauses of v0.2 §2.4**, and nothing else: the single-curve statement is superseded **for `zakhmban-shimmer` and `zakhmban-spin` only**, which use `linear`; and the closed three-duration set is supplemented by **1000ms for `zakhmban-spin` only**, as an authored-Styles value that is **not a token** and does **not** reopen the set. Neither exception may be generalised. **No token identifier, value, count, artifact or export changes**, and **no keyframe name changes.** |
 | **Icon Foundation Implementation Authorization** | 2026-10-03 | accepts **ADR 0005** and authorizes **preparation** of the eleven-name Icon foundation only — component, generated registry, pinned Lucide devDependency, verbatim licence, React peers, root exports, the mapped guard amendments and the IA-5 raw-palette guard | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** in this registry, the Token Table and `README.md` saying Icons have not begun. **Merging any implementation pull request, the other primitives, BottomSheet/Portal, a semantic active/destructive colour mapping, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **Overlay-Root and Button sm Contract Ruling** | 2026-10-04 | **Decision A** — the overlay-root / `BottomSheet` modal boundary: the application-owned `Screen` supplies a document-level overlay root and identifies the background scope; the package-owned `BottomSheet` portals into it and owns focus entry and containment, Escape and scrim dismissal, focus return, body scroll locking and background unavailability to pointer **and** keyboard, restoring all of it on close and unmount; one sheet at a time; `Portal` and `FocusTrap` stay internal and unexported. **Decision B** — Button `sm` has a **minimum visible block size of 44px**, visible control and interactive target coinciding at ≥ 44 × 44px, as a minimum and not a fixed height | **v0.2 §9**'s *"Modal is expected to reuse the package's focus mechanics"* sentence; **v0.2 §2.3**'s *"small control 40"*; **v0.2 §3.2**'s *"sm 40"*; and **ADR 0003 §5**'s *"overlay composition is application-owned"* **only** where it would place `BottomSheet`'s internal portal behaviour outside the package. **No token identifier, value, count, artifact or export changes.** Implementation, ADR 0006, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized. |
+| **Overlay Failure-Signalling Channel Correction** | 2026-10-04 | **withdraws the final sentence of Decision A §A.4** — *"The mechanism for making it evident is representation and belongs to ADR 0006"* — so that **§A.9 governs** and the developer-visible failure-signalling channel is an **internal implementation choice**. The sentence is **struck in place, not deleted** | **nothing in v0.2.** It supersedes **one sentence of Decision A §A.4** and nothing else. **Both requirements §A.4 exists for remain binding**: invalid structure must produce a developer-observable failure and must never silently fall back to an inline sheet. §A.9 is unchanged. **No token, value, count, artifact or export changes**, and no implementation is authorized. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -244,6 +246,7 @@ reader learns what replaced part of it.
 | **0003** | Token Representation and Artifact Contract | **Accepted** — 2026-09-18 | representation |
 | **0004** | Styles Keyframe Representation Contract | **Accepted** — 2026-09-24 | representation / public contract |
 | **0005** | Icon Representation and Glyph Delivery Contract | **Accepted** — 2026-10-03 | representation / public contract |
+| **0006** | Overlay-Root Representation Contract | **Accepted** — 2026-10-04 | representation / public contract |
 
 **ADR 0003 is accepted, 2026-09-18.** It settles the representation of the
 Token Foundation V1 values the Scoped Token Foundation V1 Owner Sign-off froze
@@ -342,6 +345,42 @@ rule is discharged** and **no clause of the ADR changed**. The verification is
 **version-scoped**: a later Lucide version must be re-checked. **Nothing is
 implemented by the ADR**; implementation is authorized separately and
 narrowly by the record below.
+
+**ADR 0006 is accepted, 2026-10-04.** It settles the **cross-boundary
+representation** that Decision A of the Overlay-Root and Button sm Contract
+Ruling reserved for it: the application marks a document-level overlay root
+with **`data-zakhmban-overlay-root`** and the content a sheet must disable
+with **`data-zakhmban-overlay-background`**; **six structural obligations**
+fix where the root sits and that it is unique, outside the background and
+rendered unconditionally; **four invalid structures** are enumerated, and an
+invalid one yields **no inline sheet** plus a **developer-observable
+failure**; and the overlay styling reaches consumers through the **existing
+`./styles` entry** on the ADR 0004 precedent, with **no fifth subpath and no
+`package.json` change**. Direction needs no package rule — a `<body>`-child
+root inherits `dir="rtl"` from the document, so owner **D-2** stands.
+
+**It creates and changes no design value**, and it is **not authority over
+one**. It names no selector beyond the two attributes the two sides must
+share, and **leaves every internal mechanism open** — the React portal
+technique, the inertness and scroll-lock mechanisms, focusable-element
+enumeration, the **failure-signalling channel** and the overlay stylesheet's
+path. **It adds no token, export, subpath, sixth primitive, public `Portal`
+or public `FocusTrap`.** It preserves the layering caveat it was corrected to
+carry: **document-level placement escapes the `Screen`'s stacking and
+clipping ancestors but does not by itself prove paint order**, which depends
+on the stacking contexts a given layout creates together with Decision 15's
+approved layering rules and **must be verified in a consumer layout**.
+
+**Its earlier Proposed merge did not accept it.** ADR 0006 entered `main` as
+**Proposed** through pull request #20, merge commit
+`36681b393c1987df7c3505e1898a1a818314c668`; **a merge is not an acceptance**,
+and the record above is. Acceptance became possible once the **Overlay
+Failure-Signalling Channel Correction** of the same date closed its one open
+item. **It is subordinate to Decision A**, which governs wherever the two
+could be read differently, and **accepting it authorizes no implementation**:
+`BottomSheet` still requires a separate owner implementation authorization,
+on the pattern of the Icon Foundation Implementation Authorization of
+2026-10-03.
 
 ## Token Table status
 
@@ -880,8 +919,9 @@ unknown 12 is NARROWED, not closed** — answered for **`Portal` and
 `Text`, `Screen` and `VisuallyHidden`**, each of which would still need the
 same ADR as a sixth primitive.
 
-**Reserved for ADR 0006, which does not yet exist — and scoped to the
-cross-boundary contract only.** **Mandatory:** the overlay-root DOM and
+**Reserved for ADR 0006 — scoped to the cross-boundary contract only.**
+(**ADR 0006 was proposed and accepted on 2026-10-04**; the sentence below
+described the position before it existed and is kept for the record.) **Mandatory:** the overlay-root DOM and
 stylesheet contract; how the background scope is identified by the
 application and read by the package, including any marking the application
 must apply; that the no-fallback failure is **observable** to the application
@@ -922,6 +962,51 @@ Authorization of 2026-10-03; **`Button`** needs its own authorization and the
 `md` representation answer; **`TextField`, `Select` and `OtpInput`** are
 untouched here and need their own. **The package stays `0.2.0` and
 `private`**, with `v0.1.0` and `v0.2.0` unchanged and **no new tag**.
+
+### Overlay Failure-Signalling Channel Correction — 2026-10-04
+
+**Authority kind: a scoped correction to an approved owner ruling, owner
+tier.** Level 3 — approved owner rulings. **It decides no design value,
+creates no token, changes no count, artifact or export, and authorizes no
+implementation.**
+
+**What it corrects.** The Overlay-Root and Button sm Contract Ruling of the
+same date carried two clauses that could not both be followed. **§A.4** ended
+*"The mechanism for making it evident is representation and belongs to ADR
+0006."* **§A.9** listed *"the signalling mechanism for that failure"* among
+the items **left to implementation**. Both sat inside the same approved
+ruling, so neither the precedence chain nor the global supersession rule
+separated them, and the deferral rule barred an implementer, a consumer or an
+agent from choosing between them. ADR 0006 recorded the contradiction and
+refused to settle it.
+
+**The correction.** **§A.4's final sentence is WITHDRAWN**, and **§A.9
+governs**: the developer-visible failure-signalling channel is an **internal
+implementation choice**, not a representation question and not ADR 0006's to
+settle.
+
+**Unchanged and still binding.** Both requirements §A.4 exists for stand
+exactly as written — **invalid structure must produce a developer-observable
+failure**, and **must never silently fall back to an inline sheet**. **§A.9
+is unchanged**, including its mandatory cross-boundary list and its
+interoperability exception. Decision A §A.1, §A.2, §A.3, §A.5, §A.6, §A.7,
+§A.8 and §A.10 are untouched, as is Decision B in full.
+
+**Form.** The withdrawn sentence is **struck through in place and marked with
+this date** in the Token Table, on the convention this register already uses
+for a closed entry. **No approved text is deleted**, and the dated ruling is
+otherwise preserved exactly as approved. The full record is in the Token
+Table.
+
+**Unchanged:** every token identifier and value · the **118 / 39 / 1**
+boundary · the exports · `private: true` · version `0.2.0` · the `v0.1.0` and
+`v0.2.0` tags · every open deferral.
+
+**Not authorized by it:** implementation of `BottomSheet` or any primitive ·
+any source, test, script, guard, manifest or artifact change · a sixth
+primitive · a public `Portal` or `FocusTrap` · a new export subpath · a new
+token or design value · version change · tag · release · publication ·
+consumer-repository change · deployment.
 
 ## Missing design-system document — scoped disposition
 

@@ -6909,8 +6909,14 @@ for as long as it is open:
 silently fall back to an inline sheet** that appears modal while being trapped
 by an ancestor stacking context, or while leaving the background operable.
 The failure must be evident to the developer rather than degrade an
-accessibility path in production. **The mechanism for making it evident is
-representation and belongs to ADR 0006.**
+accessibility path in production. ~~**The mechanism for making it evident is
+representation and belongs to ADR 0006.**~~ — **WITHDRAWN 2026-10-04** by the
+Overlay Failure-Signalling Channel Correction recorded below. **The sentence
+is struck, not deleted**, and the two requirements around it are **unchanged
+and still binding**: invalid structure must produce a **developer-observable
+failure**, and it must **never silently fall back to an inline sheet**. What
+the withdrawal removes is only the assignment of the *channel* to ADR 0006;
+**§A.9 governs it, and the channel is an internal implementation choice.**
 
 This is the concrete hazard Decision 15 already recorded: *"`transform`,
 `opacity` below 1, `filter` and positioned ancestors may create new stacking
@@ -7164,3 +7170,58 @@ lockfile, workflow or generated artifact change · a sixth primitive · a public
 `Portal` or `FocusTrap` · any new export subpath · any new token or design
 value · version change · tag · release · GitHub Release · package publication ·
 consumer-repository change · deployment · repository-visibility change.
+
+---
+
+## OVERLAY FAILURE-SIGNALLING CHANNEL CORRECTION — 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**Authority kind: a scoped correction to an approved owner ruling, owner
+tier.** Level 3 — approved owner design/product rulings. **It decides no
+design value, creates no token, changes no count, artifact or export, and
+authorizes no implementation.**
+
+**What it corrects.** The Overlay-Root and Button sm Contract Ruling of the
+same date carried two clauses that could not both be followed. **§A.4** ended
+*"The mechanism for making it evident is representation and belongs to ADR
+0006."* **§A.9**, under *"Left to implementation, and deliberately NOT frozen
+by ADR 0006"*, listed *"the signalling mechanism for that failure."* One
+assigned the channel to the ADR; the other withheld it. Both sat inside the
+same approved ruling, so neither the precedence chain nor the global
+supersession rule separated them, and the registry's deferral rule barred an
+implementer, a consumer or an agent from choosing between them.
+
+**The correction.** **§A.4's final sentence is WITHDRAWN.** **§A.9 governs:
+the developer-visible failure-signalling channel is an internal implementation
+choice**, not a representation question and not ADR 0006's to settle.
+
+**What is unchanged and remains binding.** Both requirements §A.4 exists for
+stand exactly as written:
+
+- **invalid structure must produce a developer-observable failure**, not a
+  silent degradation; and
+- **it must never fall back to an inline sheet** that appears modal while
+  trapped by an ancestor stacking context, or while leaving the background
+  operable.
+
+**§A.9 is unchanged**, including its mandatory cross-boundary list and its
+interoperability exception: a mechanism that turns out to require something
+of the application stops being internal and joins the contract.
+
+**Form of the correction.** The withdrawn sentence is **struck through in
+place and marked with this date**, on the convention this register already
+uses for a closed entry. **No approved text is deleted**, and the dated
+Overlay-Root and Button sm Contract Ruling is otherwise preserved exactly as
+approved.
+
+**Unchanged:** every token identifier and value · the **118 / 39 / 1**
+boundary · the generated artifacts · the exports · `private: true` · version
+`0.2.0` · the `v0.1.0` and `v0.2.0` tags · Decision A §A.1, §A.2, §A.3, §A.5,
+§A.6, §A.7, §A.8 and §A.10 · Decision B in full · every open deferral.
+
+**Not authorized by it:** implementation of `BottomSheet` or any primitive ·
+any source, test, script, guard, manifest or artifact change · a sixth
+primitive · a public `Portal` or `FocusTrap` · a new export subpath · a new
+token or design value · version change · tag · release · publication ·
+consumer-repository change · deployment.
