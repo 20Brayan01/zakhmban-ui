@@ -285,9 +285,14 @@ Also still open, and **not** closed by any decision above:
 - **the visible Checkbox square dimension** — §3.2 states a radius and a fill
   and **no dimension at all**. Recorded under Decision 9 below. It does not
   block the approved radius, but **Checkbox cannot be implemented without it**;
-- **the Button size sm height conflict** — §3.2 documents Button sm at 40px
+- ~~**the Button size sm height conflict** — §3.2 documents Button sm at 40px
   while §6's 44×44 minimum applies to anything tappable. Recorded under
-  Decision 10 below. **Decision 10 is scoped to Chip and does not resolve it**;
+  Decision 10 below. **Decision 10 is scoped to Chip and does not resolve
+  it**~~ — **CLOSED 2026-10-04** by the Overlay-Root and Button sm Contract
+  Ruling, Decision B: Button `sm` has a **minimum visible block size of
+  44px**, the visible control and the interactive target coincide, and v0.2
+  §2.3's *"small control 40"* and §3.2's *"sm 40"* are superseded. **No 40px
+  token is created**; the minimum resolves through `--control-min-target`;
 - **Chip state coverage** — whether Chip has a hover state, and whether
   "pressed" denotes `aria-pressed` selection or a transient pointer press.
   Recorded under Decision 10 below. Non-blocking for the approved 44px
@@ -324,8 +329,16 @@ Also still open, and **not** closed by any decision above:
 - **whether Select ever gains a custom listbox** — it remains native unless a
   later design decision authorises one, and no stacking capacity is reserved
   for it;
-- **the exact overlay-root / Portal technique**, which remains for Styles and
-  Primitives;
+- ~~**the exact overlay-root / Portal technique**, which remains for Styles
+  and Primitives~~ — **CLOSED IN PART 2026-10-04** by the Overlay-Root and
+  Button sm Contract Ruling, Decision A: ownership and the behavioural
+  boundary are settled — the application-owned `Screen` supplies a
+  document-level overlay root and identifies the background scope, and the
+  package-owned `BottomSheet` portals into it and owns focus, dismissal,
+  focus return, scroll locking and background unavailability, with `Portal`
+  and `FocusTrap` internal and unexported. **The shared overlay-root selector
+  and every other representation question remain open and are reserved for
+  ADR 0006, which does not yet exist**;
 - **whether each stacking role is public or package-internal**, reserved for
   ADR 0003;
 - **the positive desktop/web token contract — Decision 16b** — which V2
@@ -3227,7 +3240,12 @@ documented keyboard, focus and state obligation is preserved unchanged —
 approved focus indicator, and §6's requirement that a chip's pressed state
 carry a word or glyph and never colour alone.
 
-##### Open — the Button size sm height conflict
+##### Open — the Button size sm height conflict — **CLOSED 2026-10-04**
+
+> **Dated record, preserved unchanged.** The block below is Decision 10's
+> text as approved on 2026-09-18 and is correct at its own date. The conflict
+> it records was **closed on 2026-10-04** by Decision B of the Overlay-Root
+> and Button sm Contract Ruling. Nothing in Decision 10 changes.
 
 Recorded as a **separate unresolved component-geometry question** under the
 existing open questions. **No new numbered Token Table decision is created by
@@ -6817,3 +6835,332 @@ reduced-motion duty all stand. **Neither exception may be generalised.**
   audited**, and **version bump, tag, release-workflow execution, GitHub
   Release, package publication and consumer migration each remain separate
   owner actions.**
+
+---
+
+## OVERLAY-ROOT AND BUTTON SM CONTRACT RULING — 2026-10-04
+
+**Decided by:** human design/product owner · **Date:** 2026-10-04
+
+**Authority kind: value and behavioural contract, owner tier.** Level 3 —
+approved owner design/product rulings. **Representation stays with the ADR
+series**: this ruling names no selector, no attribute, no class, no CSS and no
+React mechanism, and creates no token.
+
+**Scope.** Two decisions, **separately numbered and separately scoped**,
+issued together because both block the same milestone and neither blocks the
+other. **Each carries its own supersession record, because their targets
+differ** — Decision A reaches v0.2 §9's Modal note and reconciles an ADR 0003
+rationale sentence; Decision B reaches v0.2 §2.3 and §3.2. Nothing in either
+decision depends on the other.
+
+**Implementation is not authorized by this ruling.** It records decisions.
+The separate authorizations each affected component still requires are listed
+in *Scope — what this ruling does not authorize* below.
+
+### DECISION A — OVERLAY ROOT AND BOTTOMSHEET MODAL BOUNDARY — APPROVED
+
+**The question D-6 allocated to v0.3.0 is answered as a boundary between the
+application-owned `Screen` and the package-owned `BottomSheet`.** The option
+approved is the one that keeps Decision 15's ownership table intact and adds
+no public surface.
+
+#### A.1 — What the application supplies
+
+- **The application-owned `Screen` supplies a dedicated overlay root at
+  document level**, **outside the `Screen` content subtree and outside its
+  stacking and clipping contexts.**
+- **The application identifies the background content** that must become
+  unavailable while a `BottomSheet` is open.
+
+Both are **consumer obligations**, on the pattern the Route A shimmer
+obligation already established: a duty this package states, documents and
+cannot itself enforce. They do not reverse the directional rule of v0.2 §7.3 —
+the package still imports nothing from an application and knows none by name.
+
+#### A.2 — What the package owns
+
+**`BottomSheet` portals its scrim and its surface into that root**, and owns,
+for as long as it is open:
+
+- **focus entry and focus containment**;
+- **Escape dismissal and scrim-click dismissal**;
+- **focus return to the opener**;
+- **body scroll locking**;
+- **making the identified background unavailable to pointer *and* keyboard
+  interaction.**
+
+**It restores every one of those effects on close and on unmount.**
+
+#### A.3 — Pointer interaction and truthful semantics
+
+- **The scrim receives pointer interaction; background content does not.**
+- **The modal's declared accessibility semantics must match its actual
+  behaviour.** `role="dialog"` with `aria-modal="true"` may only be declared
+  when the background is genuinely unavailable.
+- **`aria-hidden` plus `pointer-events` alone is not a substitute for
+  preventing keyboard interaction with the background.** A background that
+  remains reachable by sequential focus navigation is not inert, whatever the
+  attributes say.
+
+#### A.4 — No silent fallback
+
+**A missing overlay root, or an unidentified background scope, must not
+silently fall back to an inline sheet** that appears modal while being trapped
+by an ancestor stacking context, or while leaving the background operable.
+The failure must be evident to the developer rather than degrade an
+accessibility path in production. **The mechanism for making it evident is
+representation and belongs to ADR 0006.**
+
+This is the concrete hazard Decision 15 already recorded: *"`transform`,
+`opacity` below 1, `filter` and positioned ancestors may create new stacking
+contexts"* and *"A child with z-index 30 cannot escape an ancestor stacking
+context."* The approved `--press-scale: 0.98` transform is one such ancestor.
+
+#### A.5 — One overlay at a time
+
+- **Only one package-owned `BottomSheet` may be open at a time**, and **the
+  package prevents a second package-owned `BottomSheet` from opening.**
+- **Simultaneous `BottomSheet` and application-owned `Modal`, nested dialogs,
+  and multiple scrims are unsupported in v0.3.0.**
+- **Coordinating its own `Modal` with `BottomSheet` is the application's
+  responsibility.** **No internal package mechanism can enforce an
+  application's `Modal` policy, and none is claimed to.**
+
+This confirms rather than amends the standing entry *"simultaneous Modal and
+BottomSheet, nested dialogs, and multiple simultaneous blocking overlays —
+none is approved, and any future support requires a separate architecture
+ruling."* That entry stands.
+
+#### A.6 — The boundary that is retained
+
+**`Portal` and `FocusTrap` stay internal to `BottomSheet`.**
+
+**Not authorized by this decision:** a sixth primitive · a public `Portal` ·
+a public `FocusTrap` · any new export subpath · any new design value · any
+new token.
+
+#### A.7 — The application-owned Modal
+
+**For v0.3.0 the application-owned `Modal` provides its own focus
+mechanics.** It cannot reuse the package's, because the package exports none —
+that is the direct consequence of A.6, and it is accepted rather than worked
+around.
+
+**This supersedes one sentence of v0.2 §9**, named exactly in the supersession
+record below. **The rest of that note is not superseded**: `BottomSheet` and
+`Modal` still owe the identical dialog, focus-trap and escape-handling duties
+of §3.4 and §6, and `Modal` remains Tier 2.
+
+#### A.8 — What closes, what is preserved, what narrows
+
+**Of D-6's seven deferred items, this decision closes five and a half:**
+
+| D-6 item | Status after this decision |
+| --- | --- |
+| Portal implementation | **Closed** — owned by `BottomSheet`, internal, unexported |
+| Overlay container styling | **Ownership closed** (package Styles, per Decision 15); **the rules themselves are representation — ADR 0006** |
+| Simultaneous / nested overlay policy | **Closed** — one at a time; A.5 |
+| Body scroll locking | **Closed** — a package duty while open, restored on close |
+| Inert-background mechanics | **Outcome closed** (A.2, A.3); **the mechanism is representation — ADR 0006** |
+| Pointer-event policy | **Closed** — A.3 |
+| **Shared overlay-root selectors** | **NOT closed.** Reserved for ADR 0006 |
+
+**Decision 15's ownership table is preserved unchanged and is confirmed, not
+amended.** Its **Primitives** row already reads *"Modal and BottomSheet DOM
+structure · Scrim/Surface DOM order · any portal behaviour · focus trap ·
+Escape handling · focus return · local component isolation"*, and its
+**Styles** row already reads *"overlay-root styling · portal-container styling
+· body scroll locking · inert-background mechanics · pointer-event
+behaviour"*. Decision A adds only what Decision 15 never assigned: **which
+party renders the overlay-root node.** Styles still owns that node's rules.
+
+**ADR 0003 §5 is reconciled rather than left standing in parallel.** Its
+sentence *"`Screen`, `Portal` and overlay composition are application-owned"*
+is a **rationale for publishing the three stacking integers**, inside a
+document with representation authority only. **It remains correct as to
+`Screen` and as to overlay composition** — the application composes `Screen`
+and supplies the root, and still needs the integers to honour the order.
+**It is superseded only insofar as it would imply that `BottomSheet`'s
+internal portal behaviour is application-owned**, which Decision 15 had
+already assigned to Primitives.
+
+**v0.2 §9 unknown 12 is NARROWED, not closed.** For **`Portal` and
+`FocusTrap`** the question is answered: they are **not public components of
+this package**, and their mechanics live inside `BottomSheet`. **For `Box`,
+`Stack`, `Text`, `Screen` and `VisuallyHidden` unknown 12 remains open exactly
+as written**, and promoting any of them would still require the same ADR as a
+sixth primitive.
+
+#### A.9 — Reserved for ADR 0006, provisionally numbered
+
+**A separate representation ADR must be accepted before `BottomSheet`
+implementation.** Its subject is the **cross-boundary contract** — what the
+application and the package must agree on, and what a consumer can observe.
+
+**Mandatory in ADR 0006, because each of these crosses the boundary:**
+
+- the overlay-root **DOM and stylesheet contract** — the selector, attribute
+  or class a consumer renders, and how the package's Styles layer targets it;
+- how the **background scope** is identified by the application and read by
+  the package, **including any marking the application must apply** for the
+  package to make it unavailable;
+- that the **A.4 failure is observable to the application developer** rather
+  than silent. **The signalling mechanism itself is implementation**;
+- that the overlay CSS reaches consumers through the **existing** `./styles`
+  entry and adds **no** public subpath.
+
+**Left to implementation, and deliberately NOT frozen by ADR 0006:** the
+**React portal mechanism** · the **inertness mechanism** · the **scroll-lock
+mechanism** · **where the overlay CSS file sits** under `src/styles/`, which
+ADR 0003 §18 already governs.
+
+**Decision A fixes the observable outcome of each of those in A.2, A.3 and
+A.10**, and that is the part an owner must approve. An internal mechanism no
+application can see is a reviewed implementation choice, not a value — and
+freezing one in an ADR would bind a future maintainer to a technique for a
+reason no document could later recover.
+
+**The one exception is interoperability.** If a mechanism turns out to
+require something of the application — a wrapper element, an attribute, an
+ordering guarantee, a lifecycle hook — **that part stops being internal and
+belongs in the mandatory contract above**, and ADR 0006 must record it.
+
+**ADR 0006 must preserve the no-new-export boundary of A.6.** **It does not
+exist yet**, and nothing in this ruling may be read as if it did. **No
+mechanism is selected by this ruling.**
+
+#### A.10 — Behavioural outcomes a later implementation must prove
+
+Recorded as obligations, **not implemented now and not a test contract**:
+focus moves into the sheet on open · focus cannot leave it by keyboard while
+open · Escape closes · scrim click closes · focus returns to the opener on
+close · the background is unreachable by sequential focus navigation and by
+pointer while open · body scroll is locked while open and restored on close
+and on unmount · a second package-owned `BottomSheet` cannot open · the sheet
+renders in the overlay root and is not trapped by a transformed ancestor ·
+`aria-modal` is declared only when the background is genuinely unavailable ·
+reduced motion leaves `zakhmban-slide-up`'s `translateY(0)` end state.
+
+### DECISION B — BUTTON SM MINIMUM BLOCK SIZE — APPROVED
+
+**Button `sm` has a minimum visible block size of 44px.**
+
+- **The visible control and the interactive target coincide.** The
+  interactive target is **at least 44 × 44px**.
+- **44px is a minimum, not an exact fixed height.** Content, Persian line
+  height, text zoom, user font settings and permitted wrapping may make the
+  button taller.
+- **No invisible expanded-target model is created.**
+
+This applies to Button the reasoning **Decision 10** already approved for
+Chip, including its words *"This is minimum-height behaviour, not a fixed
+height"* and *"The visible Chip and its interactive target coincide. No
+invisible expanded-target model is created."* **One textual difference is
+recorded rather than glossed:** §3.2 gave Chip a *"Minimum 40px height"*,
+whereas §3.2 gives Button a **size scale** — *"Sizes sm 40 / md 48 / lg 52"* —
+which reads as a fixed height. Decision 10's acceptance basis therefore did
+not transfer automatically, and **this decision, not Decision 10, is what
+resolves Button.**
+
+#### B.1 — What is superseded
+
+**This decision supersedes two statements, named exactly**, and it does **not**
+supersede nothing:
+
+- **v0.2 §2.3, Control geometry** — the term **`small control 40`** inside
+  *"Tap minimum 44px · small control 40 · input 48 · primary button 52 · app
+  bar 56 · bottom nav 64 + 20 safe area."* **The rest of that list stands
+  unchanged**, including the 44px tap minimum, which this decision applies
+  rather than alters.
+- **v0.2 §3.2, the Button row** — the term **`sm 40`** inside *"Sizes sm 40 /
+  md 48 / lg 52."*
+
+#### B.2 — What is unchanged
+
+- **Button `md` 48 and `lg` 52 are unchanged.**
+- **Button is not added to the accessibility-exception register.** That
+  register continues to hold exactly one entry, ScaleSelect's 36px cells.
+- **§6's rule is unchanged and is strengthened by application**, including
+  *"Spacing may not be used to justify a smaller target."*
+
+#### B.3 — Representation: no new token
+
+**The 44px minimum is expressed through the existing `--control-min-target`
+role**, exactly as Decision 10 prescribed for Chip — `min-block-size:
+var(--control-min-target)`.
+
+- **No 40px geometry token is created or published.** ADR 0003 gap 3's
+  reasoning is discharged by removal of the conflict, not by publishing the
+  value it withheld.
+- **No new public token is created.** **Token Foundation stays 118 / 39 / 1.**
+
+#### B.4 — One follow-up, recorded accurately and not resolved here
+
+**How Button `md` 48 is expressed through an appropriately named token is a
+separate representation question, and it is not answered here.** The facts:
+`--control-height-button` carries **52px**, which §2.3 names as *"primary
+button 52"*; **48px exists only as `--control-height-input`**, a role named
+for a different control.
+
+**This decision invents no value for it and authorizes no misuse of
+`--control-height-input` for a Button.** It is a **representation question for
+the ADR series**, due with the Button implementation, and it is **a genuine
+blocker for a complete three-size Button** — `sm` and `lg` can resolve through
+approved, correctly-named roles today and `md` cannot.
+
+### Supersessions of record — this ruling
+
+| Decision | Exact earlier rule replaced | New effective rule |
+| --- | --- | --- |
+| **A** | **v0.2 §9**, Note on Modal and BottomSheet — the sentence *"The application's Modal is expected to reuse the package's focus mechanics rather than re-implement them."* | For v0.3.0 the application-owned `Modal` **provides its own focus mechanics**; the package exports none. The remainder of the note stands |
+| **A** | **ADR 0003 §5** — *"`Screen`, `Portal` and overlay composition are application-owned"*, **only** insofar as it would place `BottomSheet`'s internal portal behaviour outside the package | `BottomSheet`'s portal behaviour is **package-owned and internal**, per Decision 15's Primitives row. The sentence stands for `Screen` and for overlay composition, and the three stacking integers stay public |
+| **B** | **v0.2 §2.3**, Control geometry — the term **`small control 40`** | Button `sm` has a **minimum visible block size of 44px**; the visible control and the interactive target coincide |
+| **B** | **v0.2 §3.2**, Button row — the term **`sm 40`** in *"Sizes sm 40 / md 48 / lg 52"* | **`sm` ≥ 44px minimum**, `md` 48 and `lg` 52 unchanged |
+
+**No other part of v0.2 is superseded by this ruling.** **No token identifier,
+value, count or artifact changes**, the exports are unchanged, and the package
+remains **`0.2.0`** and **`private`**.
+
+### Deferrals this ruling closes
+
+- **the Button size sm height conflict** — closed by Decision B;
+- **the overlay-root and Portal technique**, as to **ownership and
+  behavioural boundary** — closed by Decision A, **except the shared
+  overlay-root selector**, which moves to ADR 0006 as representation;
+- **simultaneous / nested overlay policy for v0.3.0** — closed by A.5 as
+  *unsupported*.
+
+### Deferrals that remain open, and are untouched
+
+`--radius-pill` · the **banner accent contract (IA-6)**, which still blocks
+InfoBanner and ErrorBanner · Decision 6b's Modal radius · Decision 4b's
+shadows · **typography role assignment for error text**, banner prose and
+ListRow metadata · the visible **Checkbox** square dimension · Chip state
+coverage · border widths · the BottomNav badge-size defect · non-Card Surface
+bindings · the visited-link colour · **dark mode** · LTR direction ·
+`--shadow-none` representation · Decision 16b · **any sixth primitive** ·
+**any fourth public subpath** · and **v0.2 §9 unknown 12 for `Box`, `Stack`,
+`Text`, `Screen` and `VisuallyHidden`**.
+
+### Scope — what this ruling does not authorize
+
+**It authorizes no implementation.** Recording a decision is not an
+implementation authorization, and merging the pull request that records it is
+not one either.
+
+**Before any affected code:**
+
+- **`BottomSheet`** requires **ADR 0006 accepted and registry-entered**, and
+  then a **separate owner implementation authorization**, on the pattern of
+  the Icon Foundation Implementation Authorization of 2026-10-03;
+- **`Button`** requires a **separate owner implementation authorization**, and
+  the **B.4 representation question** answered for `md`;
+- **`TextField`, `Select` and `OtpInput`** are untouched by this ruling and
+  require their own implementation authorization.
+
+**Not authorized, and unchanged:** any source, test, script, manifest,
+lockfile, workflow or generated artifact change · a sixth primitive · a public
+`Portal` or `FocusTrap` · any new export subpath · any new token or design
+value · version change · tag · release · GitHub Release · package publication ·
+consumer-repository change · deployment · repository-visibility change.
