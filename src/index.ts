@@ -42,10 +42,22 @@ export { Icon } from "./icons/index.js";
 export type { IconName, IconProps } from "./icons/index.js";
 
 /**
- * Primitives — BottomSheet, the first of the frozen five, under the
- * BottomSheet Implementation Authorization of 2026-10-04. Two names and no
- * more: the overlay root is the application's, and `Portal` and `FocusTrap`
- * stay internal to the component (Decision A §A.6).
+ * Primitives — three of the frozen five.
+ *
+ * `BottomSheet` under the BottomSheet Implementation Authorization of
+ * 2026-10-04: the overlay root is the application's, and `Portal` and
+ * `FocusTrap` stay internal to the component (Decision A §A.6).
+ *
+ * `TextField` and `Select` under the TextField and Select Implementation
+ * Authorization of 2026-10-05. `SelectOption` is a type and not a runtime
+ * key; it is exported because `options†` cannot be typed without it, and it
+ * is the only name here that is neither a component nor a component's props.
+ *
+ * `Button` and `OtpInput` are still owed their own authorizations.
  */
 export { BottomSheet } from "./primitives/index.js";
 export type { BottomSheetProps } from "./primitives/index.js";
+export { TextField } from "./primitives/index.js";
+export type { TextFieldProps } from "./primitives/index.js";
+export { Select } from "./primitives/index.js";
+export type { SelectOption, SelectProps } from "./primitives/index.js";

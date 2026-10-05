@@ -24,16 +24,20 @@ describe("source entry", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the Validation Helpers, Icon and BottomSheet capabilities, and nothing else", async () => {
+  it("exports exactly the Validation Helpers, Icon and the three implemented primitives, and nothing else", async () => {
     // ADR 0002 and ADR 0005: the root barrel widens only by a reviewed diff.
-    // `Icon` joined it with the Icon Foundation; `IconName` and `IconProps`
-    // are types and so have no runtime key here. No default export, and no
-    // further name arriving unnoticed alongside them.
+    // `Icon` joined it with the Icon Foundation; `TextField` and `Select`
+    // with their authorization of 2026-10-05. `IconName`, `IconProps`,
+    // `TextFieldProps`, `SelectProps` and `SelectOption` are types and so
+    // have no runtime key here. No default export, and no further name
+    // arriving unnoticed alongside them.
     const entry = await import("../../dist/index.js");
     expect(Object.keys(entry).sort()).toEqual(
       [
         "BottomSheet",
         "Icon",
+        "Select",
+        "TextField",
         "isValidIranianNationalId",
         "normalizeIranianMobile",
       ].sort(),
@@ -43,7 +47,7 @@ describe("source entry", () => {
     expect(source).not.toMatch(/^export default\b/m);
   });
 
-  it("ships no primitive at this commit", () => {
+  it("ships only the authorized primitives", () => {
     // The scope boundary, enforced rather than trusted. Each of these arrives
     // in its own commit with its own tests; none may ride along in a
     // foundation change.
@@ -53,15 +57,24 @@ describe("source entry", () => {
     // "Icon" left it with the Icon Foundation, which the Icon Foundation
     // Implementation Authorization of 2026-10-03 permits. "BottomSheet" left
     // it with the BottomSheet Implementation Authorization of 2026-10-04.
-    // The four remaining frozen primitives stay, each still owed its own
-    // authorization before it may appear.
+    // "TextField" and "Select" left it with theirs of 2026-10-05, which is
+    // explicit that it keeps `OtpInput` and `Button` forbidden.
+    //
+    // Those two remain, each still owed its own authorization before it may
+    // appear. The match is on the file's basename with separators removed,
+    // so neither `text-field.tsx` nor `otp_input.tsx` could slip past a
+    // substring test on the full path.
     const files = walk(srcDir);
+    const basenames = files.map((file) =>
+      file
+        .slice(file.lastIndexOf("/") + 1)
+        .toLowerCase()
+        .replace(/[-_]/g, ""),
+    );
 
-    for (const forbidden of ["Button", "TextField", "Select", "OtpInput"]) {
+    for (const forbidden of ["Button", "OtpInput"]) {
       expect(
-        files.some((file) =>
-          file.toLowerCase().includes(forbidden.toLowerCase()),
-        ),
+        basenames.some((name) => name.includes(forbidden.toLowerCase())),
         `src/ contains a file matching "${forbidden}" — that belongs to a later commit`,
       ).toBe(false);
     }

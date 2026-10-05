@@ -34,6 +34,9 @@ const ALL_STYLES = [
   "global.css",
   "keyframes.css",
   "overlay.css",
+  // The shared TextField and Select surface, delivered through the same
+  // ./styles entry. Every hygiene rule below applies to it unchanged.
+  "field.css",
 ];
 
 /**
