@@ -18,10 +18,15 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the ADR 0002 and ADR 0005 capabilities, and nothing else", async () => {
+  it("exports exactly the ADR 0002, ADR 0005 and BottomSheet capabilities, and nothing else", async () => {
     const entry = await import("@zakhmban/ui");
     expect(Object.keys(entry).sort()).toEqual(
-      ["Icon", "isValidIranianNationalId", "normalizeIranianMobile"].sort(),
+      [
+        "BottomSheet",
+        "Icon",
+        "isValidIranianNationalId",
+        "normalizeIranianMobile",
+      ].sort(),
     );
   });
 

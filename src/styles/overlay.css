@@ -1,0 +1,126 @@
+/**
+ * Overlay styles — authored Styles CSS. This file is a source of truth.
+ *
+ * The package-owned `BottomSheet` surface and its scrim, delivered through
+ * the existing `@zakhmban/ui/styles` entry on the ADR 0004 precedent: no new
+ * public subpath, and `package.json` is unchanged.
+ *
+ * WHAT TARGETS THE APPLICATION'S OVERLAY ROOT: nothing, deliberately.
+ * Accepted ADR 0006 requires that "an overlay root that contains no open
+ * sheet must not affect layout, paint or hit-testing". The root is an
+ * application-owned element that is always present, so the safest rule is
+ * none at all: the scrim and the surface position themselves against the
+ * viewport, need no help from their mount point, and an empty root is a
+ * zero-height block box by construction rather than by a rule that has to be
+ * got right.
+ *
+ * LAYERING. `--z-scrim` and `--z-dialog` are Decision 15's approved
+ * integers. They order the scrim below the surface, and ADR 0006's
+ * document-level root is what takes both out of the `Screen`'s stacking and
+ * clipping ancestors. Neither fact proves paint order in a given consumer
+ * layout — ADR 0006 §4 is explicit that this must be verified there — so
+ * nothing here is written as if it did.
+ *
+ * HEIGHT, and the two approved states (BottomSheet Height Ruling,
+ * 2026-10-04, with its constrained-height fallback). One mechanism produces
+ * both states and needs no threshold, no measurement and no script:
+ *
+ *   - the surface is capped at `calc(100dvh - var(--control-min-target))`,
+ *     which reserves the 44px exposed scrim region, and it scrolls;
+ *   - the title lives inside the scrolling body, because v0.2 §3.4 names
+ *     only the footer as sticky;
+ *   - the footer is `position: sticky` at the block end of that scroller.
+ *
+ * Sticky carries the ordinary case: pinned while there is room, with the
+ * content scrolling past it. It does NOT carry the degenerate one. A sticky
+ * box taller than its scrollport has its bottom inset pinned and its top
+ * pushed permanently out of view, so a footer taller than the sheet would
+ * strand its own action — verified in a browser, not assumed. That is the
+ * condition the ruling's fallback exists for, so the component measures it
+ * and marks the surface, and the rule below unpins the footer for that state
+ * only: the whole bounded sheet then scrolls and everything is reachable.
+ *
+ * The condition is "does the footer fit in the scrollport", not a number.
+ * No threshold, height or token is introduced, and the fallback is never a
+ * layout the component chooses — only one it is forced into.
+ *
+ * MOTION. `zakhmban-slide-up` is applied with its approved duration, easing
+ * and single iteration. No reduced-motion rule appears here and none is
+ * needed: `keyframes.css` already redefines the keyframe to a static
+ * `translateY(0)` under `prefers-reduced-motion: reduce`, so the end state
+ * is reached with no animation.
+ *
+ * DIRECTION. No rule sets `direction` (owner D-2). The sheet inherits it
+ * from the document through the `<body>`-child overlay root, which is one of
+ * the reasons ADR 0006 puts the root there.
+ *
+ * The non-Card Surface binding below is a component decision, which is where
+ * Decision 14 puts it: "Their exact component bindings remain component /
+ * Styles decisions unless another canonical rule already governs them."
+ */
+
+.zakhmban-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scrim);
+  background-color: var(--overlay);
+}
+
+.zakhmban-sheet-surface {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--z-dialog);
+
+  display: flex;
+  flex-direction: column;
+
+  /* BottomSheet Height Ruling: content-driven below the cap, and the cap
+     reserves one tap minimum of scrim. `dvh` so collapsing browser chrome
+     cannot push the footer off screen. */
+  max-block-size: calc(100dvh - var(--control-min-target));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  /* Decision 6a: block-start corners only. */
+  border-start-start-radius: var(--radius-sheet);
+  border-start-end-radius: var(--radius-sheet);
+
+  background-color: var(--surface);
+  box-shadow: var(--shadow-sheet);
+
+  animation: zakhmban-slide-up var(--duration-slow) var(--easing-standard) 1;
+}
+
+/* The title scrolls with the content: v0.2 §3.4 names only the footer as
+   sticky, and that is what keeps a usable scrolling region at constrained
+   heights. */
+.zakhmban-sheet-body {
+  flex: 1 1 auto;
+  padding: var(--space-4);
+}
+
+.zakhmban-sheet-title {
+  margin-block: 0 var(--space-3);
+  font-size: var(--text-section-title-size);
+  line-height: var(--text-section-title-line-height);
+  font-weight: var(--text-section-title-weight);
+  color: var(--text-primary);
+}
+
+.zakhmban-sheet-footer {
+  position: sticky;
+  inset-block-end: 0;
+  flex: 0 0 auto;
+  padding: var(--space-4);
+  background-color: var(--surface);
+}
+
+/* The constrained-height fallback of the BottomSheet Height Ruling. The
+   component sets this state only when a pinned footer would strand part of
+   itself; the sheet is already scrollable, so unpinning is all that is
+   needed to bring every part back into reach. */
+.zakhmban-sheet-surface[data-zakhmban-sheet-footer="scrolls"]
+  .zakhmban-sheet-footer {
+  position: static;
+}

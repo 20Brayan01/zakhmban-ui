@@ -28,7 +28,26 @@ function declarations(css: string): string[] {
 
 const reset = read("reset.css");
 const global = read("global.css");
-const ALL_STYLES = ["fonts.css", "reset.css", "global.css", "keyframes.css"];
+const ALL_STYLES = [
+  "fonts.css",
+  "reset.css",
+  "global.css",
+  "keyframes.css",
+  "overlay.css",
+];
+
+/**
+ * The four Styles files that existed before the overlay work. D-6's
+ * prohibition still binds every one of them: the overlay mechanics belong in
+ * `overlay.css` and nowhere else, so a `position: fixed` appearing in
+ * `global.css` is still the defect the guard was written to catch.
+ */
+const PRE_OVERLAY_STYLES = [
+  "fonts.css",
+  "reset.css",
+  "global.css",
+  "keyframes.css",
+];
 
 describe("D-1 · the minimal reset", () => {
   it("contains exactly the three approved rules", () => {
@@ -123,10 +142,17 @@ describe("D-2 · the global body contract", () => {
   it("never forces direction — the document owns it", () => {
     // v0.2 §5 sets dir="rtl" and lang="fa" once on the document, and the font
     // ruling assigns framework document/head integration to applications.
+    //
+    // Matched as a declaration rather than as a substring: `flex-direction`
+    // is a layout property that says nothing about writing direction, and a
+    // bare `includes("direction:")` reads it as a violation. The property
+    // this rule is about is `direction`, at the start of a declaration.
+    const DIRECTION_DECLARATION = /(^|[;{\s])direction\s*:/;
     for (const file of ALL_STYLES) {
-      expect(read(file).includes("direction:"), `${file} sets direction`).toBe(
-        false,
-      );
+      expect(
+        DIRECTION_DECLARATION.test(read(file)),
+        `${file} sets direction`,
+      ).toBe(false);
     }
   });
 });
@@ -222,10 +248,17 @@ describe("Styles CSS hygiene", () => {
     }
   });
 
-  it("implements no overlay-root, Portal or overlay mechanic", () => {
-    // D-6: excluded from v0.2.0 and allocated to v0.3.0 alongside the five
-    // primitives. No technique is approved, so none may appear.
-    for (const file of ALL_STYLES) {
+  it("keeps overlay mechanics out of every non-overlay Styles file", () => {
+    // D-6 excluded overlay mechanics from v0.2.0 while no technique was
+    // approved. Decision A, Accepted ADR 0006 and the BottomSheet Height
+    // Ruling have since approved one, and the BottomSheet Implementation
+    // Authorization of 2026-10-04 permits it to ship — in `overlay.css`,
+    // alongside the component and these tests, and nowhere else.
+    //
+    // The prohibition is therefore narrowed, not lifted: the four files that
+    // predate the overlay work may still not acquire a stacking, scroll-lock
+    // or inertness mechanic by accident.
+    for (const file of PRE_OVERLAY_STYLES) {
       const source = read(file);
       for (const deferred of [
         "overlay-root",

@@ -13,6 +13,15 @@ const manifest: Record<string, unknown> = JSON.parse(
  */
 const ALLOWED_DEV_DEPENDENCIES = [
   "@eslint/js",
+  // BottomSheet is the first INTERACTIVE primitive, so its contract is
+  // behaviour rather than markup: which element has focus, whether the
+  // background is really excluded, what the document looks like after an
+  // interrupted unmount. jsdom supplies the DOM those assertions need and
+  // Testing Library drives it. Both are development-only and neither
+  // reaches dist/ (BottomSheet Implementation Authorization, 2026-10-04).
+  "@testing-library/dom",
+  "@testing-library/react",
+  "jsdom",
   "@types/node",
   "eslint",
   "prettier",

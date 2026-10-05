@@ -72,7 +72,8 @@ describe("authored token CSS", () => {
   });
 
   it("keeps the style entry separate — it is not an eighth token file", () => {
-    // Styles v0.2.0 added four authored stylesheets and the font directory
+    // Styles v0.2.0 added four authored stylesheets and the font directory;
+    // the BottomSheet work added overlay.css as a fifth.
     // beside the entry. The entry still imports the tokens through the single
     // base.css aggregation point, and FIRST, so every Styles rule below it
     // resolves its values.
@@ -82,6 +83,7 @@ describe("authored token CSS", () => {
       "global.css",
       "index.css",
       "keyframes.css",
+      "overlay.css",
       "reset.css",
     ]);
     const entry = readFileSync(`${stylesDir}/index.css`, "utf8");
@@ -94,6 +96,7 @@ describe("authored token CSS", () => {
       "./reset.css",
       "./global.css",
       "./keyframes.css",
+      "./overlay.css",
     ]);
   });
 
