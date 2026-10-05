@@ -278,10 +278,15 @@ Also still open, and **not** closed by any decision above:
   glyph-coverage verification, CSS URL resolution, offline loading and
   source/dist byte parity — recorded with that ruling and owned by the
   implementation commit;
-- **typography role assignment** for **error text**, **banner explanatory
+- **typography role assignment** for ~~**error text**~~, **banner explanatory
   prose** and **ListRow metadata** — recorded under Decision 8 below. It does
   not block Caption weight for the four canonically named uses, but it does
-  block complete typography coverage for the affected components;
+  block complete typography coverage for the affected components.
+  **CLOSED IN PART 2026-10-05** by the TextField and Select Error Typography
+  Ruling: **`TextField` and `Select` error text takes the Caption step and
+  `--danger-fg`**, which unblocks those two components. **Banner explanatory
+  prose and ListRow metadata remain open exactly as recorded**, and no other
+  typography role is settled;
 - **the visible Checkbox square dimension** — §3.2 states a radius and a fill
   and **no dimension at all**. Recorded under Decision 9 below. It does not
   block the approved radius, but **Checkbox cannot be implemented without it**;
@@ -2889,7 +2894,9 @@ the Phase 1 kit and the shipped Website, at a different size (13px).
 ##### Caption role coverage — the explicit scope
 
 Caption at 400 covers **only** the four uses explicitly supported by canonical
-documentation:
+documentation — **plus a fifth added 2026-10-05**, `TextField` and `Select`
+error text, by the TextField and Select Error Typography Ruling, which
+supersedes the word *only* for that one addition and for nothing else:
 
 1. **Hint**
 2. **Timestamp**
@@ -2905,7 +2912,14 @@ documentation:
 
 **Role membership must not be inferred from a shared font size.**
 
-##### Open — typography role assignment
+##### Open — typography role assignment — **CLOSED IN PART 2026-10-05**
+
+> **Dated record, preserved unchanged.** The block below is Decision 8's text
+> as approved on 2026-09-18 and is correct at its own date. Its **error-text**
+> half was closed on **2026-10-05**, for `TextField` and `Select` only, by the
+> TextField and Select Error Typography Ruling: those two take the Caption
+> step and `--danger-fg`. **Banner explanatory prose and ListRow metadata
+> remain open**, and nothing else in Decision 8 changes.
 
 Recorded here as an **unresolved item under the existing open font and
 typography design questions**. **No new numbered Token Table decision is
@@ -7522,6 +7536,214 @@ consumer-repository change · deployment · repository-visibility change.**
 contract (IA-6) · Decision 6b's Modal radius · Decision 4b's shadows ·
 typography role assignment for error text · border widths · the Checkbox
 square dimension · Chip state coverage · Decision 16b · v0.2 §9 unknown 12
+for `Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
+
+**The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
+unchanged and **no new tag**.
+
+---
+
+## TEXTFIELD AND SELECT ERROR TYPOGRAPHY RULING — 2026-10-05
+
+**Decided by:** human design/product owner · **Date:** 2026-10-05
+
+**Authority kind: value assignment, owner tier.** Level 3 — approved owner
+design/product rulings. **It creates no token, changes no count and
+authorizes no implementation.**
+
+### The exact earlier deferral
+
+Decision 8's Caption approval closed the Caption weight question for four
+named uses and left this one open, in terms that named these two components:
+
+> **Typography role assignment remains open for error text, banner explanatory
+> prose and ListRow metadata.**
+
+and recorded why it mattered:
+
+> **Error text exists on frozen Tier-1 primitives** — `TextField` and `Select`
+> both carry an `error` prop that §2.2 assigns to no type step. … **These
+> roles must be assigned before the affected components can be implemented
+> without guessing.**
+
+It was explicit that the approval did not reach them: *"This ruling does NOT
+automatically assign Caption typography to: TextField or Select error text"*,
+and *"Role membership must not be inferred from a shared font size."*
+
+### The new effective rule
+
+**`TextField` and `Select` error-message text takes the existing Caption
+step — `--text-caption-size` 12px, `--text-caption-line-height` 1.5,
+`--text-caption-weight` 400 — and the existing `--danger-fg` token for its
+ink.**
+
+- **No token is created.** All four properties are already among the approved
+  118, and the **118 / 39 / 1** boundary is unchanged.
+- **No new value is approved.** This assigns an existing role to a use that
+  had none; it alters no size, weight, line height or colour.
+- `--danger-fg` (`#C80303`) on `--background` (`#FFFFFF`) measures
+  **6.0515:1**, clearing §6's 4.5:1 for text. **No claim of complete
+  accessibility conformance follows from that one measurement.**
+
+**Why Caption.** It is already the approved step for **Hint**, the sibling
+message slot on the same control, so hint and error share a size and differ
+by ink and `aria-invalid`. A field that changed type size when it became
+invalid would shift its own layout on every validation.
+
+**Colour is not the only signal**, as §6 requires: the state is carried by
+`aria-invalid`, by the message text itself and by the error border, not by
+the ink alone.
+
+### Scope — narrow, and stated as such
+
+**This assignment applies to `TextField` and `Select` error text only.**
+
+**It does not settle** banner explanatory prose · ListRow metadata · any
+other deferred typography role · the Body–Caption relationship · the
+typography family · Caption weight for any further use. **Those remain open
+exactly as recorded**, and the live open-questions entry is marked closed **in
+part** rather than closed.
+
+**It supersedes** one statement, named exactly: **Decision 8's Caption
+role-coverage list**, which read *"Caption at 400 covers **only** the four
+uses explicitly supported by canonical documentation"*. That list now carries
+a **fifth** use — `TextField` and `Select` error text — **by this ruling and
+for these two components only**. The four original uses are unchanged, and
+the dated Decision 8 record is preserved as approved.
+
+### Border bindings — confirmed as implementation, under Decision 14
+
+§3.2 names a **"blue border"** on focus and §2.3 gives **1.5px** for an error
+border, neither bound to a token. **Decision 14 governs**: *"Their exact
+component bindings remain **component / Styles decisions** unless another
+canonical rule already governs them"*, and it names **the controls**
+explicitly.
+
+**The implementer may therefore bind the focused and error border treatments
+to appropriate existing public colour tokens**, subject to two conditions:
+
+1. **The implementation pull request must state and justify the exact
+   bindings it chose**, so the choice is reviewed rather than discovered.
+2. **No token may be created and no raw colour value used.**
+
+**The existing global `:focus-visible` treatment is untouched.** D-3's
+two-ring indicator already ships in `global.css`; neither component may
+replace, remove or re-declare it, and the focused *border* is a separate
+treatment that sits alongside it.
+
+### Boundaries
+
+**No token identifier, value, count, artifact or export changes** · the
+exports are unchanged · the package stays **`0.2.0`** and **`private`**, with
+`v0.1.0` and `v0.2.0` unchanged and **no new tag** · **no implementation is
+authorized by this ruling**; the authorization below is a separate record.
+
+---
+
+## TEXTFIELD AND SELECT IMPLEMENTATION AUTHORIZATION — 2026-10-05
+
+**Decided by:** human design/product owner · **Date:** 2026-10-05
+
+**Authority kind: implementation authorization, owner tier.** Level 3 —
+approved owner rulings. **It decides no design value and creates no token.**
+
+**Scope: `TextField` and `Select`, together.** Every other primitive is
+outside it.
+
+**Preconditions, all met.** The two components' public contracts are fully
+specified in v0.2 §3.2; their geometry is approved and public
+(`--control-height-input` 48px, `--radius-input` 14px); the disabled triplet,
+`--border` and the label and hint type steps are approved; D-3's focus
+indicator already ships; and the **Error Typography Ruling above closes the
+one open value that named them**. No other open Token Table entry touches
+either component: §3.2's *"native control unless a design need forces a
+listbox"* already resolves the standing Select-listbox question to **native**.
+
+### Authorized, and limited to it
+
+- a **branch**, local **implementation commits**, a **normal push**, and
+  **one reviewable pull request** against `main`;
+- `src/` work implementing **`TextField`** and **`Select`** against v0.2 §3.2
+  — `TextField`'s `label†` `value` `onChange` `hint` `error` `required`
+  `suffix` `multiline` `rows` `dir` `inputMode`, and `Select`'s `label†`
+  `options†` `value` `onChange` `hint` `error` `placeholder`, with the
+  `className` / `style` / `id` / `data-*` / `aria-*` pass-through and ref
+  forwarding §3 requires of every component;
+- the **component CSS** these two need, authored under `src/styles/` per
+  ADR 0003 §18 and delivered through the **existing `./styles` entry**;
+- the **guard amendments** the work genuinely requires, each a reviewed diff,
+  **keeping `OtpInput` and `Button` forbidden**;
+- **exactly pinned development dependencies** if any are genuinely needed
+  beyond those already present, each justified in the pull request.
+  **`dependencies` stays `{}`.**
+
+**Merging is not authorized.** Preparing the work and opening the pull
+request is as far as this record goes: **the merge is a separate manual owner
+decision**, taken after review and after the required checks pass. **Green CI
+is evidence, not merge approval.**
+
+### Required implementation boundary
+
+- **The approved API and nothing more.** No prop outside §3.2's two lists, no
+  variant, no tone and no size prop.
+- **`Select` is a native control.** A custom listbox is **not authorized**;
+  §3.2 permits one only if *"a design need forces"* it, and that would be a
+  separate owner decision. Were one ever authorized, §3.2 requires full
+  `role="listbox"` keyboard semantics.
+- **Accessibility as §3.2 and §6 state it:** a real `<label>` — **never
+  placeholder-as-label** — `hint` and `error` wired through
+  `aria-describedby`, `aria-invalid` on error, full keyboard operation, and
+  the first invalid field receiving focus where §4.2's submit behaviour
+  applies to the component.
+- **Error text** takes the Caption step and `--danger-fg`, per the ruling
+  above. **Hint** takes Caption at 400, already approved.
+- **Focused and error borders** bind to existing public colour tokens, with
+  the exact bindings **stated and justified in the pull request**. **No new
+  token, no raw colour value.**
+- **The global `:focus-visible` indicator stays intact** — not replaced, not
+  removed, not re-declared.
+- **RTL:** logical properties only, and **no rule sets `direction`** (owner
+  D-2). `TextField`'s `dir` prop is the caller's isolation mechanism for a
+  Latin technical value (v0.2 §5), not a direction the component decides.
+- **No new design value or token**, no new export subpath, and **no change to
+  the `exports` map**.
+
+### Acceptance outcomes
+
+- **Component tests** for both: label association, `aria-describedby` wiring
+  for hint and error, `aria-invalid`, the required and disabled states, the
+  read-only state, `TextField`'s multiline and suffix forms, and `Select`'s
+  option rendering and change behaviour.
+- **Keyboard tests**: full operation without a pointer, focus order, and —
+  for `Select` — native keyboard selection.
+- **Accessibility assertions** that are behavioural rather than markup
+  restatements: that the accessible name comes from the real `<label>`, and
+  that the error message is announced through `aria-describedby` rather than
+  by colour.
+- **Built-package verification**: the architecture suite's existing
+  discipline extended to the new surface, and **`verify:dist`** green.
+- **A rendered-browser check** for what source cannot prove: the 48px control
+  height and 14px radius as rendered, the focused and error border treatments
+  against the **unchanged** global focus ring, RTL layout and label placement,
+  and the error message's rendered size and ink. **State what was and was not
+  verified; claim no complete accessibility conformance.**
+- **Consumer-integration obligations** identified in the pull request, not
+  performed in it.
+
+### Not authorized, and unchanged
+
+**Merging any pull request** · **`Button`** · **`OtpInput`** · **any change
+to `BottomSheet`** · `Icon` · any **Tier 2** component · a sixth primitive ·
+a public `Portal` or `FocusTrap` · a new export subpath · **any new design
+value or token** · a runtime dependency · **version change · tag · release ·
+GitHub Release · package publication · `zakhmban-therapists` or any other
+consumer-repository change · deployment · repository-visibility change.**
+
+**Still deferred and untouched:** `--radius-pill` · the banner accent
+contract (IA-6) · **banner prose and ListRow metadata typography** ·
+Decision 6b's Modal radius · Decision 4b's shadows · border *width* tokens ·
+the Checkbox square dimension · Chip state coverage · Decision 16b ·
+**Decision B §B.4's Button `md` token representation** · v0.2 §9 unknown 12
 for `Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
 
 **The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
