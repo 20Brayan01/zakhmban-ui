@@ -194,6 +194,8 @@ in full in the Token Table.
 | **Overlay Failure-Signalling Channel Correction** | 2026-10-04 | **withdraws the final sentence of Decision A §A.4** — *"The mechanism for making it evident is representation and belongs to ADR 0006"* — so that **§A.9 governs** and the developer-visible failure-signalling channel is an **internal implementation choice**. The sentence is **struck in place, not deleted** | **nothing in v0.2.** It supersedes **one sentence of Decision A §A.4** and nothing else. **Both requirements §A.4 exists for remain binding**: invalid structure must produce a developer-observable failure and must never silently fall back to an inline sheet. §A.9 is unchanged. **No token, value, count, artifact or export changes**, and no implementation is authorized. |
 | **BottomSheet Height Ruling** | 2026-10-04 | the sheet **grows with its content** up to a maximum block size of **`calc(100dvh - var(--control-min-target))`**; **long content scrolls inside the sheet** while **title and footer stay reachable**; **the sheet must not overflow the dynamic viewport** | **nothing in v0.2** — v0.2 specified no sheet height anywhere, so there is nothing to replace; this closes an **unrecorded gap**, not a listed deferral. **No token is created** — `--control-min-target` is an existing public token at `44px` — and **no count, artifact or export changes**. Decision 16b is **not** reopened. |
 | **BottomSheet Implementation Authorization** | 2026-10-04 | authorizes **`BottomSheet` only** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved Decision A, Accepted ADR 0006 and height-ruling contracts | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying the primitives have not begun. **Merging any pull request, `TextField`, `Select`, `OtpInput`, `Button`, Button `md`'s token representation, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
+| **TextField and Select Error Typography Ruling** | 2026-10-05 | assigns **`TextField` and `Select` error-message text** to the existing **Caption step** (12px / 1.5 / 400) with the existing **`--danger-fg`** ink, and confirms under **Decision 14** that the focused and error **border** bindings are the implementer's, to be stated and justified in the implementation pull request | **nothing in v0.2** — v0.2 §2.2 assigned these uses no type step, so there is no rule to replace. It supersedes **Decision 8's Caption role-coverage list**, which read *"Caption at 400 covers **only** the four uses"*, by adding a **fifth** use for these two components and nothing else. **Banner prose and ListRow metadata remain open.** **No token is created**; the 118 / 39 / 1 boundary, the exports and the artifacts are unchanged. |
+| **TextField and Select Implementation Authorization** | 2026-10-05 | authorizes **`TextField` and `Select` together** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved §3.2 contracts and the Error Typography Ruling above | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying these two have not begun. **Merging any pull request, `Button`, `OtpInput`, changes to `BottomSheet`, Tier 2 components, a new design value or token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1174,6 +1176,112 @@ GitHub Release · package publication · `zakhmban-therapists` or any other
 consumer-repository change · deployment · repository-visibility change.
 **The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
 unchanged and **no new tag**.
+
+### TextField and Select Error Typography Ruling — 2026-10-05
+
+**Authority kind: value assignment, owner tier.** Level 3 — approved owner
+rulings. **It creates no token and authorizes no implementation.**
+
+**The exact earlier deferral.** Decision 8 left typography role assignment
+open for *"error text, banner explanatory prose and ListRow metadata"*, and
+recorded why it mattered: *"Error text exists on frozen Tier-1 primitives —
+`TextField` and `Select` both carry an `error` prop that §2.2 assigns to no
+type step… These roles must be assigned before the affected components can be
+implemented without guessing."* It was explicit that its own Caption approval
+did **not** reach them, and that *"Role membership must not be inferred from a
+shared font size."*
+
+**The new effective rule.** **`TextField` and `Select` error-message text
+takes the existing Caption step — 12px / 1.5 / weight 400 — and the existing
+`--danger-fg` ink.** All four properties are already among the approved 118,
+so **no token is created** and the **118 / 39 / 1** boundary is unchanged.
+Caption is already the approved step for **Hint**, the sibling message slot on
+the same control, so hint and error share a size and differ by ink and
+`aria-invalid` rather than by a type change that would shift the field's
+layout on every validation. `--danger-fg` on `--background` measures
+**6.0515:1**, clearing §6's 4.5:1 for text; **no claim of complete
+accessibility conformance follows from that measurement**.
+
+**Narrow scope, stated as such.** The assignment applies to **`TextField` and
+`Select` error text only**. **Banner explanatory prose, ListRow metadata and
+every other deferred typography role remain open exactly as recorded**, and
+the Token Table's open entry is marked closed **in part**. **It supersedes**
+one statement, named exactly: **Decision 8's Caption role-coverage list**,
+which read *"Caption at 400 covers **only** the four uses explicitly supported
+by canonical documentation"* — that list now carries a **fifth** use, for
+these two components and nothing else. The dated Decision 8 record is
+preserved as approved and annotated in place.
+
+**Border bindings confirmed as implementation, under Decision 14.** §3.2 names
+a *"blue border"* on focus and §2.3 gives 1.5px for an error border, neither
+bound to a token. Decision 14 governs — *"Their exact component bindings
+remain component / Styles decisions unless another canonical rule already
+governs them"*, naming **the controls** explicitly — so the implementer may
+bind both to **existing public colour tokens**, on two conditions: the
+implementation pull request **states and justifies the exact bindings**, and
+**no token is created and no raw colour value used**. **The global
+`:focus-visible` treatment is untouched**: D-3's two-ring indicator already
+ships and may not be replaced, removed or re-declared.
+
+### TextField and Select Implementation Authorization — 2026-10-05
+
+**Authority kind: implementation authorization, owner tier.** Level 3.
+**It decides no design value and creates no token. Scope: `TextField` and
+`Select`, together.**
+
+**Preconditions, all met:** both public contracts are fully specified in v0.2
+§3.2 · the geometry is approved and public (`--control-height-input` 48px,
+`--radius-input` 14px) · the disabled triplet, `--border` and the label and
+hint type steps are approved · D-3's focus indicator already ships · and the
+**Error Typography Ruling above closes the one open value that named them**.
+No other open entry touches either component — §3.2's *"native control unless
+a design need forces a listbox"* already resolves the standing Select-listbox
+question to **native**.
+
+**Authorized, and limited to it:** a branch · local implementation commits · a
+normal push · **one reviewable pull request** · `src/` work implementing both
+components against §3.2's two prop lists with the standard pass-through and
+ref forwarding · the component CSS they need, authored under `src/styles/` per
+ADR 0003 §18 and delivered through the **existing `./styles` entry** · the
+guard amendments the work requires, **keeping `OtpInput` and `Button`
+forbidden** · exactly pinned development dependencies if genuinely needed,
+with **`dependencies` staying `{}`**.
+
+**Merging is not authorized.** **The merge is a separate manual owner
+decision** after review and checks. **Green CI is evidence, not merge
+approval.**
+
+**Required boundary:** the approved API and nothing more — no prop outside
+§3.2's lists, no variant, tone or size prop · **`Select` is native**, and a
+custom listbox is **not authorized** · a real `<label>`, never
+placeholder-as-label, `hint` and `error` through `aria-describedby`,
+`aria-invalid` on error, full keyboard operation · **error text takes Caption
+and `--danger-fg`**, hint takes Caption 400 · focused and error borders bind
+to **existing public colour tokens**, **stated and justified in the pull
+request**, with no token created and no raw colour value · **the global
+`:focus-visible` indicator stays intact** · logical properties only and **no
+rule sets `direction`** · no new design value, token or export subpath, and
+**no change to the `exports` map**.
+
+**Acceptance outcomes:** component tests for label association,
+`aria-describedby` wiring, `aria-invalid`, required, disabled and read-only
+states, multiline and suffix forms, and `Select`'s option and change
+behaviour · **keyboard** tests including native `Select` selection ·
+**behavioural accessibility assertions** rather than markup restatements ·
+**built-package** verification with `verify:dist` green · a **rendered-browser
+check** of the 48px height and 14px radius as rendered, the focused and error
+borders against the unchanged global ring, RTL layout and label placement, and
+the error message's rendered size and ink, **stating what was and was not
+verified and claiming no complete conformance** · **consumer-integration
+obligations identified, not performed**.
+
+**Not authorized, and unchanged:** merging any pull request · `Button` ·
+`OtpInput` · any change to `BottomSheet` or `Icon` · any Tier 2 component · a
+sixth primitive · a public `Portal` or `FocusTrap` · a new export subpath ·
+any new design value or token · a runtime dependency · version change · tag ·
+release · publication · consumer-repository change · deployment ·
+repository-visibility change. **The package stays `0.2.0` and `private`**,
+with `v0.1.0` and `v0.2.0` unchanged and **no new tag**.
 
 ## Missing design-system document — scoped disposition
 
