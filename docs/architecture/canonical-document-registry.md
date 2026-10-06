@@ -196,6 +196,7 @@ in full in the Token Table.
 | **BottomSheet Implementation Authorization** | 2026-10-04 | authorizes **`BottomSheet` only** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved Decision A, Accepted ADR 0006 and height-ruling contracts | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying the primitives have not begun. **Merging any pull request, `TextField`, `Select`, `OtpInput`, `Button`, Button `md`'s token representation, a sixth primitive, a public `Portal`/`FocusTrap`, a new subpath, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **TextField and Select Error Typography Ruling** | 2026-10-05 | assigns **`TextField` and `Select` error-message text** to the existing **Caption step** (12px / 1.5 / 400) with the existing **`--danger-fg`** ink, and confirms under **Decision 14** that the focused and error **border** bindings are the implementer's, to be stated and justified in the implementation pull request | **nothing in v0.2** — v0.2 §2.2 assigned these uses no type step, so there is no rule to replace. It supersedes **Decision 8's Caption role-coverage list**, which read *"Caption at 400 covers **only** the four uses"*, by adding a **fifth** use for these two components and nothing else. **Banner prose and ListRow metadata remain open.** **No token is created**; the 118 / 39 / 1 boundary, the exports and the artifacts are unchanged. |
 | **TextField and Select Implementation Authorization** | 2026-10-05 | authorizes **`TextField` and `Select` together** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved §3.2 contracts and the Error Typography Ruling above | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying these two have not begun. **Merging any pull request, `Button`, `OtpInput`, changes to `BottomSheet`, Tier 2 components, a new design value or token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
+| **Resting Control-Boundary Role Exception — TextField and Select** | 2026-10-06 | binds the **resting boundary of `TextField` and `Select`** to **1px `var(--text-secondary)`** (`#667085`, **4.9748:1** on `--surface` `#FFFFFF`, against §6's 3:1 for a control boundary), as a **named role exception** — an ink token doing boundary work on these two controls and nowhere else | the **Owner Contrast Ruling §4 readable-roles list**, which named **eight text roles**, now carries a **ninth, explicitly non-text** entry for these two controls only; and the **2026-10-05 Decision 14 grant**, which reached **only the focused and error borders**, is **extended** so the resting border is settled rather than left open. **Decision 14's Card binding to `--border` is untouched**, `--border` is **not remapped**, and **IA-1 is applied, not narrowed**. **No token is created**; 118 / 39 / 1, the exports and the artifacts are unchanged. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1282,6 +1283,61 @@ any new design value or token · a runtime dependency · version change · tag �
 release · publication · consumer-repository change · deployment ·
 repository-visibility change. **The package stays `0.2.0` and `private`**,
 with `v0.1.0` and `v0.2.0` unchanged and **no new tag**.
+
+
+### Resting Control-Boundary Role Exception — TextField and Select — 2026-10-06
+
+**Authority kind:** value assignment with a named role exception, owner tier.
+**Level 3** — approved owner design/product rulings. Recorded in full in
+[`token-table-ratification.md`](token-table-ratification.md).
+
+**What it decides.** The **resting boundary of `TextField` and `Select`** is
+**1px `var(--text-secondary)`**. `#667085` on `--surface` `#FFFFFF` measures
+**4.9748:1**, against §6's **3:1** for a control boundary. **No token is
+created and no raw colour value is used**; the **118 / 39 / 1** boundary, the
+exports and the artifacts are unchanged, and §2.3's 1px width is unchanged.
+**No claim of a complete accessibility audit follows from that measurement.**
+
+**Why it exists.** A rendered-browser check on 2026-10-06 put the two
+controls in different positions under **IA-1**. `Select` was already
+discharged: Chromium paints the native expander from the element's `color`,
+here `--text-primary` at **14.0674:1**, a persistent compliant glyph that
+identifies the control independently of its boundary — **Chromium-scoped
+evidence**, since the glyph is UA-drawn. An **empty `TextField`** was not:
+its **1.2653:1** `--border` boundary was the sole visible means of locating
+the control, which IA-1 forbids. The `<label>` does not discharge it, because
+`--text-label` is also §3.2's step for a **data-row key**; the placeholder
+does not either, because it is optional. No approved token carried both a
+boundary role and 3:1 — every token at or above 3:1 on white is an ink,
+action, link, status-foreground or brand role, and every boundary or surface
+role is at or below **2.4699:1**. **Both controls take the new binding**
+although only one needed it, because §3.2 requires *"Same geometry and states
+as TextField"*.
+
+**What it supersedes, named exactly.** The **Owner Contrast Ruling §4
+readable-roles list**, whose eight entries are all **text** roles, now carries
+a **ninth** entry marked **non-text** for these two controls only. And the
+**2026-10-05 Decision 14 grant**, which reached *"the focused and error
+border treatments"*, is **extended**: the resting border is settled by this
+ruling rather than left as an implementer choice. Both dated records are
+**preserved as approved** and annotated in place.
+
+**What it does not do.** It creates **no general rule** — `--text-secondary`,
+and every other ink token, remains unauthorized as a boundary for **Card,
+Chip, StatusBadge, SearchInput, OtpInput, Checkbox, Switch, ImageUploader,
+ScaleSelect, any other bordered surface and any future control**. It does
+**not** remap `--border`, which keeps its value, its role and every existing
+binding including Decision 14's Card contract. It does **not** weaken
+**IA-1**, which is applied here exactly as written. The focused border, the
+error border and width, the disabled triplet, the global `:focus-visible`
+indicator, the 2026-10-05 Caption error typography, the geometry, the public
+API and the exports are **all unchanged**.
+
+**What it does not authorize.** **No new implementation** — it corrects a
+binding inside work the **TextField and Select Implementation Authorization
+of 2026-10-05** already permits. **Merging any pull request stays a separate
+manual owner decision**, and the package stays **`0.2.0`** and **`private`**
+with **no new tag**.
 
 ## Missing design-system document — scoped disposition
 

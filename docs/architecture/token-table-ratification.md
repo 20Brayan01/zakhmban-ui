@@ -4058,7 +4058,8 @@ after the first tag.
 **Readable de-emphasised text uses `--text-secondary` `#667085` /
 `--neutral-600`.**
 
-This applies to the canonical readable roles:
+This applies to the canonical readable roles — **plus a ninth use added
+2026-10-06**, which is deliberately **not** a readable role:
 
 - captions;
 - hints;
@@ -4067,7 +4068,13 @@ This applies to the canonical readable roles:
 - privacy notes;
 - placeholder text when it communicates information;
 - supporting labels;
-- secondary monetary information.
+- secondary monetary information;
+- *(added 2026-10-06, non-text)* the **resting boundary of `TextField` and
+  `Select`**, by the **Resting Control-Boundary Role Exception** below. That
+  entry is a **named exception to this list's own character**, not a new
+  readable role: it is recorded here so the list cannot be read as
+  text-only when it no longer is, and it authorizes no further non-text use
+  of this or any other ink token.
 
 **Verified contrast:**
 
@@ -7631,6 +7638,18 @@ two-ring indicator already ships in `global.css`; neither component may
 replace, remove or re-declare it, and the focused *border* is a separate
 treatment that sits alongside it.
 
+> **Extended 2026-10-06 — this dated record is preserved as approved and
+> nothing above is withdrawn.** The grant above names **two** treatments, the
+> focused and the error border, and the **resting** border was deliberately
+> outside it. A rendered-browser check found that an empty `TextField`'s
+> resting `--border` boundary at **1.2653:1** was its sole visible means of
+> locating the control, which **IA-1** forbids. The **Resting
+> Control-Boundary Role Exception of 2026-10-06** settles that third
+> treatment directly — 1px `--text-secondary`, **4.9748:1** — rather than
+> widening this grant into a choice. The two bindings this record governs,
+> `--brand-blue` on focus and `--danger` at 1.5px on error, are
+> **unchanged**.
+
 ### Boundaries
 
 **No token identifier, value, count, artifact or export changes** · the
@@ -7748,3 +7767,138 @@ for `Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
 
 **The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
 unchanged and **no new tag**.
+
+---
+
+## RESTING CONTROL-BOUNDARY ROLE EXCEPTION — TEXTFIELD AND SELECT — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: value assignment with a named role exception, owner tier.**
+Level 3 — approved owner design/product rulings. **It creates no token,
+changes no count and authorizes no new implementation**; it corrects a
+binding inside work the TextField and Select Implementation Authorization of
+2026-10-05 already authorized.
+
+### The two exact earlier statements
+
+**First — the `--text-secondary` role list.** The Owner Contrast Ruling's
+**Readable de-emphasis contract (§4)** states:
+
+> **Readable de-emphasised text uses `--text-secondary` `#667085` /
+> `--neutral-600`.** This applies to the canonical readable roles: captions;
+> hints; metadata; timestamps; privacy notes; placeholder text when it
+> communicates information; supporting labels; secondary monetary
+> information.
+
+Every one of those eight is a **text** role. This ruling adds a **ninth use
+that is not text**, and says so plainly rather than letting a boundary
+quietly join a list of inks.
+
+**Second — the 2026-10-05 Decision 14 grant.** The TextField and Select Error
+Typography Ruling reads:
+
+> **The implementer may therefore bind the focused and error border
+> treatments to appropriate existing public colour tokens**, subject to two
+> conditions.
+
+That grant names **two** treatments. The **resting** border was outside it,
+which is why the implementer reported the contrast finding rather than
+binding around it. This ruling **extends the grant to the resting boundary of
+these two controls and settles the binding itself**, so the resting border is
+no longer an open implementer choice either.
+
+**Nothing else is replaced.** No approved record ever bound `TextField` or
+`Select` to a resting boundary token. Decision 14's `--border` binding is for
+the **Card** — *"a 1px `--border` `#E2E6DD`"* — and is **untouched**.
+
+### The new effective rule
+
+**The resting boundary of `TextField` and `Select` is 1px
+`var(--text-secondary)`.**
+
+- **No token is created.** `--text-secondary` is an existing approved public
+  token; the **118 / 39 / 1** boundary, the exports and the artifacts are
+  unchanged.
+- **No new value is approved.** `#667085` / `--neutral-600` is unchanged.
+- **No raw colour value is used**, and no raw-palette entry is referenced.
+- **The width is unchanged** at §2.3's 1px.
+
+**Measured:** `--text-secondary` `#667085` on `--surface` `#FFFFFF` —
+the field fill these controls use — measures **4.9748:1**, against §6's
+**3:1** for a control boundary. The same pair measures **4.9748:1** on
+`--background` `#FFFFFF`, the page behind it. **No claim of a complete
+accessibility audit, or of complete accessibility conformance, follows from
+these two measurements.**
+
+### Why — the evidence this corrects
+
+A rendered-browser check on 2026-10-06, with the label and placeholder
+stripped so the boundary stood alone, found the two controls in **different**
+positions under **IA-1**:
+
+- **`Select` was already discharged.** Chromium paints the native expander
+  from the element's `color`, which resolves here to `--text-primary`
+  `#002A5E` — **14.0674:1**. Recolouring the element turned the glyph with
+  it, so the dependency was demonstrated rather than assumed. That glyph is
+  persistent, visible and compliant, and it identifies the control
+  independently of the boundary, which is what IA-1's *"other visible,
+  compliant information already identifies the control"* describes. It is
+  **UA-drawn**, so that evidence is **Chromium-scoped** and another engine may
+  draw it differently.
+- **An empty `TextField` was not.** With no value, no icon and no guaranteed
+  placeholder, the **1.2653:1** `--border` boundary was the only thing marking
+  the hit area — the condition IA-1 forbids: *"A boundary with less than 3:1
+  must never be the sole visible means of … locating a control … identifying
+  that an element is interactive."*
+
+**The `<label>` does not discharge it.** `--text-label` is also §3.2's step
+for a **data-row key**, so a 13px/500 line above a white region is not
+evidence that what follows is interactive. **The placeholder does not either**
+— it is optional, and a rule cannot rest on a prop a caller may omit.
+
+**No compliant alternative existed inside the approved set.** Every approved
+semantic token at or above 3:1 on white is an ink, action, link,
+status-foreground or brand role; every boundary or surface role is at or
+below **2.4699:1** (`--border-strong`, short of 3:1, and scoped by **IA-2** to
+two canonical sentences, neither an input). The choice was therefore between a
+new token, a raw colour, a narrowing of IA-1, and this named exception. **The
+owner chose the exception.**
+
+**Both controls take it**, although only one needed it: §3.2 requires
+*"Same geometry and states as TextField"*, and two controls that sat side by
+side with visibly different resting boundaries would break that sentence to
+fix a rule.
+
+### Scope — narrow, and stated as such
+
+**This exception applies to the resting boundary of `TextField` and `Select`
+and to nothing else.**
+
+**It creates no general rule.** It does **not** authorize `--text-secondary`,
+or any other ink token, as a boundary for: **Card · Chip · StatusBadge ·
+SearchInput · OtpInput · Checkbox · Switch · ImageUploader · ScaleSelect ·
+any other bordered surface · any future control**. Each of those keeps
+whatever its own canonical rule or component decision gives it, and the Card
+keeps `--border`.
+
+**It is not a remapping of `--border`.** `--border` `#E2E6DD` is unchanged,
+keeps its role, and keeps every existing binding.
+
+**It does not weaken IA-1.** IA-1 is applied here exactly as written and is
+the reason this ruling exists; no clause of it is narrowed, scoped or
+reinterpreted.
+
+**It settles nothing else.** The focused border (`--brand-blue`), the error
+border (`--danger`, 1.5px), the disabled triplet, the global `:focus-visible`
+indicator, the Caption error typography of 2026-10-05, the geometry, the
+public API and the exports are **all unchanged**.
+
+### Boundaries
+
+**No token identifier, value, count, artifact or export changes** · the
+exports are unchanged · the package stays **`0.2.0`** and **`private`**, with
+`v0.1.0` and `v0.2.0` unchanged and **no new tag** · **no new implementation
+is authorized**: this corrects a binding inside the work the authorization of
+2026-10-05 already permits, and **merging any pull request remains a separate
+manual owner decision**.
