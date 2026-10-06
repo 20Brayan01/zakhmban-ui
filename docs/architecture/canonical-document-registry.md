@@ -200,6 +200,7 @@ in full in the Token Table.
 | **v0.3.0 Remaining-Primitive Rulings — Button and OtpInput** | 2026-10-06 | four numbered decisions: **(1)** retires the released geometry identifier **`--control-height-button`** and replaces it with **`--control-height-button-md` 48px** and **`--control-height-button-lg` 52px**, declared a **breaking change under v0.2 §7** and approved for the planned **`v0.3.0`**; **(2)** `OtpInput`'s `error` is a **text message** taking the Caption step and **`--danger-fg`**; **(3)** `OtpInput` digits take **`--text-card-title`** with `--text-primary` and tabular figures; **(4)** the **resend cooldown and resend action are application-owned** and `OtpInput` has no timer, control or prop for them | **Decision B §B.4**, which left the `md` representation unanswered, is **answered**; **ADR 0003 §6's geometry row** for the retired identifier; the **2026-10-05 error-typography scope sentence**, widened to `OtpInput` and no further; **Decision 8's Caption coverage list**, which gains a **sixth** use; **v0.2 §2.2's `--text-card-title` use list**, which gains a **third**; and **v0.2 §3.2's `OtpInput` state list** insofar as *resend cooldown* could read as an API obligation. **No implementation is authorized by the rulings**; the approved target **119 / 39 / 1** takes effect only when the Button implementation changes the token source, and **this record leaves the artifact at 118 / 39 / 1**. **`v0.1.0` and `v0.2.0` are unchanged** and still carry `--control-height-button` as released. |
 | **Button Implementation Authorization** | 2026-10-06 | authorizes **`Button` only** — a branch, implementation commits, a normal push and **one reviewable pull request**, **after the documentation pull request recording the rulings has merged** — against §3.2's `variant tone size block disabled loading iconStart onClick`, carrying the Ruling 1 token-source change and the regenerated artifacts | **nothing in v0.2** — it approves no design value. It supersedes only the **current-status statements** saying `Button` has not begun. **Merging any pull request, `OtpInput`, changes to the other primitives, Tier 2 components, any token beyond Ruling 1's two identifiers, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **OtpInput Implementation Authorization** | 2026-10-06 | authorizes **`OtpInput` only**, on the same terms and after the same merge — against §3.2's `length value onChange onComplete error`, with five cells, LTR digit order inside RTL, the **unconditional 44×44** minimum per cell, and **no token created** | **nothing in v0.2** — it approves no design value and changes no count. It supersedes only the **current-status statements** saying `OtpInput` has not begun. **Merging any pull request, `Button` ahead of its own merge, changes to the other primitives, any new token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
+| **Button Default Variant and Size Ruling** | 2026-10-06 | sets `Button`'s default **`variant`** to **`secondary`** and its default **`size`** to **`md`**, so a **`primary`** Button must be selected explicitly at its use site; **`tone` keeps v0.2 §3.2's `green`**, re-approved by nothing | **nothing canonical** — §3.2 states no default for `variant` or `size`, so a gap is closed rather than a rule overturned, and §3.2's `tone` default is untouched. It replaces one **non-canonical** statement: the implementer-chosen defaults disclosed in the open Button implementation pull request, which was never a record. **No token is created and no count changes**; Ruling 1's **119 / 39 / 1** target is unchanged and the artifact stays **118 / 39 / 1** until the Button implementation lands. The public API is unchanged — the three props stay optional with the same closed unions. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1447,6 +1448,55 @@ built-artifact tests, and a rendered-browser check at the design width, at
 **320 CSS px** and at **200% zoom**.
 
 **Merging is not authorized** and remains a separate manual owner decision.
+
+
+### Button Default Variant and Size Ruling — 2026-10-06
+
+**Authority kind:** explicit interpretation and API default assignment, owner
+tier. **Level 3** — approved owner design/product rulings. Recorded in full in
+[`token-table-ratification.md`](token-table-ratification.md).
+
+**What it decides.** `Button`'s default **`variant`** is **`secondary`** and
+its default **`size`** is **`md`**. **`tone` keeps v0.2 §3.2's `green`** and
+is not re-approved here. **A `primary` Button must be selected explicitly at
+its use site.**
+
+**The gap it closes.** §3.2's Button API cell marks none of `variant`, `tone`
+or `size` with `†`, so under §3's convention all three are **optional** and
+each needs a default — yet the row supplies one only for tone. The defaults
+for `variant` and `size` were therefore unstated, and the registry's rules are
+that **silence never creates permission** and that **a deferred or unresolved
+decision must not be filled by an implementer**. The open Button
+implementation pull request chose `primary` and `md` on its own authority and
+disclosed the choice in its description; **a pull-request description is not a
+canonical record**. This ruling is the owner making the decision instead, and
+the record says so rather than quietly adopting the implementer's value.
+
+**Why `secondary`.** §3.2 states *"One primary per screen."* A
+primary-by-default component would defeat that rule by omission — every Button
+whose `variant` a caller forgot would become primary. Requiring the emphatic
+variant to be asked for makes the rule the component's behaviour rather than a
+convention a reviewer must police. **Why `md`:** 48px is the middle of the
+three approved sizes and matches the approved input height, so a Button beside
+a `TextField` aligns. That says nothing about the binding — Button `md`
+resolves through **`--control-height-button-md`**, and Decision B §B.4 forbids
+reaching for the input's role; the two values coincide, the roles do not.
+
+**What it does not do.** It creates **no token** and changes **no count** —
+Ruling 1's **119 / 39 / 1** target is unchanged, and the generated artifact
+stays **118 / 39 / 1** until the Button implementation lands. The **public API
+is unchanged**: all three props stay optional with the same closed unions, and
+only the omitted-value is decided. **`primary` is not removed, deprecated or
+discouraged** — it remains the correct choice for a screen's single principal
+action and must simply be asked for. The approved sizes, variants, tones,
+loading contract, accessibility obligations and every colour and geometry
+binding are **all unchanged**.
+
+**What it does not authorize.** **No new implementation** — it corrects a
+default inside work the **Button Implementation Authorization of 2026-10-06**
+already permits. **Merging any pull request stays a separate manual owner
+decision**, and the package stays **`0.2.0`** and **`private`** with **no new
+tag**.
 
 ## Missing design-system document — scoped disposition
 

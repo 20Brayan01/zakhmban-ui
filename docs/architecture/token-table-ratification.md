@@ -8359,3 +8359,99 @@ export subpath · **any new design value or token** · a runtime dependency ·
 **version change · tag · release · package publication ·
 `zakhmban-therapists` or any other consumer-repository change · deployment ·
 repository-visibility change.**
+
+---
+
+## BUTTON DEFAULT VARIANT AND SIZE RULING — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: explicit interpretation and API default assignment, owner
+tier.** Level 3 — approved owner design/product rulings. **It creates no
+token, changes no count and authorizes no new implementation.** It corrects a
+default inside work the **Button Implementation Authorization of 2026-10-06**
+already permits.
+
+### The gap this closes, stated plainly
+
+**v0.2 §3.2 gives `Button` a default for `tone` and for nothing else.** Its
+API cell reads *"`variant` `tone` `size` `block` `disabled` `loading`
+`iconStart` `onClick`"* with no `†` on any of them, so under §3's convention —
+*"Props marked † are required"* — all three of `variant`, `tone` and `size`
+are **optional**, and an optional prop must have a default. The row supplies
+one only for tone: *"tones green (default), blue, red"*.
+
+**The defaults for `variant` and `size` were therefore unstated, and
+unstated is not permissive.** The registry's rule is *"Silence never creates
+permission"*, and its deferral rule is that *"A deferred or unresolved
+decision must not be filled by an implementer, a reference kit, a consumer
+implementation or an AI agent."*
+
+**This is recorded rather than glossed: the open `Button` implementation pull
+request chose `primary` and `md` on its own authority and disclosed the
+choice in its description.** A pull-request description is not a canonical
+record and carries no authority. **The choice was an implementer filling a
+deferral, and this ruling is the owner making the decision instead.**
+
+### The new effective rule
+
+| Prop | Default | Authority |
+| --- | --- | --- |
+| **`variant`** | **`secondary`** | this ruling |
+| **`size`** | **`md`** | this ruling |
+| **`tone`** | **`green`** | **v0.2 §3.2, unchanged** — this ruling re-approves nothing |
+
+**A `primary` Button must be selected explicitly at its use site.**
+
+**Why `secondary`.** §3.2 states *"One primary per screen."* A component that
+defaulted to `primary` would defeat that rule by omission: every Button whose
+`variant` a caller forgot would become a primary one, and the screen would
+acquire several without anyone deciding to add them. Making the emphatic
+variant the one that must be asked for turns the rule into the component's
+behaviour instead of a convention a reviewer has to police.
+
+**Why `md`.** 48px is the middle of the approved three and matches
+`--control-height-input`'s approved input height, so a Button set beside a
+`TextField` aligns without either being sized by hand. **This states nothing
+about the token binding**: Button `md` resolves through
+`--control-height-button-md`, and Decision B §B.4 forbids reaching for the
+input's role — the two values coincide, the roles do not.
+
+### What this ruling supersedes, named exactly
+
+**Nothing canonical.** v0.2 §3.2 states no default for `variant` or `size`,
+so there is no earlier rule to replace; this ruling closes a gap rather than
+overturning a decision. **§3.2's `tone` default is untouched**, and so is
+every other part of the Button row.
+
+**It replaces one non-canonical statement**: the implementer-chosen defaults
+disclosed in the open Button implementation pull request. That disclosure was
+never a record and never had authority; it is named here so the correction is
+traceable rather than silent.
+
+### Scope — narrow, and stated as such
+
+**This ruling applies to `Button` and to nothing else.**
+
+- **No token is created and no count changes.** The **119 / 39 / 1** target
+  that **Ruling 1** approves is unchanged, and this record changes no
+  artifact — the generated count at this commit remains **118 / 39 / 1**
+  until the Button implementation lands.
+- **The public API is unchanged.** `variant`, `tone` and `size` stay optional
+  and keep the same closed unions; only the value each takes when omitted is
+  decided.
+- **`primary` is not removed, deprecated or discouraged.** It remains one of
+  three approved variants and the correct choice for a screen's single
+  principal action — it must simply be asked for.
+- **It settles nothing else**: the approved sizes, the three variants, the
+  three tones, the loading contract, the accessibility obligations, the
+  geometry bindings and every colour binding are **all unchanged**.
+
+### Boundaries
+
+**No token identifier, value, count, artifact or export changes** · the
+exports are unchanged · the package stays **`0.2.0`** and **`private`**, with
+`v0.1.0` and `v0.2.0` unchanged and **no new tag** · **no new implementation
+is authorized**: this corrects a default inside work the Button
+Implementation Authorization of 2026-10-06 already permits, and **merging any
+pull request remains a separate manual owner decision**.
