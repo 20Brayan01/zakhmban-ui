@@ -18,12 +18,14 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the ADR 0002, ADR 0005 and BottomSheet capabilities, and nothing else", async () => {
+  it("exports exactly the ADR 0002, ADR 0005 and implemented-primitive capabilities, and nothing else", async () => {
     const entry = await import("@zakhmban/ui");
     expect(Object.keys(entry).sort()).toEqual(
       [
         "BottomSheet",
         "Icon",
+        "Select",
+        "TextField",
         "isValidIranianNationalId",
         "normalizeIranianMobile",
       ].sort(),
@@ -43,6 +45,47 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(markup).toContain('aria-hidden="true"');
     expect(markup).toContain('<g transform="translate(24, 0) scale(-1, 1)">');
     expect(markup).toContain('d="m15 18-6-6 6-6"');
+  });
+
+  it("renders TextField and Select through the built artifact", async () => {
+    // The same half a source-only test cannot reach, for the two primitives
+    // this commit adds: that the COMPILED components a consumer installs
+    // still produce a real label bound to a real control, and that Select is
+    // still the native element the authorization requires.
+    const { TextField, Select } = await import("@zakhmban/ui");
+
+    const field = renderToStaticMarkup(
+      createElement(TextField, { label: "وزن", error: "نامعتبر" }),
+    );
+    expect(field).toContain("<label");
+    expect(field).toContain("<input");
+    expect(field).toContain('aria-invalid="true"');
+    expect(field).toContain('role="alert"');
+    expect(field).toContain("نامعتبر");
+
+    const select = renderToStaticMarkup(
+      createElement(Select, {
+        label: "محل زخم",
+        options: [{ value: "heel", label: "پاشنه" }],
+      }),
+    );
+    expect(select).toContain("<select");
+    expect(select).toContain('<option value="heel">پاشنه</option>');
+    // A custom listbox is not authorized, and the built artifact is where
+    // that would show up if it had been built anyway.
+    expect(select).not.toContain('role="listbox"');
+  });
+
+  it("binds the built label to the built control, not merely to a name", async () => {
+    // `for` and `id` must agree in the COMPILED output: a mismatch here is
+    // a field with no accessible name in every consuming application, and
+    // it is exactly the kind of thing a bundler or a minifier could break.
+    const { TextField } = await import("@zakhmban/ui");
+    const markup = renderToStaticMarkup(
+      createElement(TextField, { label: "وزن", id: "w" }),
+    );
+    expect(markup).toContain('for="w"');
+    expect(markup).toContain('id="w"');
   });
 
   it("publishes no runtime glyph list and no registry", async () => {

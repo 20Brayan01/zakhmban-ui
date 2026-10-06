@@ -396,13 +396,16 @@ describe("typed token artifact — ADR 0003 §11", () => {
 
   it("does not widen the root export", async () => {
     // ADR 0003 §11: tokens reach consumers through `./tokens`, never through
-    // the root barrel. `Icon` and `BottomSheet` are on this list because ADR
-    // 0005 and the BottomSheet Implementation Authorization put them there
-    // in reviewed diffs — no token, type or registry rode along with either.
+    // the root barrel. `Icon`, `BottomSheet`, `TextField` and `Select` are on
+    // this list because ADR 0005 and the two implementation authorizations
+    // put them there in reviewed diffs — no token, type or registry rode
+    // along with any of them.
     const root = await import("@zakhmban/ui");
     expect(Object.keys(root).sort()).toEqual([
       "BottomSheet",
       "Icon",
+      "Select",
+      "TextField",
       "isValidIranianNationalId",
       "normalizeIranianMobile",
     ]);

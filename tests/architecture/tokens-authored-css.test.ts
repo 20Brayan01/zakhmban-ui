@@ -73,11 +73,12 @@ describe("authored token CSS", () => {
 
   it("keeps the style entry separate — it is not an eighth token file", () => {
     // Styles v0.2.0 added four authored stylesheets and the font directory;
-    // the BottomSheet work added overlay.css as a fifth.
-    // beside the entry. The entry still imports the tokens through the single
-    // base.css aggregation point, and FIRST, so every Styles rule below it
-    // resolves its values.
+    // the BottomSheet work added overlay.css as a fifth, and TextField and
+    // Select add field.css as a sixth, beside the entry. The entry still
+    // imports the tokens through the single base.css aggregation point, and
+    // FIRST, so every Styles rule below it resolves its values.
     expect(readdirSync(stylesDir).sort()).toEqual([
+      "field.css",
       "fonts",
       "fonts.css",
       "global.css",
@@ -97,6 +98,7 @@ describe("authored token CSS", () => {
       "./global.css",
       "./keyframes.css",
       "./overlay.css",
+      "./field.css",
     ]);
   });
 

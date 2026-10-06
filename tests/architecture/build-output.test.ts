@@ -23,6 +23,9 @@ const COPIED_ASSETS = [
   // The BottomSheet scrim and surface, delivered through the existing
   // ./styles entry (ADR 0006 §6) and adding no public subpath.
   "styles/overlay.css",
+  // The shared TextField and Select surface (TextField and Select
+  // Implementation Authorization, 2026-10-05), on the same entry.
+  "styles/field.css",
   "styles/fonts/Vazirmatn-Variable.woff2",
   "styles/fonts/OFL.txt",
   // ADR 0005 §3: the vendored glyph notice travels with the artifact it

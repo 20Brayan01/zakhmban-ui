@@ -1,0 +1,227 @@
+/**
+ * Field styles — authored Styles CSS. This file is a source of truth.
+ *
+ * The shared surface of the two input primitives, `TextField` and `Select`,
+ * delivered through the existing `@zakhmban/ui/styles` entry on the ADR 0004
+ * and ADR 0006 precedent: no new public subpath, and `package.json` is
+ * unchanged.
+ *
+ * ONE SET OF RULES FOR BOTH. v0.2 §3.2 says of `Select`: "Same geometry and
+ * states as TextField". That is written here as one class rather than two
+ * matched sets, so the two cannot drift apart by edit.
+ *
+ * THE COLOUR BINDINGS, and the authority for choosing them. Decision 14
+ * names `TextField` and `Select` among the components it "does not by itself
+ * canonically bind", and says their "exact component bindings remain
+ * component / Styles decisions unless another canonical rule already governs
+ * them". The TextField and Select Error Typography Ruling of 2026-10-05
+ * repeats that for the focused and error borders specifically, on two
+ * conditions: the bindings are stated and justified in the pull request, and
+ * no token is created and no raw colour used. Both hold. Every value below
+ * resolves through an existing public token; no `--_` source and no raw
+ * palette entry is read.
+ *
+ *   resting border   `--text-secondary`, by the Resting Control-Boundary
+ *                    Role Exception of 2026-10-06. 4.9748:1 on `--surface`,
+ *                    against §6's 3:1 for a control boundary. This is an
+ *                    INK token doing boundary work, which is a named owner
+ *                    exception for these two controls and not a general
+ *                    rule — see the note at the end of this file.
+ *   focused border   `--brand-blue`. §3.2 asks for a "blue border + ring"
+ *                    and this is the package's one semantic blue identity
+ *                    role that is not already spoken for: `--info` is a
+ *                    status tone, `--action-blue-*` are Decision 3a's action
+ *                    surfaces, `--link*` are links, and
+ *                    `--focus-indicator-outer-color` belongs to D-3's ring,
+ *                    which the border sits alongside rather than inside.
+ *                    4.0843:1 on `--background`, clearing §6's 3:1 for a
+ *                    control boundary that distinguishes a state.
+ *   error border     `--danger`. The base tone is the non-text role of the
+ *                    danger family, which is what a border is; `--danger-fg`
+ *                    is its ink and is used for the message text instead.
+ *                    4.4881:1 on `--background`, clearing 3:1.
+ *   disabled         the approved `--disabled-bg` / `--disabled-text` /
+ *                    `--disabled-border` triplet, unchanged.
+ *   field surface    `--surface`. Decision 14 narrowed Surface to "the
+ *                    component / content-surface side of the split", and a
+ *                    control is a component surface rather than page canvas.
+ *
+ * TYPOGRAPHY. Label takes the approved `--text-label` step. Hint takes
+ * Caption, already approved for it by Decision 8. Error takes Caption and
+ * `--danger-fg` by the ruling of 2026-10-05, so hint and error share a size
+ * and a field does not change its own layout when it becomes invalid.
+ *
+ * THE FOCUS RING IS NOT HERE. D-3's two-ring indicator ships in `global.css`
+ * and applies to the real control because the real control is the focusable
+ * element. Nothing below replaces it, removes it or re-declares it, and no
+ * rule in this file sets `outline`. The focused BORDER is a separate
+ * treatment that sits alongside it, which is how §3.2 words it — "blue
+ * border + ring".
+ *
+ * NON-COLOUR SIGNALLING (§6). The error state is carried by `aria-invalid`,
+ * by the message text and by `role="alert"`, not by the red border alone.
+ *
+ * ZOOM (§6). No text container has a fixed height. The control's 48px is a
+ * `min-block-size`, so the box grows with the text at 200% rather than
+ * clipping it, and the approved geometry is still what is rendered at 100%.
+ *
+ * DIRECTION. No rule sets `direction` (owner D-2), and every inset, margin
+ * and padding below is logical. `TextField`'s `dir` prop is an attribute the
+ * caller puts on the control for v0.2 §5 isolation; it is not a rule here.
+ *
+ * THE NATIVE EXPANDER. No `appearance` declaration: the platform `<select>`
+ * indicator is left exactly as the platform draws it, because §3.2 gives
+ * `Select` no icon and no canonical source specifies a replacement.
+ */
+
+.zakhmban-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.zakhmban-field-label {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line-height);
+  font-weight: var(--text-label-weight);
+  color: var(--text-primary);
+}
+
+.zakhmban-field-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  /* v0.2 §2.3 and §3.2: input 48, radius 14, borders 1px. A minimum rather
+     than a fixed height, so 200% text zoom grows the box instead of
+     clipping it (§6). */
+  min-block-size: var(--control-height-input);
+  border-radius: var(--radius-input);
+
+  /* Resting Control-Boundary Role Exception, 2026-10-06. Not `--border`:
+     that boundary measures 1.2653:1 and was the only visible means of
+     locating an empty field, which IA-1 forbids. Width unchanged at §2.3's
+     1px. */
+  border: 1px solid var(--text-secondary);
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+.zakhmban-field-input {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+
+  /* The control box owns the border, the radius and the background; the
+     input owns the padding, so it fills the box and D-3's ring lands at the
+     box's own edge rather than inside it. */
+  padding-inline: var(--space-4);
+  padding-block: var(--space-2);
+  border: none;
+  border-radius: inherit;
+  background-color: transparent;
+  color: inherit;
+  inline-size: 100%;
+}
+
+/* A multiline field is sized by its `rows`, and may be resized only along
+   the block axis: horizontal resizing would break the field out of the
+   column it sits in. */
+textarea.zakhmban-field-input {
+  resize: block;
+}
+
+.zakhmban-field-suffix {
+  flex: 0 0 auto;
+  padding-inline-end: var(--space-4);
+  color: var(--text-secondary);
+}
+
+/* "focus (blue border + ring)" — §3.2. `:focus-within` because the focusable
+   element is the control inside this box, and the border belongs to the box.
+   The ring itself is `global.css`, untouched. */
+.zakhmban-field-control:focus-within {
+  border-color: var(--brand-blue);
+}
+
+/* "1.5px when a card is selected or in error" — §2.3. The error border wins
+   over the focused one: a field that is both focused and invalid is still
+   invalid, and the ring already shows that it is focused. */
+.zakhmban-field-control[data-zakhmban-field-invalid] {
+  border-width: 1.5px;
+  border-color: var(--danger);
+}
+
+/* Both state selectors name the control's own class, and that is not
+   decoration — it is the fix for two defects a browser found and source
+   review did not.
+
+   `:has(:disabled)` matches a box containing a DISABLED <option>, so every
+   `Select` with a placeholder rendered as though the whole control were
+   disabled. And `:read-only` is not the readonly attribute: it matches any
+   element that is not user-alterable, which includes every <select>, the
+   suffix <span> and the <label> — so the read-only tint leaked onto every
+   `Select` and onto any `TextField` with a suffix. Naming the control
+   element is what confines each rule to the control's actual state. */
+.zakhmban-field-control:has(.zakhmban-field-input:disabled) {
+  border-color: var(--disabled-border);
+  background-color: var(--disabled-bg);
+  color: var(--disabled-text);
+}
+
+/* Read-only is not disabled: the value is still selectable, focusable and
+   announced, so it keeps the resting ink and takes only the quieter fill
+   that marks it as not editable. Matched on the attribute rather than on
+   `:read-only`, for the reason above. */
+.zakhmban-field-control:has(.zakhmban-field-input[readonly]:not(:disabled)) {
+  background-color: var(--surface-subtle);
+}
+
+.zakhmban-field-message {
+  margin-block: 0;
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line-height);
+  font-weight: var(--text-caption-weight);
+  color: var(--text-secondary);
+}
+
+/* The TextField and Select Error Typography Ruling, 2026-10-05: the Caption
+   step above, with `--danger-fg` for the ink. 6.0515:1 on `--background`,
+   against §6's 4.5:1 for text. */
+.zakhmban-field-message[data-zakhmban-field-message="error"] {
+  color: var(--danger-fg);
+}
+
+/**
+ * ON THE RESTING BORDER — resolved by owner ruling, and narrow.
+ *
+ * The first implementation bound this to `--border #E2E6DD`, which measures
+ * 1.2653:1 on `--background #FFFFFF`. A rendered-browser check found that
+ * for an EMPTY `TextField` — no value, no icon, no guaranteed placeholder —
+ * that boundary was the only visible means of locating the control, which
+ * IA-1 forbids: "A boundary with less than 3:1 must never be the sole
+ * visible means of … locating a control … identifying that an element is
+ * interactive."
+ *
+ * The `<label>` does not discharge it. `--text-label` is also §3.2's step
+ * for a DATA-ROW KEY, so a 13px/500 line above a white region is not
+ * evidence that what follows is interactive. The placeholder does not
+ * either: it is optional, and a rule cannot rest on a prop a caller may
+ * omit.
+ *
+ * `Select` was already discharged and still is — Chromium paints the native
+ * expander from the element's `color`, which resolves to `--text-primary` at
+ * 14.0674:1. That is UA-drawn, so the evidence is Chromium-scoped; it is a
+ * reason the Select never needed this change, not a reason to style the two
+ * differently. §3.2's "Same geometry and states as TextField" is why both
+ * take the same boundary.
+ *
+ * No approved token carried both a boundary role and 3:1 — every token at or
+ * above 3:1 on white is an ink, action, link, status-foreground or brand
+ * role — so the owner recorded a NAMED EXCEPTION rather than a binding:
+ * `--text-secondary`, an ink token, does boundary work HERE AND NOWHERE
+ * ELSE. It authorizes nothing for Card, Chip, StatusBadge, SearchInput,
+ * OtpInput, Checkbox, Switch, ImageUploader, ScaleSelect, any other bordered
+ * surface or any future control, it does not remap `--border`, and it does
+ * not weaken IA-1. A component still may not decide a token value; this one
+ * was decided for it.
+ */
