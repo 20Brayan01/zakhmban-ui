@@ -135,8 +135,15 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
         cell.select();
         /* Below 320 CSS px the row scrolls inside its own group rather than the
            page. A focused cell outside that scrollport would be unreachable in
-           practice, so it is brought back. */
-        cell.scrollIntoView({ block: "nearest", inline: "nearest" });
+           practice, so it is brought back.
+           
+           Feature-detected because it is a progressive enhancement, not a
+           contract: jsdom implements no `scrollIntoView` at all, and a renderer
+           without it must still be able to focus a cell. Same discipline as
+           `BottomSheet`'s `ResizeObserver` fallback. */
+        if (typeof cell.scrollIntoView === "function") {
+            cell.scrollIntoView({ block: "nearest", inline: "nearest" });
+        }
     };
     /**
      * Writes `next` into the code at `at`, then reports it.

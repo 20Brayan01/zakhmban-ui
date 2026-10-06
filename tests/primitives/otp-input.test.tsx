@@ -241,6 +241,30 @@ describe("OtpInput — deletion and navigation", () => {
     expect(document.activeElement).toBe(cells()[0]);
   });
 
+  it("survives a renderer that implements no scrollIntoView", () => {
+    // jsdom implements none, and CI caught this where a narrow grep over the
+    // local output did not: the suite reported "43 passed" while also
+    // reporting 30 unhandled errors, and only the exit code told the truth.
+    //
+    // Scrolling a focused cell back into view is a progressive enhancement
+    // for widths below 320px, not a contract. Focus must work without it.
+    const onChange = vi.fn();
+    render(<Host onChange={onChange} />);
+
+    // The environment really does lack it — otherwise this test proves
+    // nothing, because the guarded call would simply have run.
+    const cell = cells()[0]!;
+    expect(
+      typeof (cell as unknown as { scrollIntoView?: unknown }).scrollIntoView,
+    ).not.toBe("function");
+
+    expect(() => {
+      fireEvent.change(cell, { target: { value: "1" } });
+    }).not.toThrow();
+    expect(onChange).toHaveBeenLastCalledWith("1");
+    expect(document.activeElement).toBe(cells()[1]);
+  });
+
   it("is fully operable with no pointer at all", () => {
     // §6: "Full operation without a pointer."
     const onComplete = vi.fn();
