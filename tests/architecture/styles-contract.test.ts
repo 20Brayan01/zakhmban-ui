@@ -37,6 +37,9 @@ const ALL_STYLES = [
   // The shared TextField and Select surface, delivered through the same
   // ./styles entry. Every hygiene rule below applies to it unchanged.
   "field.css",
+  // The Button primitive, on the same entry (Button Implementation
+  // Authorization, 2026-10-06). Every hygiene rule below applies to it.
+  "button.css",
 ];
 
 /**

@@ -80,7 +80,21 @@
    * ------------------------------------------------------------------ */
   --control-min-target: 44px;
   --control-height-input: 48px;
-  --control-height-button: 52px;
+
+  /* Button md and lg, by Ruling 1 of the v0.3.0 Remaining-Primitive Rulings
+   * (2026-10-06), which answers Decision B §B.4.
+   *
+   * The released identifier `--control-height-button` is RETIRED, not
+   * aliased: its 52px value survives under the `-lg` name, and a
+   * compatibility alias would hide a breaking change that v0.2 §7 requires be
+   * visible — "Breaking: removing or renaming a semantic token".
+   *
+   * `--control-height-input` stays the INPUT role and is not used for a
+   * Button; that reuse is exactly what §B.4 refused. Button `sm` carries no
+   * token of its own and resolves through `--control-min-target`, per
+   * Decision B §B.3. */
+  --control-height-button-md: 48px;
+  --control-height-button-lg: 52px;
   --app-bar-height: 56px;
   --bottom-nav-height: 64px;
   --bottom-nav-safe-area: 20px;

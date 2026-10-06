@@ -1,0 +1,343 @@
+/**
+ * Button styles — authored Styles CSS. This file is a source of truth.
+ *
+ * The three variants, three tones and three sizes of the `Button` primitive,
+ * delivered through the existing `@zakhmban/ui/styles` entry on the ADR 0004,
+ * ADR 0006 and field.css precedent: no new public subpath, and
+ * `package.json` is unchanged.
+ *
+ * GEOMETRY, and the identifier that is deliberately absent. Ruling 1 of the
+ * v0.3.0 Remaining-Primitive Rulings (2026-10-06) answers Decision B §B.4:
+ *
+ *   sm   `--control-min-target` 44px      Decision B §B.3, a MINIMUM
+ *   md   `--control-height-button-md` 48px
+ *   lg   `--control-height-button-lg` 52px
+ *
+ * `--control-height-input` does not appear in this file and must not: reusing
+ * the input's role for a Button is exactly what §B.4 refused. The retired
+ * `--control-height-button` does not appear either, under any name.
+ *
+ * Every size is a `min-block-size`, never a fixed height. §6 requires that
+ * "Layouts survive 200% text zoom without clipping — no fixed heights on text
+ * containers", and a button is a text container. The approved 44 / 48 / 52
+ * are still what renders at 100%.
+ *
+ * THE COLOUR BINDINGS, and the authority for each.
+ *
+ *   filled fill + hover + press   Decision 3a's action ladder, `--action-
+ *                                 <tone>-rest|hover|press`. Canonical, not a
+ *                                 component choice.
+ *   filled label ink              `--on-brand-text`. White on each tone's
+ *                                 rest value measures 5.0029 / 5.0843 /
+ *                                 5.3671:1, all clearing §6's 4.5:1 for text.
+ *   outline + text label ink      Decision 12c, verbatim: "outline and text
+ *                                 Button labels use the corresponding
+ *                                 action-rest value as their foreground".
+ *   SECONDARY BORDER              `--action-<tone>-rest` — a COMPONENT
+ *                                 decision under Decision 14, which names
+ *                                 "secondary Button" among the bindings it
+ *                                 does not itself make. Measured, not assumed:
+ *                                 5.0029 / 5.0843 / 5.3671:1 on `--surface`
+ *                                 and 4.7226 / 4.7995 / 5.0664:1 on
+ *                                 `--surface-subtle`, every one clearing §6's
+ *                                 3:1 for a control boundary. It is the same
+ *                                 token Decision 12c already puts on the
+ *                                 label, so the outline and its text are one
+ *                                 value rather than two that could drift.
+ *                                 `--border` (1.2653:1) and `--border-strong`
+ *                                 (2.4699:1) were measured and rejected: both
+ *                                 fail 3:1, and IA-1 forbids a sub-3:1
+ *                                 boundary from being the sole means of
+ *                                 identifying a control, which on an outline
+ *                                 button it would be.
+ *   disabled                      the approved `--disabled-bg` /
+ *                                 `--disabled-text` / `--disabled-border`
+ *                                 triplet, unchanged.
+ *
+ * No token is created here beyond Ruling 1's two identifiers, and no raw
+ * colour literal, `--_` source or raw-palette entry is referenced. This file
+ * declares NO custom property of its own either: the variant-tone pairs are
+ * written as compound selectors reading the approved ladder directly,
+ * because a component may not mint an identifier and a custom property in a
+ * published stylesheet is a name a consumer could set.
+ *
+ * NO SPINNER. The loading state is exactly §3.2's three obligations — the
+ * label stays, `aria-busy` is set, re-entry is blocked — and the
+ * authorization is explicit that no spinner is authorized: no approved glyph
+ * is one, and ADR 0004 §8 scopes `zakhmban-spin` to "loading indicators —
+ * Tier 2". The only visual the loading state carries is the reduced opacity
+ * below, which is a presentation of `aria-busy` and introduces no value that
+ * a token would otherwise hold.
+ *
+ * THE FOCUS RING IS NOT HERE. D-3's two-ring indicator ships in `global.css`
+ * and applies to the `<button>` because the `<button>` is the focusable
+ * element. Nothing below replaces it, removes it or re-declares it, and no
+ * rule here sets `outline`.
+ *
+ * DIRECTION. No rule sets `direction` (owner D-2). Every inset, margin and
+ * padding is logical, so `iconStart` sits at the inline start — visually the
+ * right in the RTL document — with no physical property anywhere.
+ */
+
+.zakhmban-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  /* v0.2 §2.3: "14 input and button", at every size (Decision 5). */
+  border-radius: var(--radius-button);
+  border: 1px solid transparent;
+
+  padding-inline: var(--space-5);
+
+  font-size: var(--text-button-size);
+  line-height: var(--text-button-line-height);
+  font-weight: var(--text-button-weight);
+
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+/* v0.2 §2.4: "The only transform in the system is a 0.98 press scale." */
+.zakhmban-button:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: scale(var(--press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zakhmban-button {
+    transition: none;
+  }
+
+  .zakhmban-button:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: none;
+  }
+}
+
+/* The label is its own element so `loading` can dim the control without the
+   text ever being removed — "Loading keeps the label". */
+.zakhmban-button-label {
+  min-inline-size: 0;
+}
+
+/* ----------------------------------------------------------------------
+ * Sizes. A MINIMUM at every step, so 200% text zoom grows the control
+ * instead of clipping it.
+ * -------------------------------------------------------------------- */
+
+.zakhmban-button-sm {
+  /* Decision B: "Button `sm` has a minimum visible block size of 44px", and
+     §B.3 expresses it through this existing role. No 40px token exists. */
+  min-block-size: var(--control-min-target);
+}
+
+.zakhmban-button-md {
+  min-block-size: var(--control-height-button-md);
+}
+
+.zakhmban-button-lg {
+  min-block-size: var(--control-height-button-lg);
+}
+
+.zakhmban-button-block {
+  display: flex;
+  inline-size: 100%;
+}
+
+/* ----------------------------------------------------------------------
+ * Variants x tones. Written as compound selectors rather than through a
+ * component-local `--zakhmban-button-*` custom property, because a component
+ * may not mint an identifier: the field guard states it plainly, and a
+ * custom property declared in a published stylesheet is a name a consumer
+ * can set. These rules reference the approved ladder directly and declare
+ * nothing of their own.
+ *
+ * The enabled guard `:not(:disabled):not([aria-disabled="true"])` appears on
+ * every hover and press rule so neither state can paint over a disabled
+ * control or a loading one.
+ * -------------------------------------------------------------------- */
+
+.zakhmban-button-primary {
+  color: var(--on-brand-text);
+}
+
+.zakhmban-button-primary.zakhmban-button-green {
+  background-color: var(--action-green-rest);
+}
+
+.zakhmban-button-primary.zakhmban-button-blue {
+  background-color: var(--action-blue-rest);
+}
+
+.zakhmban-button-primary.zakhmban-button-red {
+  background-color: var(--action-red-rest);
+}
+
+.zakhmban-button-primary.zakhmban-button-green:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-green-hover);
+}
+
+.zakhmban-button-primary.zakhmban-button-blue:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-blue-hover);
+}
+
+.zakhmban-button-primary.zakhmban-button-red:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-red-hover);
+}
+
+.zakhmban-button-primary.zakhmban-button-green:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-green-press);
+}
+
+.zakhmban-button-primary.zakhmban-button-blue:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-blue-press);
+}
+
+.zakhmban-button-primary.zakhmban-button-red:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background-color: var(--action-red-press);
+}
+
+/* Secondary and text share their ink rule: Decision 12c gives both "the
+   corresponding action-rest value as their foreground". Only the border
+   differs, and only secondary draws one. */
+.zakhmban-button-secondary,
+.zakhmban-button-text {
+  background-color: transparent;
+}
+
+.zakhmban-button-secondary.zakhmban-button-green,
+.zakhmban-button-text.zakhmban-button-green {
+  color: var(--action-green-rest);
+}
+
+.zakhmban-button-secondary.zakhmban-button-blue,
+.zakhmban-button-text.zakhmban-button-blue {
+  color: var(--action-blue-rest);
+}
+
+.zakhmban-button-secondary.zakhmban-button-red,
+.zakhmban-button-text.zakhmban-button-red {
+  color: var(--action-red-rest);
+}
+
+/* The secondary border — this file's choice under Decision 14, measured in
+   the header rather than assumed from the token's name. */
+.zakhmban-button-secondary.zakhmban-button-green {
+  border-color: var(--action-green-rest);
+}
+
+.zakhmban-button-secondary.zakhmban-button-blue {
+  border-color: var(--action-blue-rest);
+}
+
+.zakhmban-button-secondary.zakhmban-button-red {
+  border-color: var(--action-red-rest);
+}
+
+.zakhmban-button-secondary.zakhmban-button-green:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-green:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-green-hover);
+  border-color: var(--action-green-hover);
+}
+
+.zakhmban-button-secondary.zakhmban-button-blue:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-blue:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-blue-hover);
+  border-color: var(--action-blue-hover);
+}
+
+.zakhmban-button-secondary.zakhmban-button-red:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-red:hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-red-hover);
+  border-color: var(--action-red-hover);
+}
+
+.zakhmban-button-secondary.zakhmban-button-green:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-green:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-green-press);
+  border-color: var(--action-green-press);
+}
+
+.zakhmban-button-secondary.zakhmban-button-blue:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-blue:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-blue-press);
+  border-color: var(--action-blue-press);
+}
+
+.zakhmban-button-secondary.zakhmban-button-red:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ),
+.zakhmban-button-text.zakhmban-button-red:active:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  color: var(--action-red-press);
+  border-color: var(--action-red-press);
+}
+
+/* A `text` button never draws a border, in any state. */
+.zakhmban-button-text {
+  border-color: transparent;
+}
+
+/* ----------------------------------------------------------------------
+ * States.
+ * -------------------------------------------------------------------- */
+
+.zakhmban-button:disabled {
+  background-color: var(--disabled-bg);
+  border-color: var(--disabled-border);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+}
+
+/* A text button keeps its transparent ground when disabled: a filled
+   disabled block where there was no block is a shape appearing, not a state
+   changing. */
+.zakhmban-button-text:disabled {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* Loading is NOT disabled: the control stays focusable and announced, which
+   is what "keeps the label" requires. `aria-disabled` reports that it cannot
+   be activated, and the component blocks re-entry in script. */
+.zakhmban-button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.7;
+}

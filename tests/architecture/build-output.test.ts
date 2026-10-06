@@ -26,6 +26,9 @@ const COPIED_ASSETS = [
   // The shared TextField and Select surface (TextField and Select
   // Implementation Authorization, 2026-10-05), on the same entry.
   "styles/field.css",
+  // The Button primitive's styles (Button Implementation Authorization,
+  // 2026-10-06), on the same entry.
+  "styles/button.css",
   "styles/fonts/Vazirmatn-Variable.woff2",
   "styles/fonts/OFL.txt",
   // ADR 0005 §3: the vendored glyph notice travels with the artifact it

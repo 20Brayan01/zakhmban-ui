@@ -78,6 +78,7 @@ describe("authored token CSS", () => {
     // imports the tokens through the single base.css aggregation point, and
     // FIRST, so every Styles rule below it resolves its values.
     expect(readdirSync(stylesDir).sort()).toEqual([
+      "button.css",
       "field.css",
       "fonts",
       "fonts.css",
@@ -99,6 +100,7 @@ describe("authored token CSS", () => {
       "./keyframes.css",
       "./overlay.css",
       "./field.css",
+      "./button.css",
     ]);
   });
 

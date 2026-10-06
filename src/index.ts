@@ -53,7 +53,13 @@ export type { IconName, IconProps } from "./icons/index.js";
  * key; it is exported because `options†` cannot be typed without it, and it
  * is the only name here that is neither a component nor a component's props.
  *
- * `Button` and `OtpInput` are still owed their own authorizations.
+ * `Button` under the Button Implementation Authorization of 2026-10-06, with
+ * its three closed unions — `ButtonVariant`, `ButtonTone` and `ButtonSize` —
+ * exported as types so an unapproved variant, tone or size is a compile
+ * error in the consuming application rather than a silently unstyled control.
+ *
+ * `OtpInput` is still owed its own implementation pull request; its
+ * authorization of 2026-10-06 is recorded but no code for it exists here.
  */
 export { BottomSheet } from "./primitives/index.js";
 export type { BottomSheetProps } from "./primitives/index.js";
@@ -61,3 +67,10 @@ export { TextField } from "./primitives/index.js";
 export type { TextFieldProps } from "./primitives/index.js";
 export { Select } from "./primitives/index.js";
 export type { SelectOption, SelectProps } from "./primitives/index.js";
+export { Button } from "./primitives/index.js";
+export type {
+  ButtonProps,
+  ButtonSize,
+  ButtonTone,
+  ButtonVariant,
+} from "./primitives/index.js";

@@ -52,7 +52,8 @@ export declare const tokens: {
     readonly "--brand-red": "#ec1417";
     readonly "--brand-red-dark": "#c80303";
     readonly "--brand-red-soft": "#fdebec";
-    readonly "--control-height-button": "52px";
+    readonly "--control-height-button-lg": "52px";
+    readonly "--control-height-button-md": "48px";
     readonly "--control-height-input": "48px";
     readonly "--control-min-target": "44px";
     readonly "--danger": "#ec1417";
