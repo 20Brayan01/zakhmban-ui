@@ -201,6 +201,7 @@ in full in the Token Table.
 | **Button Implementation Authorization** | 2026-10-06 | authorizes **`Button` only** — a branch, implementation commits, a normal push and **one reviewable pull request**, **after the documentation pull request recording the rulings has merged** — against §3.2's `variant tone size block disabled loading iconStart onClick`, carrying the Ruling 1 token-source change and the regenerated artifacts | **nothing in v0.2** — it approves no design value. It supersedes only the **current-status statements** saying `Button` has not begun. **Merging any pull request, `OtpInput`, changes to the other primitives, Tier 2 components, any token beyond Ruling 1's two identifiers, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **OtpInput Implementation Authorization** | 2026-10-06 | authorizes **`OtpInput` only**, on the same terms and after the same merge — against §3.2's `length value onChange onComplete error`, with five cells, LTR digit order inside RTL, the **unconditional 44×44** minimum per cell, and **no token created** | **nothing in v0.2** — it approves no design value and changes no count. It supersedes only the **current-status statements** saying `OtpInput` has not begun. **Merging any pull request, `Button` ahead of its own merge, changes to the other primitives, any new token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **Button Default Variant and Size Ruling** | 2026-10-06 | sets `Button`'s default **`variant`** to **`secondary`** and its default **`size`** to **`md`**, so a **`primary`** Button must be selected explicitly at its use site; **`tone` keeps v0.2 §3.2's `green`**, re-approved by nothing | **nothing canonical** — §3.2 states no default for `variant` or `size`, so a gap is closed rather than a rule overturned, and §3.2's `tone` default is untouched. It replaces one **non-canonical** statement: the implementer-chosen defaults disclosed in the open Button implementation pull request, which was never a record. **No token is created and no count changes**; Ruling 1's **119 / 39 / 1** target is unchanged and the artifact stays **118 / 39 / 1** until the Button implementation lands. The public API is unchanged — the three props stay optional with the same closed unions. |
+| **OtpInput Completion Announcement Ruling** | 2026-10-06 | settles **how** §3.2's *"result announced politely"* is discharged: `OtpInput` calls **`onComplete(value)`** and the **consuming application** owns the localized, polite announcement. The primitive renders **no live region of its own for completion**, must **not** place the raw code in `role="status"` or any other live region, and must **not** imply a complete entry is valid | **v0.2 §3.2's `OtpInput` clause** *"result announced politely"*, **only** insofar as it could be read as requiring the primitive to render its own live region — the rest of the row is unchanged; and the **OtpInput Implementation Authorization**'s matching boundary bullet, which is **unchanged in substance and narrowed in means**. **§6's Announcements row, frozen v1.1 §2.1 and Ruling 4 are untouched.** **No prop, token, export, subpath or package-owned string is created**; 119 / 39 / 1 is unchanged and this record changes **no code and no release state**. |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1497,6 +1498,66 @@ default inside work the **Button Implementation Authorization of 2026-10-06**
 already permits. **Merging any pull request stays a separate manual owner
 decision**, and the package stays **`0.2.0`** and **`private`** with **no new
 tag**.
+
+
+### OtpInput Completion Announcement Ruling — 2026-10-06
+
+**Authority kind:** explicit interpretation and ownership assignment, owner
+tier. **Level 3** — approved owner design/product rulings. Recorded in full in
+[`token-table-ratification.md`](token-table-ratification.md).
+
+**The gap it closes.** Three canonical passages meet at a point none resolves.
+§3.2 requires `OtpInput`'s *"result announced politely"*; §6 assigns the
+mechanism — *"success and progress `role="status"`"*; and **frozen v1.1 §2.1**
+forbids the package to *"carry application-specific strings"*. A live region
+needs text, §3.2 names none, the approved five-prop API supplies none, and the
+package may not author one — so an implementer had to choose between
+announcing nothing, inventing product copy, or adding a prop the authorization
+forbids. The open implementation pull request took a fourth route and put the
+**entered code** in the region; that avoided inventing a string and **is not
+what this ruling approves**.
+
+**What it decides.** `OtpInput` discharges the obligation by calling
+**`onComplete(value)`** — already in its approved API, so **no prop is added
+and no signature changes**. The **consuming application** owns the
+meaningful, localized, polite announcement, **without repeating the OTP digits
+in a live region**. The primitive must **not** place the raw code in
+`role="status"` or any other live region — announcing a one-time code aloud
+reads out a credential — and must **not** state or imply that a complete entry
+is valid, since **completeness is not correctness** and only the application
+can check the code.
+
+**What it supersedes, named exactly.** **v0.2 §3.2's clause *"result announced
+politely"***, **only** insofar as it could be read as requiring the primitive
+to render a live region of its own; the rest of the `OtpInput` row — the five
+props, LTR digit order, paste filling all cells, `autocomplete="one-time-code"`
+— stands as written. And the **OtpInput Implementation Authorization**'s
+matching boundary bullet, **unchanged in substance and narrowed in means**,
+annotated in place rather than rewritten. **§6's Announcements row is
+untouched**, `role="alert"` still governs errors, and `role="status"` remains
+correct for the application's own messages. **Frozen v1.1 §2.1 is untouched
+and is the reason this ruling exists.** **Ruling 4** is untouched and is the
+**precedent**: an obligation §3.2 lists among `OtpInput`'s concerns, which the
+package cannot discharge without overstepping, belongs to the application.
+
+**What it preserves.** The approved **five-prop API** with no prop added,
+removed or re-signed; the **error association** — Caption step, `--danger-fg`,
+`role="alert"`, `aria-describedby`; the **cell labels**, **keyboard
+behaviour**, **paste**, **`autocomplete="one-time-code"`**, the **LTR digit
+order inside an RTL page**, the **unconditional 44×44 minimum**; and **no
+timer, resend control or cooldown prop**.
+
+**What it does not do.** It creates **no token** and changes **no count** —
+**119 / 39 / 1** is unchanged — and no export, subpath, package-owned string
+or sixth primitive. It is **not a general rule about live regions**: it says
+what `OtpInput` must not announce and approves no pattern for any other
+component.
+
+**What it does not authorize.** **No new implementation** — it settles a means
+inside work the **OtpInput Implementation Authorization of 2026-10-06**
+already permits, and **this record changes no code and no release state**.
+**Merging any pull request stays a separate manual owner decision**; the
+package stays **`0.2.0`** and **`private`** with **no new tag**.
 
 ## Missing design-system document — scoped disposition
 
