@@ -173,7 +173,11 @@ const APPROVED_PUBLIC_TOKENS: Record<string, string> = {
 
   "--control-min-target": "44px",
   "--control-height-input": "48px",
-  "--control-height-button": "52px",
+  // Ruling 1 of the v0.3.0 Remaining-Primitive Rulings, 2026-10-06: the
+  // released `--control-height-button` is RETIRED and replaced by these two.
+  // The old identifier is asserted absent below — no compatibility alias.
+  "--control-height-button-md": "48px",
+  "--control-height-button-lg": "52px",
   "--app-bar-height": "56px",
   "--bottom-nav-height": "64px",
   "--bottom-nav-safe-area": "20px",
@@ -278,8 +282,8 @@ describe("typed token artifact — ADR 0003 §11", () => {
 
   it("holds exactly 118 keys", async () => {
     const { tokens } = await import("@zakhmban/ui/tokens");
-    expect(Object.keys(tokens)).toHaveLength(118);
-    expect(Object.keys(APPROVED_PUBLIC_TOKENS)).toHaveLength(118);
+    expect(Object.keys(tokens)).toHaveLength(119);
+    expect(Object.keys(APPROVED_PUBLIC_TOKENS)).toHaveLength(119);
   });
 
   it("keys every entry with the canonical CSS identifier, leading -- included", async () => {
@@ -403,6 +407,7 @@ describe("typed token artifact — ADR 0003 §11", () => {
     const root = await import("@zakhmban/ui");
     expect(Object.keys(root).sort()).toEqual([
       "BottomSheet",
+      "Button",
       "Icon",
       "Select",
       "TextField",

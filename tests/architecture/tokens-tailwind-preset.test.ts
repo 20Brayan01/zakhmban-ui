@@ -152,7 +152,8 @@ describe("Tailwind v4 @theme artifact", () => {
     for (const geometry of [
       "--control-min-target",
       "--control-height-input",
-      "--control-height-button",
+      "--control-height-button-md",
+      "--control-height-button-lg",
       "--app-bar-height",
       "--bottom-nav-height",
       "--bottom-nav-safe-area",

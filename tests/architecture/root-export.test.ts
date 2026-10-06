@@ -23,6 +23,7 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(Object.keys(entry).sort()).toEqual(
       [
         "BottomSheet",
+        "Button",
         "Icon",
         "Select",
         "TextField",

@@ -25,7 +25,7 @@ const readme = readFileSync(
 
 describe("token consumer contract", () => {
   it("resolves all four named exports through @zakhmban/ui/tokens", () => {
-    expect(Object.keys(everyToken)).toHaveLength(118);
+    expect(Object.keys(everyToken)).toHaveLength(119);
     expect(surfaceValue).toBe("#ffffff");
     expect(literalWhite).toBe("#ffffff");
     expect(cssDeclaration("--space-4")).toBe("--space-4: 16px;");

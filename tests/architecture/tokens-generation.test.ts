@@ -57,7 +57,7 @@ describe("token generation", () => {
     const result = run(generator, ["--check"]);
     expect(result.stderr).toBe("");
     expect(result.status, result.stdout + result.stderr).toBe(0);
-    expect(result.stdout).toContain("118 public tokens");
+    expect(result.stdout).toContain("119 public tokens");
     expect(result.stdout).toContain("39 internal properties");
   });
 
@@ -244,10 +244,10 @@ describe("token generation", () => {
       });
 
     // Seven authored token files, the generated Tailwind artifact, and the
-    // seven Styles stylesheets: index, fonts, reset, global, keyframes,
-    // overlay and field.
+    // eight Styles stylesheets: index, fonts, reset, global, keyframes,
+    // overlay, field and button.
     const sources = walk(join(root, "src"));
-    expect(sources.length).toBe(15);
+    expect(sources.length).toBe(16);
 
     for (const source of sources) {
       const built = join(
