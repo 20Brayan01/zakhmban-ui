@@ -2895,8 +2895,10 @@ the Phase 1 kit and the shipped Website, at a different size (13px).
 
 Caption at 400 covers **only** the four uses explicitly supported by canonical
 documentation — **plus a fifth added 2026-10-05**, `TextField` and `Select`
-error text, by the TextField and Select Error Typography Ruling, which
-supersedes the word *only* for that one addition and for nothing else:
+error text, by the TextField and Select Error Typography Ruling — and **a
+sixth added 2026-10-06**, `OtpInput` error text, by Ruling 2 of the v0.3.0
+Remaining-Primitive Rulings. Each supersedes the word *only* for its own
+addition and for nothing else:
 
 1. **Hint**
 2. **Timestamp**
@@ -7146,6 +7148,19 @@ the ADR series**, due with the Button implementation, and it is **a genuine
 blocker for a complete three-size Button** — `sm` and `lg` can resolve through
 approved, correctly-named roles today and `md` cannot.
 
+> **Answered 2026-10-06 — this dated record is preserved as approved and
+> nothing above is withdrawn.** **Ruling 1** of the v0.3.0
+> Remaining-Primitive Rulings retires the released identifier
+> `--control-height-button` and replaces it with
+> **`--control-height-button-md` 48px** and **`--control-height-button-lg`
+> 52px**, so `md` resolves through a correctly-named role and
+> `--control-height-input` is **not** used for a Button. **The blocker is
+> closed.** Everything else in Decision B is unchanged: `sm` ≥ 44px through
+> `--control-min-target` per **B.3**, `md` 48 and `lg` 52 per **B.2**, and the
+> two §2.3 and §3.2 supersessions in **B.1**. The approved public-token target
+> becomes **119 / 39 / 1** only when the Button implementation changes the
+> token source; at this commit the artifact is **118 / 39 / 1**.
+
 ### Supersessions of record — this ruling
 
 | Decision | Exact earlier rule replaced | New effective rule |
@@ -7532,7 +7547,9 @@ pipeline is evidence, not approval.
 ### Not authorized, and unchanged
 
 **Merging any pull request** · `TextField` · `Select` · `OtpInput` ·
-`Button` · **Decision B §B.4's Button `md` token representation** · any Tier 2
+`Button` · ~~**Decision B §B.4's Button `md` token representation**~~ —
+**CLOSED 2026-10-06** by Ruling 1 of the v0.3.0 Remaining-Primitive Rulings ·
+any Tier 2
 component · a sixth primitive · a public `Portal` or `FocusTrap` · a new
 export subpath · a new token or design value · a runtime dependency —
 `dependencies` stays `{}` · **version change · `v0.3.0` tag · release ·
@@ -7604,6 +7621,14 @@ the ink alone.
 ### Scope — narrow, and stated as such
 
 **This assignment applies to `TextField` and `Select` error text only.**
+
+> **Extended 2026-10-06 — this dated record is preserved as approved and
+> nothing above is withdrawn.** **Ruling 2** of the v0.3.0
+> Remaining-Primitive Rulings reaches **`OtpInput`** as well, on the finding
+> that its `error` prop is likewise a **text message**. The step, the ink and
+> the 6.0515:1 measurement are **unchanged**; only the set of components
+> covered is widened, and it is widened **by one component and no further**.
+> Banner explanatory prose and ListRow metadata **remain open**.
 
 **It does not settle** banner explanatory prose · ListRow metadata · any
 other deferred typography role · the Body–Caption relationship · the
@@ -7762,7 +7787,8 @@ consumer-repository change · deployment · repository-visibility change.**
 contract (IA-6) · **banner prose and ListRow metadata typography** ·
 Decision 6b's Modal radius · Decision 4b's shadows · border *width* tokens ·
 the Checkbox square dimension · Chip state coverage · Decision 16b ·
-**Decision B §B.4's Button `md` token representation** · v0.2 §9 unknown 12
+~~**Decision B §B.4's Button `md` token representation**~~ — **CLOSED
+2026-10-06** · v0.2 §9 unknown 12
 for `Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
 
 **The package stays `0.2.0` and `private`**, with `v0.1.0` and `v0.2.0`
@@ -7902,3 +7928,434 @@ exports are unchanged · the package stays **`0.2.0`** and **`private`**, with
 is authorized**: this corrects a binding inside the work the authorization of
 2026-10-05 already permits, and **merging any pull request remains a separate
 manual owner decision**.
+
+---
+
+## V0.3.0 REMAINING-PRIMITIVE RULINGS — BUTTON AND OTPINPUT — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: value and representation assignment, owner tier.** Level 3 —
+approved owner design/product rulings. **Four numbered decisions.** The two
+implementation authorizations that follow them are separate records.
+
+**What this ruling changes in the repository: nothing.** No token source, no
+generated artifact, no count, no export, no component. The package stays
+**`0.2.0`** and **`private`**; **`v0.1.0` and `v0.2.0` are unchanged**, and
+the `v0.2.0` tag still carries **`--control-height-button` `52px`** exactly as
+released. **At this commit the generated artifact remains 118 / 39 / 1**, and
+`generate-tokens --check` still prints *"118 public tokens, 39 internal
+properties"*.
+
+---
+
+### RULING 1 — BUTTON GEOMETRY IDENTIFIERS — APPROVED
+
+**The released public identifier `--control-height-button` is retired and
+replaced by two explicitly named roles:**
+
+| Identifier | Value | Role | Canonical basis |
+| --- | --- | --- | --- |
+| **`--control-height-button-md`** | **48px** | Button size `md` | v0.2 §3.2 *"Sizes sm 40 / md 48 / lg 52"* |
+| **`--control-height-button-lg`** | **52px** | Button size `lg` | §2.3 *"primary button 52"*; §3.2 *"lg 52"* |
+
+**No design value is created or changed.** 48px and 52px are v0.2 §3.2's
+already-approved `md` and `lg`. This ruling decides **naming only**, which is
+the representation question **Decision B §B.4** recorded and left open.
+
+**Button `sm` is unchanged** and continues to resolve through
+**`--control-min-target`**, exactly as **Decision B §B.3** prescribes:
+`min-block-size: var(--control-min-target)`.
+
+**`--control-height-input` keeps its input role and is not used for a
+Button.** B.4's objection — that 48px exists only under *"a role named for a
+different control"* — is discharged by giving Button its own correctly named
+role, not by reusing the input's.
+
+#### 1.1 — The count target, and what is true today
+
+**The approved public-token target becomes 119 / 39 / 1 only when the Button
+implementation changes the token source.** One identifier is removed and two
+are added, a net of **+1 public token**. The internal count stays **39** —
+geometry carries no `--_` source because it is deliberately outside the
+Tailwind namespaces (ADR 0003 §12) — and the single Tailwind artifact stays
+**1**.
+
+**This documentation pull request leaves the actual count at 118 / 39 / 1**,
+and no record here may be read as saying the artifact has already changed.
+
+#### 1.2 — Breaking change, intentionally approved
+
+**v0.2 §7 classifies this as breaking**, in terms that name it exactly:
+
+> **Versioning.** Semver. Breaking: **removing or renaming a semantic token**,
+> a component, or a prop; changing default variants; altering geometry tokens.
+
+**The owner approves it as a breaking change for the planned `v0.3.0`
+release**, taken under semver's major-version-zero clause while the package is
+`0.2.0`, `private`, and pre-`v1.0.0`. **It is declared, not inferred.**
+
+**This is the first retirement of a *released* identifier.** `--text-muted`
+and the six retired interaction identifiers were retired **before any tag
+carried them**; `--control-height-button` is present in the `src/` and
+`dist/` of **both `v0.1.0` and `v0.2.0`**. The precedent is therefore
+recorded as **not covering this case**.
+
+#### 1.3 — Known migration references
+
+**Known references in `zakhmban-therapists`**, which its later migration must
+update:
+
+| File | What it does |
+| --- | --- |
+| `src/app/offline/offline.module.css:70` | `min-block-size: var(--control-height-button)` on `.retry` — a button at 52px, i.e. the **`lg`** role, so it maps to **`--control-height-button-lg`** |
+| `src/test/ui-tokens.smoke.test.ts:51` | names the identifier in its sampled-token list |
+| `src/test/ui-tokens.smoke.test.ts:98` | asserts the value is `"52px"` |
+| `RUN_LOG.md:233` | historical log — a record, not code |
+
+**Known references in this repository**: `src/tokens/base.css`;
+`src/tokens/index.ts` and the three `dist/tokens/` artifacts, all regenerated;
+`tests/architecture/tokens-typescript.test.ts`'s hand-listed approved set; and
+`tests/architecture/tokens-tailwind-preset.test.ts`'s geometry-absent-from-preset
+list. **Documentary references** in ADR 0003's token table, this register and
+the canonical registry are **annotated, never rewritten**.
+
+**These are the *known* references, enumerated at `main` `61ae432`. No claim
+is made that all consumers are known.** The package is distributed by private
+git tag and no consumer inventory exists; `zakhmban-therapists` pins
+`#v0.2.0` and is unaffected until it migrates.
+
+#### 1.4 — What Ruling 1 supersedes, named exactly
+
+- **The public identifier `--control-height-button`**, as declared in
+  `src/tokens/base.css` and recorded in **ADR 0003 §6's geometry row** —
+  *"`--control-height-button` | `52px` | §2.3 'primary button 52'"*. Its
+  **value survives** under the new `-lg` name; only the identifier is retired.
+- **Decision B §B.4**, which recorded that *"How Button `md` 48 is expressed
+  through an appropriately named token is a separate representation question,
+  and it is not answered here."* **It is answered here.** Everything else in
+  Decision B — `sm` ≥ 44px, `md` 48, `lg` 52, the `--control-min-target`
+  representation, the two §2.3 and §3.2 supersessions — is **unchanged**.
+
+**Nothing else is superseded.** `--control-height-input`, `--control-min-target`,
+`--app-bar-height`, `--bottom-nav-height` and `--bottom-nav-safe-area` keep
+their identifiers, values and roles.
+
+---
+
+### RULING 2 — OTPINPUT ERROR IS A TEXT MESSAGE — APPROVED
+
+**`OtpInput`'s `error` prop is a text message**, as it is on `TextField` and
+`Select`. **Its text takes the existing Caption step** —
+`--text-caption-size` 12px, `--text-caption-line-height` 1.5,
+`--text-caption-weight` 400 — **with the existing `--danger-fg` ink.**
+
+- **No token is created.** All four properties are already among the approved
+  118, and the boundary is unchanged by this ruling.
+- `--danger-fg` `#C80303` on `--background` `#FFFFFF` measures **6.0515:1**,
+  clearing §6's 4.5:1 for text. **No claim of complete accessibility
+  conformance, and no claim of a complete accessibility audit, follows from
+  that one measurement.**
+- **Colour is not the only signal**, as §6 requires: the state is carried by
+  the message text and by the error announcement, not by ink alone.
+
+**Why the same step.** The three primitives that carry `error` now present it
+identically, so a validation message does not change size according to which
+control produced it.
+
+#### 2.1 — What Ruling 2 supersedes, named exactly
+
+- **The TextField and Select Error Typography Ruling of 2026-10-05, its scope
+  sentence**: *"This assignment applies to `TextField` and `Select` error
+  text only."* **It now reaches `OtpInput` as well, and no further
+  component.**
+- **Decision 8's Caption role-coverage list**, which after 2026-10-05 read
+  *"plus a fifth added 2026-10-05"*. It now carries a **sixth** use —
+  `OtpInput` error text — **by this ruling and for this component only.**
+
+**Still open, exactly as recorded:** banner explanatory prose · ListRow
+metadata · every other deferred typography role.
+
+---
+
+### RULING 3 — OTPINPUT DIGIT TYPOGRAPHY — APPROVED
+
+**The five `OtpInput` digits take the existing `--text-card-title` step** —
+`--text-card-title-size` 16px, `--text-card-title-line-height` 1.5,
+`--text-card-title-weight` 600 — **with `--text-primary` ink and
+`font-variant-numeric: tabular-nums`.**
+
+- **No token is created and no ninth typographic step is approved.** The
+  eight-step scale stays closed.
+- **No line-height override is authorized.** Measured in a browser: a 16px /
+  1.5 digit produces a **25px line box inside a 44px cell**, with no clipping
+  at either 390px or 320px. The step fits as approved.
+- **Tabular figures are already canonical**, not new: §2.2 requires
+  `font-variant-numeric: tabular-nums` for *"money, dimensions, scores,
+  countdowns and codes"*, and an OTP is a code.
+
+#### 3.1 — What Ruling 3 supersedes, named exactly
+
+**v0.2 §2.2's `--text-card-title` use list** — *"Card heading, ListRow
+primary"* — **gains a third use: `OtpInput` digits, and nothing else.** The
+two original uses are unchanged, and this extension authorizes no further
+use of the step.
+
+**`--text-button` was considered and not chosen.** Its line height of 1 was
+initially thought to be required for a glyph centred in a control; measurement
+disproved that, and `--text-card-title` was preferred because its use list is
+already plural and content-oriented, so extending it puts no control-named
+token on a non-button — the naming objection Decision B §B.4 raises in the
+geometry case.
+
+---
+
+### RULING 4 — RESEND COOLDOWN IS APPLICATION-OWNED — APPROVED
+
+**The resend cooldown and the resend action belong to the consuming
+application.**
+
+**`OtpInput` has no timer, no resend control and no cooldown prop.** It
+implements no countdown, renders no resend affordance, and exposes nothing in
+its public API for either.
+
+**Basis.** §3.2 lists *"resend cooldown"* among `OtpInput`'s **states** but
+gives the component **no prop for it**, and §6 requires that *"Countdowns are
+not live regions — they would announce continuously; the app announces the
+threshold crossings only."* A countdown the package cannot announce is a
+countdown the package should not own.
+
+#### 4.1 — What Ruling 4 supersedes, named exactly
+
+**v0.2 §3.2's `OtpInput` state list**, insofar as *"resend cooldown"* could be
+read as an obligation on the primitive. **It is read as describing the
+surrounding authentication flow, not the component's API.** The four other
+listed states — empty, partial, complete, error — **remain the component's**,
+and the rest of the `OtpInput` row is unchanged.
+
+---
+
+### Boundaries of this ruling
+
+**No token identifier, value, count, artifact or export changes at this
+commit** · the exports stay the six approved keys · the package stays
+**`0.2.0`** and **`private`** · **`v0.1.0` and `v0.2.0` are unchanged and no
+new tag is created** · **no implementation is authorized by these four
+rulings**; the two authorizations below are separate records, and **merging
+any pull request remains a separate manual owner decision**.
+
+**Still deferred and untouched:** `--radius-pill` · the banner accent contract
+(IA-6) · **banner prose and ListRow metadata typography** · Decision 6b's
+Modal radius · Decision 4b's shadows · border *width* tokens · the Checkbox
+square dimension · Chip state coverage · Decision 16b · v0.2 §9 unknown 12 for
+`Box`, `Stack`, `Text`, `Screen` and `VisuallyHidden`.
+
+---
+
+## BUTTON IMPLEMENTATION AUTHORIZATION — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: implementation authorization, owner tier.** Level 3. **It
+decides no design value.**
+
+**Scope: `Button` only.** `OtpInput` has its own authorization below, and
+every other primitive is outside both.
+
+**Preconditions, all met.** `Button`'s public contract is fully specified in
+v0.2 §3.2; **Decision B** fixes `sm` at a 44px minimum through
+`--control-min-target`; **Ruling 1 above** closes §B.4 by naming
+`--control-height-button-md` and `--control-height-button-lg`; radius is 14px
+at all three sizes (Decision 5); the label step is `--text-button`; the filled
+variants consume **Decision 3a's** action ladder and the outline and text
+variants consume **Decision 12c's** action-rest foreground; `--on-brand-text`,
+the disabled triplet and `--press-scale` are approved. **No open Token Table
+entry touches `Button` once Ruling 1 is recorded.**
+
+### Authorized, and limited to it
+
+- a **branch**, local **implementation commits**, a **normal push**, and
+  **one reviewable pull request** against `main`, **after the documentation
+  pull request recording these rulings has merged**;
+- `src/` work implementing **`Button`** against §3.2 — `variant` `tone` `size`
+  `block` `disabled` `loading` `iconStart` `onClick`, with the `className` /
+  `style` / `id` / `data-*` / `aria-*` pass-through and ref forwarding §3
+  requires;
+- **the token-source change Ruling 1 approves**: retiring
+  `--control-height-button` and adding `--control-height-button-md` 48px and
+  `--control-height-button-lg` 52px, with the generated TypeScript and
+  Tailwind artifacts regenerated and **`dist/` rebuilt and committed**;
+- the **component CSS** `Button` needs, authored under `src/styles/` and
+  delivered through the **existing `./styles` entry**;
+- the **guard amendments** the work genuinely requires, each a reviewed diff,
+  **keeping `OtpInput` forbidden** until its own pull request;
+- **exactly pinned development dependencies** if genuinely needed.
+  **`dependencies` stays `{}`.**
+
+**Merging is not authorized.** The merge is a **separate manual owner
+decision**, taken after review and after the required checks pass. **Green CI
+is evidence, not merge approval.**
+
+### Required implementation boundary
+
+- **The approved API and nothing more.** No prop outside §3.2's list.
+- **Sizes:** `sm` **≥ 44px** via `min-block-size: var(--control-min-target)`;
+  `md` **48px** via `--control-height-button-md`; `lg` **52px** via
+  `--control-height-button-lg`. **`--control-height-input` must not appear in
+  Button CSS.**
+- **Variants and tones:** `primary` · `secondary` (outline) · `text`; green
+  (default), blue, red. Filled variants bind to the Decision 3a ladder;
+  outline and text labels bind to the action-rest foreground per Decision 12c.
+  The **secondary border** binding is a component decision under **Decision
+  14**, which names *"secondary Button"* among the components it does not
+  canonically bind — the pull request must **state and justify** it, create no
+  token and use no raw colour.
+- **Loading is exactly §3.2's three obligations** — *"Loading keeps the label,
+  sets `aria-busy`, and blocks re-entry."* **No spinner is authorized**: the
+  approved glyph inventory holds eleven names and none is a spinner, and
+  ADR 0004 §8 scopes `zakhmban-spin` to *"loading indicators — Tier 2"*. A
+  spinner would need a glyph decision and a geometry this ruling does not
+  make.
+- **`iconStart`** renders through the existing `Icon`, and the button carries
+  its own accessible name — §3.1: *"an icon-only control must carry a label on
+  the control, not the icon."*
+- **Never disable without a visible reason nearby** (§3.2) is the consuming
+  application's duty; the component must not prevent it.
+- **The global `:focus-visible` indicator stays intact** — not replaced, not
+  removed, not re-declared.
+- **RTL:** logical properties only, and **no rule sets `direction`** (owner
+  D-2).
+- **No new design value or token** beyond Ruling 1's two identifiers, **no new
+  export subpath**, and **no change to the `exports` map**.
+
+### Acceptance outcomes
+
+- **Component tests** for all three sizes, all three variants, all three
+  tones, `block`, `disabled` and `loading`, asserting that loading keeps the
+  label, sets `aria-busy` and blocks re-entry.
+- **Keyboard and accessibility tests** that are behavioural rather than markup
+  restatements: full operation without a pointer, Enter and Space activation,
+  the accessible name, and that a disabled or loading button does not fire
+  `onClick`.
+- **Focus tests** proving the global indicator still applies and is not
+  duplicated.
+- **Generated-token and artifact parity**: `generate-tokens --check` reporting
+  **119 public tokens, 39 internal properties**, `verify:dist` green, and the
+  Tailwind preset still carrying **no geometry key**.
+- **Built-package verification** extending the architecture suite's existing
+  discipline to the new surface.
+- **A rendered-browser check** of the three sizes, the focus ring, RTL layout
+  and **200% zoom**, stating what was and was not verified and **claiming no
+  complete accessibility conformance**.
+- **A migration note in the pull request** for the retired identifier, listing
+  the known `zakhmban-therapists` references from Ruling 1 §1.3 and stating
+  that unknown consumers cannot be enumerated.
+
+### Not authorized, and unchanged
+
+**Merging any pull request** · **`OtpInput`** · any change to `BottomSheet`,
+`TextField`, `Select` or `Icon` · any **Tier 2** component · a sixth primitive
+· a new export subpath · **any token beyond Ruling 1's two identifiers** · any
+unrelated token, value or mapping · a runtime dependency · **version change ·
+tag · release · GitHub Release · package publication · `zakhmban-therapists`
+or any other consumer-repository change · deployment · repository-visibility
+change.**
+
+---
+
+## OTPINPUT IMPLEMENTATION AUTHORIZATION — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: implementation authorization, owner tier.** Level 3. **It
+decides no design value and creates no token.**
+
+**Scope: `OtpInput` only.**
+
+**Preconditions, all met.** The public contract is specified in v0.2 §3.2;
+cell radius is the approved **12px small-control geometry**
+(`--radius-control`); **Ruling 2** assigns the error message its step and ink;
+**Ruling 3** assigns the digits theirs; **Ruling 4** places the resend
+cooldown outside the component. **No open Token Table entry touches
+`OtpInput` once those three are recorded.**
+
+### Authorized, and limited to it
+
+- a **branch**, local **implementation commits**, a **normal push**, and
+  **one reviewable pull request** against `main`, **after the documentation
+  pull request recording these rulings has merged**;
+- `src/` work implementing **`OtpInput`** against §3.2 — `length` `value`
+  `onChange` `onComplete` `error`, with the §3 pass-through and ref
+  forwarding;
+- the **component CSS** it needs, authored under `src/styles/` and delivered
+  through the **existing `./styles` entry**;
+- the **guard amendments** the work genuinely requires, each a reviewed diff;
+- **exactly pinned development dependencies** if genuinely needed.
+  **`dependencies` stays `{}`. No token is created.**
+
+**Merging is not authorized.** The merge is a **separate manual owner
+decision**.
+
+### Required implementation boundary
+
+- **The approved API and nothing more.** No prop outside §3.2's list, and
+  **no cooldown prop, timer or resend control** (Ruling 4).
+- **Five cells.** `length` defaults to 5, per §3.2's *"Five-cell code
+  entry"*.
+- **LTR digit order inside an RTL page** (§3.2), achieved by the §5 isolation
+  mechanism — *"an isolated inline span (`dir='ltr'`)"*, which §5 lists "OTP
+  cells" among. The `dir` **attribute** is not a CSS rule, so **owner D-2 is
+  untouched and no rule sets `direction`**.
+- **The 44×44 minimum is unconditional for every interactive cell** (§6
+  Targets, which carries no viewport or zoom qualifier, and *"Spacing may not
+  be used to justify a smaller target"*). **Flex shrink must not reduce
+  either dimension below 44px**: both `min-block-size` and `min-inline-size`
+  resolve through `--control-min-target`. `OtpInput` is **not** added to §6's
+  exception register, which continues to hold exactly one entry.
+- **At the required 320 CSS px reflow width the five-cell row fits** — five
+  44px cells plus four `--space-2` gaps need 252px against 288px available,
+  measured at **57.59 × 44** per cell with no clipping. **Behaviour below that
+  width is an implementation choice**, provided the approved accessibility
+  outcomes continue to hold; **page-level horizontal scrolling is not an
+  acceptable outcome**, and any bounded scrolling must be internal to the
+  group with the focused cell scrolled into view.
+- **200% text zoom without clipping** (§6 Motion & zoom), with no fixed height
+  on a text container.
+- **Digits** take `--text-card-title` with `--text-primary` and
+  `tabular-nums` (Ruling 3); **the error message** takes Caption and
+  `--danger-fg` (Ruling 2); **no line-height override**.
+- **`autocomplete="one-time-code"`**, **paste fills all cells**, and the
+  **result announced politely** (§3.2).
+- **The global `:focus-visible` indicator stays intact**, and every cell is a
+  real focusable control — §6: *"Real elements first."*
+- **No new design value or token**, no new export subpath, and **no change to
+  the `exports` map**.
+
+### Acceptance outcomes
+
+- **Keyboard tests**: per-cell entry, advance on input, retreat and clear on
+  Backspace, arrow traversal, full operation without a pointer.
+- **Paste tests**: a pasted code fills all cells from any cell, and a paste
+  longer or shorter than `length` is handled without loss.
+- **Completion tests**: `onComplete` fires exactly once when the last cell is
+  filled, and does not fire on an incomplete or cleared value.
+- **Error-announcement tests** that are behavioural: the message is announced
+  and reaches the accessible description, not conveyed by colour alone.
+- **RTL tests** proving the **first cell is visually leftmost** inside an RTL
+  page while DOM and focus order are unchanged.
+- **Built-artifact verification** extending the architecture suite to the new
+  surface, with `verify:dist` green and the token count **unchanged by this
+  pull request**.
+- **A rendered-browser check** at the design width, at **320 CSS px**, and at
+  **200% zoom**, recording the measured cell dimensions and stating what was
+  and was not verified. **No claim of complete accessibility conformance.**
+
+### Not authorized, and unchanged
+
+**Merging any pull request** · **`Button`**, unless its own authorized pull
+request has already merged · any change to `BottomSheet`, `TextField`,
+`Select` or `Icon` · any **Tier 2** component · a sixth primitive · a new
+export subpath · **any new design value or token** · a runtime dependency ·
+**version change · tag · release · package publication ·
+`zakhmban-therapists` or any other consumer-repository change · deployment ·
+repository-visibility change.**
