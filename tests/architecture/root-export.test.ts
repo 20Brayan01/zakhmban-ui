@@ -77,6 +77,30 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(select).not.toContain('role="listbox"');
   });
 
+  it("defaults an omitted Button variant to secondary in the BUILT package", async () => {
+    // The drift this guards against actually happened: the source and its own
+    // test agreed on `primary` while the merged ruling said `secondary`, and
+    // nothing compared either to the built artifact a consumer installs.
+    //
+    // Button Default Variant and Size Ruling, 2026-10-06. `primary` must be
+    // asked for, so that §3.2's "One primary per screen" cannot be defeated
+    // by an omitted prop.
+    const { Button } = await import("@zakhmban/ui");
+
+    const omitted = renderToStaticMarkup(createElement(Button, null, "ادامه"));
+    expect(omitted).toContain("zakhmban-button-secondary");
+    expect(omitted).not.toContain("zakhmban-button-primary");
+    // The other two approved defaults, in the same artifact.
+    expect(omitted).toContain("zakhmban-button-green");
+    expect(omitted).toContain("zakhmban-button-md");
+
+    const explicit = renderToStaticMarkup(
+      createElement(Button, { variant: "primary" }, "ثبت"),
+    );
+    expect(explicit).toContain("zakhmban-button-primary");
+    expect(explicit).not.toContain("zakhmban-button-secondary");
+  });
+
   it("binds the built label to the built control, not merely to a name", async () => {
     // `for` and `id` must agree in the COMPILED output: a mismatch here is
     // a field with no accessible name in every consuming application, and

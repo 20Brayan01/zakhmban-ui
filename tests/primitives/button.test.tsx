@@ -28,15 +28,35 @@ describe("Button — the approved API surface", () => {
     expect(control.tagName).toBe("BUTTON");
   });
 
-  it("defaults to primary / green / md", () => {
-    // §3.2 marks a default for `tone` only. `variant` and `size` carry none
-    // and neither is marked required, so the component supplies both — the
-    // one judgement call in the implementation, recorded in the PR.
+  it("defaults to secondary / green / md", () => {
+    // The Button Default Variant and Size Ruling of 2026-10-06. `secondary`
+    // and `md` are the owner's; `green` is §3.2's own default. None of the
+    // three is the implementation's choice.
     render(<Button>ادامه</Button>);
     const classes = screen.getByRole("button").className.split(" ");
-    expect(classes).toContain("zakhmban-button-primary");
+    expect(classes).toContain("zakhmban-button-secondary");
     expect(classes).toContain("zakhmban-button-green");
     expect(classes).toContain("zakhmban-button-md");
+  });
+
+  it("never renders primary unless primary was asked for", () => {
+    // This is the whole point of the ruling: §3.2 says "One primary per
+    // screen", and a primary-by-default component defeats that by omission.
+    // An omitted `variant` must not produce one.
+    render(<Button>ادامه</Button>);
+    expect(screen.getByRole("button").className).not.toContain(
+      "zakhmban-button-primary",
+    );
+  });
+
+  it("still renders primary when it is requested explicitly", () => {
+    // The ruling removes `primary` from the default, not from the API: it
+    // "is not removed, deprecated or discouraged" and stays the correct
+    // choice for a screen's single principal action.
+    render(<Button variant="primary">ثبت نهایی گزارش</Button>);
+    const classes = screen.getByRole("button").className.split(" ");
+    expect(classes).toContain("zakhmban-button-primary");
+    expect(classes).not.toContain("zakhmban-button-secondary");
   });
 
   it("accepts every approved variant, tone and size, and nothing else", () => {

@@ -27,12 +27,13 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *
  * WHAT THIS FILE CHOOSES, because the contract left it open:
  *
- *   - `variant` defaults to `primary` and `size` to `md`. §3.2 marks a
- *     default for `tone` only ("green (default)") and marks none of the three
- *     with †, so each is optional and each needs one. `md` 48px is the middle
- *     size and matches the approved input height, so a Button set beside a
- *     TextField aligns. This is the one judgement call in the file and it is
- *     flagged in the pull request.
+ *   - nothing about the defaults. They are NOT this file's choice: the
+ *     Button Default Variant and Size Ruling of 2026-10-06 fixes `variant` to
+ *     `secondary` and `size` to `md`, and §3.2 fixes `tone` to `green`. The
+ *     ruling exists because §3.2 marks none of the three with † and supplies
+ *     a default only for tone, so the other two were unstated — and the
+ *     registry's rules are that "Silence never creates permission" and that a
+ *     deferral "must not be filled by an implementer".
  *   - loading leaves the button FOCUSABLE and blocks re-entry by guarding the
  *     handler and preventing the default action, rather than by disabling it.
  *     A disabled control drops out of the tab order and stops being
@@ -49,7 +50,13 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  */
 import {} from "react";
 import { Icon } from "../icons/index.js";
-export function Button({ variant = "primary", tone = "green", size = "md", block, disabled, loading, iconStart, onClick, children, className, ref, ...rest }) {
+export function Button({ 
+/* Button Default Variant and Size Ruling, 2026-10-06. `secondary` so that
+   §3.2's "One primary per screen" cannot be defeated by omission: a
+   primary-by-default control would make every Button whose `variant` a
+   caller forgot into a primary one. A `primary` Button must be asked for.
+   `tone` is §3.2's own default and is unchanged. */
+variant = "secondary", tone = "green", size = "md", block, disabled, loading, iconStart, onClick, children, className, ref, ...rest }) {
     const isLoading = loading === true;
     const isDisabled = disabled === true;
     /**
