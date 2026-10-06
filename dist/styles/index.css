@@ -23,6 +23,7 @@
  *   overlay    the BottomSheet scrim and surface (ADR 0006, height ruling)
  *   field      the shared TextField and Select surface (2026-10-05)
  *   button     the Button primitive (2026-10-06)
+ *   otp-input  the OtpInput primitive (2026-10-06)
  *
  * This is NOT an eighth token-family file. `src/tokens/base.css` is the
  * aggregation point for the seven authored token files, so exactly one token
@@ -44,3 +45,4 @@
 @import "./overlay.css";
 @import "./field.css";
 @import "./button.css";
+@import "./otp-input.css";

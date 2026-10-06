@@ -85,6 +85,7 @@ describe("authored token CSS", () => {
       "global.css",
       "index.css",
       "keyframes.css",
+      "otp-input.css",
       "overlay.css",
       "reset.css",
     ]);
@@ -101,6 +102,7 @@ describe("authored token CSS", () => {
       "./overlay.css",
       "./field.css",
       "./button.css",
+      "./otp-input.css",
     ]);
   });
 

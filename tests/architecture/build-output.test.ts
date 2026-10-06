@@ -29,6 +29,9 @@ const COPIED_ASSETS = [
   // The Button primitive's styles (Button Implementation Authorization,
   // 2026-10-06), on the same entry.
   "styles/button.css",
+  // The OtpInput primitive's styles (OtpInput Implementation Authorization,
+  // 2026-10-06), on the same entry.
+  "styles/otp-input.css",
   "styles/fonts/Vazirmatn-Variable.woff2",
   "styles/fonts/OFL.txt",
   // ADR 0005 §3: the vendored glyph notice travels with the artifact it
