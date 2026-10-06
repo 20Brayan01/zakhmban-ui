@@ -21,12 +21,12 @@
  * resolves through an existing public token; no `--_` source and no raw
  * palette entry is read.
  *
- *   resting border   `--border`, the only approved neutral boundary role.
- *                    `--border-strong` is scoped by IA-2 to exactly two
- *                    canonical sentences, neither of them an input, and
- *                    `--divider` is a separator between items rather than a
- *                    boundary around one. Measured 1.2653:1 on
- *                    `--background` — see the note at the end of this file.
+ *   resting border   `--text-secondary`, by the Resting Control-Boundary
+ *                    Role Exception of 2026-10-06. 4.9748:1 on `--surface`,
+ *                    against §6's 3:1 for a control boundary. This is an
+ *                    INK token doing boundary work, which is a named owner
+ *                    exception for these two controls and not a general
+ *                    rule — see the note at the end of this file.
  *   focused border   `--brand-blue`. §3.2 asks for a "blue border + ring"
  *                    and this is the package's one semantic blue identity
  *                    role that is not already spoken for: `--info` is a
@@ -97,7 +97,12 @@
      clipping it (§6). */
   min-block-size: var(--control-height-input);
   border-radius: var(--radius-input);
-  border: 1px solid var(--border);
+
+  /* Resting Control-Boundary Role Exception, 2026-10-06. Not `--border`:
+     that boundary measures 1.2653:1 and was the only visible means of
+     locating an empty field, which IA-1 forbids. Width unchanged at §2.3's
+     1px. */
+  border: 1px solid var(--text-secondary);
   background-color: var(--surface);
   color: var(--text-primary);
 }
@@ -187,17 +192,36 @@ textarea.zakhmban-field-input {
 }
 
 /**
- * ON THE RESTING BORDER'S CONTRAST — recorded, not resolved here.
+ * ON THE RESTING BORDER — resolved by owner ruling, and narrow.
  *
- * `--border #E2E6DD` measures 1.2653:1 on `--background #FFFFFF`. IA-1 reads
- * §6's "3:1 … for control boundaries" as applying to boundary information
- * required to identify a control or its state, and holds that such a
- * boundary "must never be the sole visible means of locating a control".
+ * The first implementation bound this to `--border #E2E6DD`, which measures
+ * 1.2653:1 on `--background #FFFFFF`. A rendered-browser check found that
+ * for an EMPTY `TextField` — no value, no icon, no guaranteed placeholder —
+ * that boundary was the only visible means of locating the control, which
+ * IA-1 forbids: "A boundary with less than 3:1 must never be the sole
+ * visible means of … locating a control … identifying that an element is
+ * interactive."
  *
- * A white field on a white page is located by its border and by little else,
- * so this binding engages that clause. It is used all the same, because it
- * is the approved role and because the alternative would be either a new
- * token or a raw colour, both of which this work is forbidden. The finding
- * is reported for an owner rather than worked around: no component may
- * decide a token value.
+ * The `<label>` does not discharge it. `--text-label` is also §3.2's step
+ * for a DATA-ROW KEY, so a 13px/500 line above a white region is not
+ * evidence that what follows is interactive. The placeholder does not
+ * either: it is optional, and a rule cannot rest on a prop a caller may
+ * omit.
+ *
+ * `Select` was already discharged and still is — Chromium paints the native
+ * expander from the element's `color`, which resolves to `--text-primary` at
+ * 14.0674:1. That is UA-drawn, so the evidence is Chromium-scoped; it is a
+ * reason the Select never needed this change, not a reason to style the two
+ * differently. §3.2's "Same geometry and states as TextField" is why both
+ * take the same boundary.
+ *
+ * No approved token carried both a boundary role and 3:1 — every token at or
+ * above 3:1 on white is an ink, action, link, status-foreground or brand
+ * role — so the owner recorded a NAMED EXCEPTION rather than a binding:
+ * `--text-secondary`, an ink token, does boundary work HERE AND NOWHERE
+ * ELSE. It authorizes nothing for Card, Chip, StatusBadge, SearchInput,
+ * OtpInput, Checkbox, Switch, ImageUploader, ScaleSelect, any other bordered
+ * surface or any future control, it does not remap `--border`, and it does
+ * not weaken IA-1. A component still may not decide a token value; this one
+ * was decided for it.
  */

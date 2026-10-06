@@ -60,10 +60,21 @@ describe("field geometry — v0.2 §2.3 and §3.2", () => {
 });
 
 describe("field colour bindings — Decision 14 and the ruling of 2026-10-05", () => {
-  it("binds the resting border to --border", () => {
+  it("binds the resting border to --text-secondary, per the 2026-10-06 exception", () => {
+    // An INK token doing boundary work, which is a named owner exception for
+    // these two controls and not a general rule. `--border` at 1.2653:1 was
+    // the original defect: for an empty field it was the sole visible means
+    // of locating the control, which IA-1 forbids.
+    //
+    // The MEASURED threshold lives in resting-boundary-contrast.test.ts,
+    // which resolves the value and computes the ratio. This assertion is the
+    // other half — that the binding recorded in the ruling is the binding
+    // that shipped — so a swap to some other ≥3:1 token is still a visible
+    // diff here rather than a silent substitution.
     expect(rule(".zakhmban-field-control")).toContain(
-      "1px solid var(--border)",
+      "1px solid var(--text-secondary)",
     );
+    expect(rule(".zakhmban-field-control")).not.toContain("var(--border)");
   });
 
   it("binds the focused border to --brand-blue, and only the border", () => {
