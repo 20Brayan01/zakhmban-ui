@@ -197,6 +197,9 @@ in full in the Token Table.
 | **TextField and Select Error Typography Ruling** | 2026-10-05 | assigns **`TextField` and `Select` error-message text** to the existing **Caption step** (12px / 1.5 / 400) with the existing **`--danger-fg`** ink, and confirms under **Decision 14** that the focused and error **border** bindings are the implementer's, to be stated and justified in the implementation pull request | **nothing in v0.2** — v0.2 §2.2 assigned these uses no type step, so there is no rule to replace. It supersedes **Decision 8's Caption role-coverage list**, which read *"Caption at 400 covers **only** the four uses"*, by adding a **fifth** use for these two components and nothing else. **Banner prose and ListRow metadata remain open.** **No token is created**; the 118 / 39 / 1 boundary, the exports and the artifacts are unchanged. |
 | **TextField and Select Implementation Authorization** | 2026-10-05 | authorizes **`TextField` and `Select` together** — a branch, implementation commits, a normal push and **one reviewable pull request** against the approved §3.2 contracts and the Error Typography Ruling above | **nothing in v0.2** — it approves no design value and changes no token, count, artifact or export. It supersedes only the **current-status statements** saying these two have not begun. **Merging any pull request, `Button`, `OtpInput`, changes to `BottomSheet`, Tier 2 components, a new design value or token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 | **Resting Control-Boundary Role Exception — TextField and Select** | 2026-10-06 | binds the **resting boundary of `TextField` and `Select`** to **1px `var(--text-secondary)`** (`#667085`, **4.9748:1** on `--surface` `#FFFFFF`, against §6's 3:1 for a control boundary), as a **named role exception** — an ink token doing boundary work on these two controls and nowhere else | the **Owner Contrast Ruling §4 readable-roles list**, which named **eight text roles**, now carries a **ninth, explicitly non-text** entry for these two controls only; and the **2026-10-05 Decision 14 grant**, which reached **only the focused and error borders**, is **extended** so the resting border is settled rather than left open. **Decision 14's Card binding to `--border` is untouched**, `--border` is **not remapped**, and **IA-1 is applied, not narrowed**. **No token is created**; 118 / 39 / 1, the exports and the artifacts are unchanged. |
+| **v0.3.0 Remaining-Primitive Rulings — Button and OtpInput** | 2026-10-06 | four numbered decisions: **(1)** retires the released geometry identifier **`--control-height-button`** and replaces it with **`--control-height-button-md` 48px** and **`--control-height-button-lg` 52px**, declared a **breaking change under v0.2 §7** and approved for the planned **`v0.3.0`**; **(2)** `OtpInput`'s `error` is a **text message** taking the Caption step and **`--danger-fg`**; **(3)** `OtpInput` digits take **`--text-card-title`** with `--text-primary` and tabular figures; **(4)** the **resend cooldown and resend action are application-owned** and `OtpInput` has no timer, control or prop for them | **Decision B §B.4**, which left the `md` representation unanswered, is **answered**; **ADR 0003 §6's geometry row** for the retired identifier; the **2026-10-05 error-typography scope sentence**, widened to `OtpInput` and no further; **Decision 8's Caption coverage list**, which gains a **sixth** use; **v0.2 §2.2's `--text-card-title` use list**, which gains a **third**; and **v0.2 §3.2's `OtpInput` state list** insofar as *resend cooldown* could read as an API obligation. **No implementation is authorized by the rulings**; the approved target **119 / 39 / 1** takes effect only when the Button implementation changes the token source, and **this record leaves the artifact at 118 / 39 / 1**. **`v0.1.0` and `v0.2.0` are unchanged** and still carry `--control-height-button` as released. |
+| **Button Implementation Authorization** | 2026-10-06 | authorizes **`Button` only** — a branch, implementation commits, a normal push and **one reviewable pull request**, **after the documentation pull request recording the rulings has merged** — against §3.2's `variant tone size block disabled loading iconStart onClick`, carrying the Ruling 1 token-source change and the regenerated artifacts | **nothing in v0.2** — it approves no design value. It supersedes only the **current-status statements** saying `Button` has not begun. **Merging any pull request, `OtpInput`, changes to the other primitives, Tier 2 components, any token beyond Ruling 1's two identifiers, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
+| **OtpInput Implementation Authorization** | 2026-10-06 | authorizes **`OtpInput` only**, on the same terms and after the same merge — against §3.2's `length value onChange onComplete error`, with five cells, LTR digit order inside RTL, the **unconditional 44×44** minimum per cell, and **no token created** | **nothing in v0.2** — it approves no design value and changes no count. It supersedes only the **current-status statements** saying `OtpInput` has not begun. **Merging any pull request, `Button` ahead of its own merge, changes to the other primitives, any new token, version change, tag, release, publication, consumer migration and deployment all stay unauthorized.** |
 
 Individually approved Token Table decisions carry the same authority as the
 ruling that approved them, within the scope that decision names.
@@ -1338,6 +1341,112 @@ binding inside work the **TextField and Select Implementation Authorization
 of 2026-10-05** already permits. **Merging any pull request stays a separate
 manual owner decision**, and the package stays **`0.2.0`** and **`private`**
 with **no new tag**.
+
+
+### v0.3.0 Remaining-Primitive Rulings — Button and OtpInput — 2026-10-06
+
+**Authority kind:** value and representation assignment, owner tier.
+**Level 3** — approved owner design/product rulings. Recorded in full in
+[`token-table-ratification.md`](token-table-ratification.md), as **four
+numbered decisions** followed by **two separate implementation
+authorizations**.
+
+**Ruling 1 — Button geometry identifiers.** The released public identifier
+**`--control-height-button`** is **retired** and replaced by
+**`--control-height-button-md: 48px`** and
+**`--control-height-button-lg: 52px`**. No design value is created: 48 and 52
+are §3.2's approved `md` and `lg`. Button `sm` is unchanged and continues to
+resolve through **`--control-min-target`** per Decision B §B.3, and
+**`--control-height-input` is not used for a Button**, which is what §B.4
+objected to. **v0.2 §7 classifies this as breaking** — *"removing or renaming
+a semantic token"* — and the owner **approves it as a breaking change for the
+planned `v0.3.0`**, under semver's major-version-zero clause while the package
+is `0.2.0` and `private`. It is the **first retirement of a released
+identifier**: `--text-muted` and the six retired interaction identifiers never
+reached a tag, whereas this one is in both `v0.1.0` and `v0.2.0`. The
+**known** `zakhmban-therapists` references its later migration must update are
+enumerated in the ruling — `offline.module.css:70`, two lines in
+`ui-tokens.smoke.test.ts`, and a historical log entry — and the record states
+explicitly that **no claim is made that all consumers are known**.
+
+**Ruling 2 — OtpInput error.** The `error` prop is a **text message**; its
+text takes the existing **Caption** step (12px / 1.5 / 400) with
+**`--danger-fg`**, measured at **6.0515:1** on `--background`, with **no claim
+of a complete accessibility audit**. **No token is created.**
+
+**Ruling 3 — OtpInput digits.** The five digits take the existing
+**`--text-card-title`** step (16px / 1.5 / 600) with **`--text-primary`** and
+**tabular figures**, which §2.2 already requires for codes. **No ninth step,
+no new literal and no line-height override** — a 16px / 1.5 digit was measured
+at a **25px line box inside a 44px cell**, with no clipping at 390px or 320px.
+
+**Ruling 4 — Resend cooldown.** The cooldown and the resend action are
+**application-owned**. `OtpInput` has **no timer, no resend control and no
+cooldown prop**. §3.2 lists the state but gives the component no prop for it,
+and §6 requires that countdowns not be live regions.
+
+**Counts, stated precisely.** The approved public-token target becomes
+**119 / 39 / 1** — one identifier removed, two added — **only when the Button
+implementation changes the token source**. **This documentation record leaves
+the actual count at 118 / 39 / 1**, and `generate-tokens --check` still
+reports 118 public tokens and 39 internal properties at this commit. The
+package stays **`0.2.0`** and **`private`**, and **`v0.1.0` and `v0.2.0` are
+unchanged**.
+
+**What is superseded, named exactly.** **Decision B §B.4**, answered rather
+than withdrawn; **ADR 0003 §6's geometry row** for the retired identifier;
+the **2026-10-05 error-typography scope sentence**, widened to `OtpInput` and
+no further; **Decision 8's Caption coverage list**, which gains a **sixth**
+use; **v0.2 §2.2's `--text-card-title` use list**, which gains a **third**;
+and **v0.2 §3.2's `OtpInput` state list**, insofar as *"resend cooldown"*
+could be read as an API obligation. Every dated record is **preserved as
+approved and annotated in place**.
+
+### Button Implementation Authorization — 2026-10-06
+
+Authorizes **`Button` only**: a branch, implementation commits, a normal push
+and **one reviewable pull request**, **after the documentation pull request
+recording the rulings has merged**. It covers §3.2's full prop list, the
+**Ruling 1 token-source change** with regenerated artifacts and a rebuilt
+`dist/`, the component CSS through the **existing `./styles` entry**, and the
+guard amendments the work requires while **keeping `OtpInput` forbidden**.
+
+**Loading is exactly §3.2's three obligations** — keeps the label, sets
+`aria-busy`, blocks re-entry. **No spinner is authorized**: no approved glyph
+is a spinner, and ADR 0004 §8 scopes `zakhmban-spin` to *"loading indicators —
+Tier 2"*. The **secondary border** binding is a component decision under
+Decision 14 and must be stated and justified in the pull request.
+
+Acceptance requires component, keyboard, accessibility and focus tests,
+**`generate-tokens --check` reporting 119 / 39**, `verify:dist` green, the
+Tailwind preset still carrying **no geometry key**, a rendered-browser check
+at **200% zoom** claiming no complete conformance, and a **migration note**
+for the retired identifier.
+
+**Merging is not authorized** and remains a separate manual owner decision.
+
+### OtpInput Implementation Authorization — 2026-10-06
+
+Authorizes **`OtpInput` only**, on the same terms and after the same merge,
+against §3.2's `length value onChange onComplete error`. **No token is
+created.**
+
+The boundary preserves **five cells**, **LTR digit order inside an RTL page**
+through §5's `dir="ltr"` isolation — an attribute, not a CSS rule, so **owner
+D-2 is untouched** — the **unconditional 44×44 minimum** for every
+interactive cell, with **flex shrink forbidden from reducing either dimension
+below 44px**, and **200% text zoom without clipping**. At the required
+**320 CSS px** reflow width the five-cell row fits, measured at **57.59 × 44**
+per cell. Behaviour below that width is an implementation choice provided the
+approved accessibility outcomes hold; **page-level horizontal scrolling is not
+an acceptable outcome**. `OtpInput` is **not** added to §6's exception
+register. It has **no timer, resend control or cooldown prop** (Ruling 4).
+
+Acceptance requires keyboard, paste, completion, error-announcement, RTL and
+built-artifact tests, and a rendered-browser check at the design width, at
+**320 CSS px** and at **200% zoom**.
+
+**Merging is not authorized** and remains a separate manual owner decision.
 
 ## Missing design-system document — scoped disposition
 
