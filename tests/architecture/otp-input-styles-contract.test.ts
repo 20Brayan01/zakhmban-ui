@@ -111,18 +111,14 @@ describe("OtpInput typography — Rulings 2 and 3", () => {
   });
 });
 
-describe("OtpInput — the polite status region stays announceable", () => {
-  it("is hidden by clipping, not by removal from the accessibility tree", () => {
-    // `display: none`, `visibility: hidden` and zero dimensions each hide the
-    // region from assistive technology as well as from the eye, which would
-    // make §3.2's "result announced politely" announce nothing.
-    const status = rule(".zakhmban-otp-status {");
-    expect(status).toContain("clip-path");
-    expect(status).not.toContain("display: none");
-    expect(status).not.toContain("visibility: hidden");
-    expect(/(^|[;{\s])(inline-size|block-size)\s*:\s*0/.test(status)).toBe(
-      false,
-    );
+describe("OtpInput — no package-owned live region", () => {
+  it("declares no visually-hidden status class", () => {
+    // OtpInput Completion Announcement Ruling, 2026-10-06: the primitive
+    // renders no live region of its own for completion, so there is nothing
+    // to hide. A clip-rect utility left behind would also be the deferred
+    // `VisuallyHidden` of v0.2 §9 unknown 12 arriving by the back door.
+    expect(css).not.toContain("zakhmban-otp-status");
+    expect(css).not.toContain("clip-path");
   });
 });
 

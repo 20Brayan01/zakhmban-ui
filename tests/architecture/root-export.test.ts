@@ -137,7 +137,12 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     expect(markup.match(/<input/g)).toHaveLength(5);
     expect(html).toContain('dir="ltr"');
     expect(html).toContain('autocomplete="one-time-code"');
-    expect(html).toContain('role="status"');
+    // No live region of its own, and the code never reaches one — OtpInput
+    // Completion Announcement Ruling, 2026-10-06. Asserted on the BUILT
+    // artifact because that is what a consumer installs.
+    expect(html).not.toContain('role="status"');
+    expect(html).not.toContain("aria-live");
+    expect(html).not.toContain('role="log"');
     expect(html).toContain('role="alert"');
     expect(html).toContain('aria-invalid="true"');
     expect(html).toContain('inputmode="numeric"');
@@ -145,6 +150,12 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     for (const forbidden of ["cooldown", "resend", "countdown"]) {
       expect(html.includes(forbidden)).toBe(false);
     }
+
+    // The error alert is the component's ONE live region and carries the
+    // application's message, never the digits.
+    const alertText = /role="alert"[^>]*>([^<]*)</.exec(markup)?.[1] ?? "";
+    expect(alertText).toBe("نادرست");
+    expect(alertText).not.toContain("123");
   });
 
   it("publishes no runtime glyph list and no registry", async () => {

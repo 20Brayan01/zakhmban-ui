@@ -22,6 +22,16 @@
  *   Ruling 4    the resend cooldown and the resend action are
  *               APPLICATION-OWNED. This file has no timer, no resend control
  *               and no cooldown prop, and renders neither.
+ *   Announce-   §3.2's "result announced politely" is discharged by calling
+ *   ment        `onComplete(value)`, and the CONSUMING APPLICATION owns the
+ *   Ruling      localized, polite message. This file renders NO live region
+ *               of its own for completion, never places the raw code in
+ *               `role="status"` or any other live region — announcing a
+ *               one-time code aloud reads out a credential — and never
+ *               states or implies that a complete entry is VALID, because
+ *               completeness is not correctness and only the application
+ *               can check the code. The error region is unaffected and
+ *               keeps `role="alert"` (§6).
  *
  * WHAT THIS FILE CHOOSES, because the contract left it open:
  *
@@ -47,14 +57,9 @@
  *     enforce `maxLength`, so a test suite alone reports success. A cell shows
  *     one digit because it is controlled and rendered with one, not because
  *     the platform was told to truncate.
- *   - the polite result announcement carries the VALUE and no authored
- *     prose. §3.2 requires the result be "announced politely" but names no
- *     text, no prop supplies one, and frozen v1.1 §2.1 forbids this package
- *     carrying application-specific strings. The status region is therefore
- *     empty until the code is complete and then holds the code itself, which
- *     is the caller's data. Announcing different words would need a prop
- *     §3.2 does not provide, and that is an owner decision this file does
- *     not take.
+ *   - nothing about the completion announcement. That is NOT this file's
+ *     choice any more: the OtpInput Completion Announcement Ruling of
+ *     2026-10-06 settles it. See the contract list above.
  *   - each cell's `aria-label` is its position as a bare numeral, for the
  *     same reason: a positional label must exist, and a numeral is the only
  *     one that is not prose. The GROUP's name comes from the application
@@ -120,7 +125,6 @@ export function OtpInput({
   const generatedId = useId();
   const groupId = id ?? generatedId;
   const errorId = `${groupId}-error`;
-  const statusId = `${groupId}-status`;
 
   const cells = useRef<(HTMLInputElement | null)[]>([]);
   /** The last complete code `onComplete` was called for, so it fires once. */
@@ -357,14 +361,13 @@ export function OtpInput({
         })}
       </div>
 
-      {/* §3.2 "result announced politely" with §6's `role="status"`. Empty
-          until the code is complete, so it announces the result once rather
-          than narrating every keystroke, and it carries the caller's value
-          rather than any text this package authored. */}
-      <p className="zakhmban-otp-status" id={statusId} role="status">
-        {complete ? digits : ""}
-      </p>
-
+      {/* NO live region here, deliberately. The OtpInput Completion
+          Announcement Ruling of 2026-10-06: the primitive's share of §3.2's
+          "result announced politely" is `onComplete(value)` above, and the
+          application owns the message. A package-owned region could only
+          hold the code itself — this package may carry no
+          application-specific string (frozen v1.1 §2.1) — and announcing a
+          one-time code aloud reads out a credential. */}
       {invalid ? (
         <p className="zakhmban-otp-error" id={errorId} role="alert">
           {error}

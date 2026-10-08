@@ -23,6 +23,16 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *   Ruling 4    the resend cooldown and the resend action are
  *               APPLICATION-OWNED. This file has no timer, no resend control
  *               and no cooldown prop, and renders neither.
+ *   Announce-   §3.2's "result announced politely" is discharged by calling
+ *   ment        `onComplete(value)`, and the CONSUMING APPLICATION owns the
+ *   Ruling      localized, polite message. This file renders NO live region
+ *               of its own for completion, never places the raw code in
+ *               `role="status"` or any other live region — announcing a
+ *               one-time code aloud reads out a credential — and never
+ *               states or implies that a complete entry is VALID, because
+ *               completeness is not correctness and only the application
+ *               can check the code. The error region is unaffected and
+ *               keeps `role="alert"` (§6).
  *
  * WHAT THIS FILE CHOOSES, because the contract left it open:
  *
@@ -48,14 +58,9 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *     enforce `maxLength`, so a test suite alone reports success. A cell shows
  *     one digit because it is controlled and rendered with one, not because
  *     the platform was told to truncate.
- *   - the polite result announcement carries the VALUE and no authored
- *     prose. §3.2 requires the result be "announced politely" but names no
- *     text, no prop supplies one, and frozen v1.1 §2.1 forbids this package
- *     carrying application-specific strings. The status region is therefore
- *     empty until the code is complete and then holds the code itself, which
- *     is the caller's data. Announcing different words would need a prop
- *     §3.2 does not provide, and that is an owner decision this file does
- *     not take.
+ *   - nothing about the completion announcement. That is NOT this file's
+ *     choice any more: the OtpInput Completion Announcement Ruling of
+ *     2026-10-06 settles it. See the contract list above.
  *   - each cell's `aria-label` is its position as a bare numeral, for the
  *     same reason: a positional label must exist, and a numeral is the only
  *     one that is not prose. The GROUP's name comes from the application
@@ -73,7 +78,6 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
     const generatedId = useId();
     const groupId = id ?? generatedId;
     const errorId = `${groupId}-error`;
-    const statusId = `${groupId}-status`;
     const cells = useRef([]);
     /** The last complete code `onComplete` was called for, so it fires once. */
     const announced = useRef(null);
@@ -253,6 +257,6 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
                     return (_jsx("input", { ref: (element) => {
                             cells.current[index] = element;
                         }, className: "zakhmban-otp-cell", value: digit, onChange: handleChange(index), onKeyDown: handleKeyDown(index), onPaste: handlePaste(index), inputMode: "numeric", "aria-label": String(index + 1), "aria-invalid": invalid || undefined, "aria-describedby": invalid ? errorId : undefined, ...(index === 0 ? { autoComplete: "one-time-code" } : {}) }, index));
-                }) }), _jsx("p", { className: "zakhmban-otp-status", id: statusId, role: "status", children: complete ? digits : "" }), invalid ? (_jsx("p", { className: "zakhmban-otp-error", id: errorId, role: "alert", children: error })) : null] }));
+                }) }), invalid ? (_jsx("p", { className: "zakhmban-otp-error", id: errorId, role: "alert", children: error })) : null] }));
 }
 //# sourceMappingURL=otp-input.js.map

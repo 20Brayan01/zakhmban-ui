@@ -423,21 +423,56 @@ describe("OtpInput — error and the polite result", () => {
     expect(cells()[0]!.hasAttribute("aria-invalid")).toBe(false);
   });
 
-  it("announces the result politely only once the code is complete", () => {
-    // §3.2 "result announced politely" with §6's role="status". Silent while
-    // partial, so it reports the result rather than narrating every key.
+  it("renders no live region of its own, complete or not", () => {
+    // OtpInput Completion Announcement Ruling, 2026-10-06. The absence is
+    // the contract, not a gap: the application owns the localized message,
+    // and a package-owned region could only hold the code itself.
     const { rerender } = render(<OtpInput value="123" onChange={() => {}} />);
-    expect(screen.getByRole("status").textContent).toBe("");
+    expect(screen.queryByRole("status")).toBeNull();
+
     rerender(<OtpInput value="12345" onChange={() => {}} />);
-    expect(screen.getByRole("status").textContent).toBe("12345");
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(document.querySelector("[aria-live]")).toBeNull();
   });
 
-  it("keeps the status region in the accessibility tree", () => {
-    // A region hidden with `display: none` or `hidden` announces nothing.
+  it("never places the OTP value in a live region", () => {
+    // The specific harm the ruling names: announcing a one-time code aloud
+    // reads out a credential to anyone within earshot. Asserted against
+    // EVERY live region the component could produce, by any mechanism —
+    // role="status", role="log", role="timer" or a bare aria-live.
+    render(<OtpInput value="12345" onChange={() => {}} error="نادرست" />);
+
+    const live = [
+      ...document.querySelectorAll(
+        '[aria-live], [role="status"], [role="log"], [role="timer"], [role="marquee"]',
+      ),
+    ];
+    for (const region of live) {
+      expect(
+        region.textContent ?? "",
+        `a live region carries the code: ${region.outerHTML}`,
+      ).not.toContain("12345");
+    }
+
+    // The error alert IS a live region and is allowed — it carries the
+    // application's own message, never the digits.
+    const alert = screen.getByRole("alert");
+    expect(alert.textContent).toBe("نادرست");
+    expect(alert.textContent).not.toContain("12345");
+  });
+
+  it("never claims a complete entry is valid", () => {
+    // Completeness is not correctness: only the application can check the
+    // code. Nothing in the rendered output may assert success.
     render(<OtpInput value="12345" onChange={() => {}} />);
-    const status = screen.getByRole("status");
-    expect(status.hasAttribute("hidden")).toBe(false);
-    expect(status.getAttribute("aria-hidden")).toBeNull();
+    const markup = document.body.innerHTML.toLowerCase();
+    for (const claim of ["valid", "success", "correct", "verified"]) {
+      expect(markup.includes(claim), `output claims "${claim}"`).toBe(false);
+    }
+    // And no ARIA state that would imply it.
+    for (const cell of cells()) {
+      expect(cell.hasAttribute("aria-invalid")).toBe(false);
+    }
   });
 });
 

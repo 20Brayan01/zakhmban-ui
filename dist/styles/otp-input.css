@@ -140,27 +140,14 @@
 }
 
 /**
- * The polite result region — announced, never seen.
+ * NO visually-hidden status rule, deliberately.
  *
- * §3.2 requires the result be "announced politely" and §6 assigns success and
- * progress to `role="status"`. The region must therefore exist in the
- * accessibility tree while taking no visual space, and the clip-rect pattern
- * below is the one way to do that which does not also remove it from that
- * tree: `display: none`, `visibility: hidden` and zero dimensions all hide it
- * from assistive technology as well as from the eye.
- *
- * This is NOT the deferred `VisuallyHidden` component of v0.2 §9 unknown 12.
- * It is one private rule serving one region inside one primitive, it exports
- * nothing, and it creates no component.
+ * An earlier draft carried a clip-rect `.zakhmban-otp-status` class for a
+ * package-owned `role="status"` region. The OtpInput Completion Announcement
+ * Ruling of 2026-10-06 removed that region: the primitive's share of §3.2's
+ * "result announced politely" is `onComplete(value)`, and the consuming
+ * application owns the message. With no region there is nothing to hide, and
+ * a visually-hidden utility left behind would be the deferred
+ * `VisuallyHidden` component of v0.2 §9 unknown 12 arriving by the back
+ * door.
  */
-.zakhmban-otp-status {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
