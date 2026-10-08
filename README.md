@@ -252,8 +252,10 @@ into an internal path — path stability inside the package is not part of the
 contract.
 
 Declared subpaths, and what each ships today. The list below is the
-`exports` map in `package.json`; `exports-contract.test.ts`, `root-export.test.ts`
-and `format-export.test.ts` fail the build if either drifts.
+`exports` map in `package.json` minus its sixth key, `./package.json`, which
+exposes the manifest and no API; `exports-contract.test.ts`,
+`root-export.test.ts` and `format-export.test.ts` fail the build if either
+drifts.
 
 | Subpath                               | Ships today                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -263,9 +265,10 @@ and `format-export.test.ts` fail the build if either drifts.
 | `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                                                                                                                                                                                                                 |
 | `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                                                                                                                                                                                                     |
 
-These four are the whole of the public surface. There is no fifth subpath and
-no `@zakhmban/ui/fonts`: font binaries are internal assets referenced by
-package CSS, and a consumer never deep-imports one.
+These five entries — the root entry and four subpaths — are the whole of the
+public surface. There is no fifth subpath and no `@zakhmban/ui/fonts`: font
+binaries are internal assets referenced by package CSS, and a consumer never
+deep-imports one.
 
 ### Primitives — what the consuming application owns
 
