@@ -11,19 +11,28 @@ string.
 ## Status
 
 **Foundation.** The package, its toolchain and its architecture guards are in
-place, and the first three capability areas have shipped. Every remaining
-capability arrives in its own commit.
+place. Every capability allocated up to `v0.3.0` is implemented on `main`;
+`v0.3.0` itself is **prepared, not released**.
 
-| Area                                                                     | State                                                                              |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                           |
-| Formatting utilities (`./utils/format`)                                  | shipped                                                                            |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                                                            |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                  |
-| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); consume it by pinning that tag |
-| Icons (root entry — `Icon`, ADR 0005)                                    | implemented — merged and verified on `main`; **no tag carries it**                 |
-| The five primitives · overlay-root and Portal                            | not yet — allocated `v0.3.0`                                                       |
-| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                               |
+| Area                                                                     | State                                                                                      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                                   |
+| Formatting utilities (`./utils/format`)                                  | shipped                                                                                    |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                                                                    |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                          |
+| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); consume it by pinning that tag         |
+| Icons (root entry — `Icon`, ADR 0005)                                    | implemented — merged on `main`; **allocated `v0.3.0`, which is prepared but not released** |
+| The five primitives · overlay root (ADR 0006)                            | implemented — merged on `main`; **allocated `v0.3.0`, which is prepared but not released** |
+| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                                       |
+
+**`v0.3.0` is prepared, not released.** The manifest records `0.3.0`, and
+**a manifest version is not a release**: as of **2026-10-08 no `v0.3.0` tag
+exists**, and none will until the owner runs the Release workflow against a
+validated `main` SHA. **A consumer pinned to `v0.2.0` receives neither `Icon`
+nor any of the five primitives**, and keeps
+the released `--control-height-button` token that `v0.3.0` retires — see
+[Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
+`git ls-remote --tags origin` is the live answer to whether `v0.3.0` exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -104,11 +113,11 @@ and the tag was read back from the remote and confirmed to be annotated and to
 point at it. **The supported, versioned way to consume Styles is a pin to
 `v0.2.0`.** As with `v0.1.0`, **no GitHub Release object and no npm
 publication exists** — the tag _is_ the release under frozen §2.2.
-`git ls-remote --tags origin` is the live answer to what exists. **Icons are
-implemented and merged on `main` but are not released** — no tag carries
-`Icon`, so a consumer pinned to `v0.2.0` does not receive it, and `v0.3.0`
-does not exist. **The five primitives and the overlay-root/Portal technique
-have not begun** and remain allocated to `v0.3.0`.
+`git ls-remote --tags origin` is the live answer to what exists. **Icons, the
+five primitives and the overlay-root contract are implemented and merged on
+`main` but are not released** — they are allocated to `v0.3.0`, which is
+prepared and, as of 2026-10-08, untagged. A consumer pinned to `v0.2.0`
+receives none of them.
 
 **What `@zakhmban/ui/styles` carries depends on which tag you pin.** The
 **`v0.2.0` tag** carries the token CSS **and** the Styles layer: the approved
@@ -127,12 +136,15 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. As verified on **2026-10-04**, its `main` pins
+  Therapist application. As verified on **2026-10-04**, and re-verified
+  read-only on **2026-10-08** at its `main` `3631656`, it pins
   `github:20Brayan01/zakhmban-ui#v0.2.0` and **has migrated to Styles
   `v0.2.0`**, so it receives the full `./styles` surface; its lockfile
   resolves that pin to the `v0.2.0` tag object
-  `957a397b2dc919459772344a3ea8b612ef4378a8`. It does **not** receive `Icon`,
-  which no tag carries. Any later bump is a separate change in that
+  `957a397b2dc919459772344a3ea8b612ef4378a8`. It does **not** receive `Icon`
+  or any of the five primitives, which only the unreleased `v0.3.0`
+  allocation carries, and it still references the `--control-height-button`
+  token that `v0.3.0` retires. Any later bump is a separate change in that
   repository, not part of this package; its own `package.json` is the live
   answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
@@ -204,11 +216,28 @@ Two things bite on first integration:
 
 ```ts
 import {
+  BottomSheet,
+  Button,
   Icon,
+  OtpInput,
+  Select,
+  TextField,
   normalizeIranianMobile,
   isValidIranianNationalId,
 } from "@zakhmban/ui";
-import type { IconName, IconProps } from "@zakhmban/ui";
+import type {
+  BottomSheetProps,
+  ButtonProps,
+  ButtonSize,
+  ButtonTone,
+  ButtonVariant,
+  IconName,
+  IconProps,
+  OtpInputProps,
+  SelectOption,
+  SelectProps,
+  TextFieldProps,
+} from "@zakhmban/ui";
 import {
   toPersianDigits,
   formatJalaliDate,
@@ -226,23 +255,49 @@ Declared subpaths, and what each ships today. The list below is the
 `exports` map in `package.json`; `exports-contract.test.ts`, `root-export.test.ts`
 and `format-export.test.ts` fail the build if either drifts.
 
-| Subpath                               | Ships today                                                                                                                                                                                                                                      |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` — the two ADR 0002 capabilities — plus `Icon` and its `IconName` / `IconProps` types (ADR 0005), **on `main` only; no tag carries `Icon`**. Nothing else. The glyph registry stays internal |
-| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                               |
-| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. At the `v0.2.0` tag it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The historical `v0.1.0` tag carries the token CSS only    |
-| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                                 |
-| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                     |
+| Subpath                               | Ships today                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@zakhmban/ui`                        | `normalizeIranianMobile`, `isValidIranianNationalId` (ADR 0002); `Icon` with `IconName` / `IconProps` (ADR 0005); the five primitives `BottomSheet`, `TextField`, `Select`, `Button`, `OtpInput` and their prop types. **Icon and the primitives are allocated to the unreleased `v0.3.0`; the `v0.2.0` tag carries only the two validation helpers.** Nothing else — the glyph registry, `Portal` and `FocusTrap` stay internal |
+| `@zakhmban/ui/utils/format`           | `toPersianDigits`, `formatJalaliDate`, `formatToman`, `formatDuration`, `maskPhoneDisplay`, and their public types                                                                                                                                                                                                                                                                                                               |
+| `@zakhmban/ui/styles`                 | The stylesheet entry point of v0.2 §2. At the `v0.2.0` tag it carries the token CSS **and** the Styles layer — `@font-face`, reset, body defaults, focus rings and the four keyframes. The historical `v0.1.0` tag carries the token CSS only. On `main` — the unreleased `v0.3.0` allocation — it also carries the primitives' component CSS                                                                                    |
+| `@zakhmban/ui/tokens`                 | Generated typed token object — one runtime export `tokens`, plus the `TokenName`, `TokenValue` and `Tokens` types (ADR 0003 §11)                                                                                                                                                                                                                                                                                                 |
+| `@zakhmban/ui/tokens/tailwind-preset` | Generated Tailwind v4 `@theme` CSS artifact, derived from the token CSS (ADR 0001, ADR 0003)                                                                                                                                                                                                                                                                                                                                     |
 
 These four are the whole of the public surface. There is no fifth subpath and
 no `@zakhmban/ui/fonts`: font binaries are internal assets referenced by
 package CSS, and a consumer never deep-imports one.
 
+### Primitives — what the consuming application owns
+
+The package ships exactly five primitives (frozen v1.1 §2.1); a sixth
+requires an ADR in this repository. Their component CSS arrives through the
+existing `@zakhmban/ui/styles` import — there is no new subpath. What the
+consuming application must know, none of which can be enforced from here:
+
+- **`BottomSheet`** (ADR 0006, Decision A) portals into an overlay root the
+  **application** supplies: exactly one element carrying
+  `data-zakhmban-overlay-root`, and the background marked with
+  `data-zakhmban-overlay-background` across every application-controlled
+  interactive region. The sheet throws on an invalid structure rather than
+  rendering inline, and refuses to open where `inert` is unavailable. One
+  package-owned sheet is open at a time; an application `Modal` is the
+  application's own.
+- **`OtpInput`** calls `onComplete(value)` and renders **no live region for
+  completion**. The application owns the localized, polite announcement and
+  must not repeat the digits in a live region (OtpInput Completion
+  Announcement Ruling). The resend cooldown, the timer and the resend action
+  are also the application's (Ruling 4).
+- **`Button`** defaults to `variant="secondary"` and `size="md"`; a primary
+  button is selected explicitly at its use site.
+
 ## Tokens
 
-118 public tokens: 48 colour, 36 typography, 8 spacing, 5 radius, 3 elevation,
-6 motion, 1 font, 8 geometry and 3 layering. The raw palette, the eight `--_`
-sources and `--radius-checkbox` are package-internal and reach no public
+119 public tokens: 48 colour, 36 typography, 8 spacing, 5 radius, 3 elevation,
+6 motion, 1 font, 9 geometry and 3 layering. (The released `v0.1.0` and
+`v0.2.0` tags carry 118, with 8 geometry tokens — see
+[Breaking change in `v0.3.0`](#breaking-token-change-in-v030).) The raw
+palette, the eight `--_` sources and `--radius-checkbox` are
+package-internal and reach no public
 artifact. `--radius-pill` is a named role with **no approved literal** and is
 deliberately not implemented.
 
@@ -289,6 +344,51 @@ Ruling's **D-6**:
 Earlier text placing the overlay-root technique in Styles v0.2.0 is
 superseded for that technique only; everything else still arrives with
 Styles.
+
+### Breaking token change in `v0.3.0`
+
+**`v0.3.0` retires a released token.** Ruling 1 of the v0.3.0
+Remaining-Primitive Rulings (2026-10-06) removes **`--control-height-button`**
+(`52px`), which both `v0.1.0` and `v0.2.0` carry, and replaces it with two
+named roles:
+
+| Identifier                       | Value  | Role                                                |
+| -------------------------------- | ------ | --------------------------------------------------- |
+| **`--control-height-button-lg`** | `52px` | Button `lg` — the old value, under its correct name |
+| **`--control-height-button-md`** | `48px` | Button `md` — new; the default `Button` size        |
+
+v0.2 §7 classifies removing a semantic token as **breaking**, and the owner
+approved it as such for `v0.3.0` under semver's major-version-zero clause.
+**There is no compatibility alias** — `retired-button-height.test.ts` fails
+CI if one is reintroduced — so a consumer that bumps to `v0.3.0` without
+migrating gets a CSS `var()` that resolves to nothing, and the name is no
+longer a `TokenName`, so strict TypeScript that indexes `tokens` with it stops
+type-checking.
+
+**Migration.** Replace every use of `--control-height-button` with
+**`--control-height-button-lg`** — the 52px value is unchanged, so the result
+renders identically. Use **`--control-height-button-md`** only for a control
+that should take Button's 48px `md` height; it is a new role, not a rename,
+and no existing reference maps to it. Button `sm` has no height token and
+resolves through `--control-min-target`. Do **not** substitute
+`--control-height-input`: it shares the 48px value but is the input role.
+
+**Known consumer references** — `zakhmban-therapists` at `main` `3631656`,
+verified read-only on 2026-10-08; that repository pins `v0.2.0` and is
+unaffected until it bumps:
+
+| File                                    | Reference                                      | Migration                                         |
+| --------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| `src/app/offline/offline.module.css:70` | `min-block-size: var(--control-height-button)` | `--control-height-button-lg` — the 52px `lg` role |
+| `src/test/ui-tokens.smoke.test.ts:51`   | names the token in its sampled list            | sample `--control-height-button-lg`               |
+| `src/test/ui-tokens.smoke.test.ts:98`   | asserts `"52px"`                               | assert the `-lg` token is `"52px"`                |
+| `RUN_LOG.md:233`                        | historical log entry                           | none — a record, not code                         |
+
+**Unknown consumers.** The package is distributed by private git tag and no
+consumer inventory exists, so **no claim is made that these are all the
+references**. Any other application pinned to `v0.1.0` or `v0.2.0` must
+search for `--control-height-button` (and for the `TokenName` literal in
+TypeScript) before bumping to `v0.3.0`.
 
 ### Consumer obligation — shimmer under reduced motion (Route A)
 
