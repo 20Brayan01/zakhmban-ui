@@ -8326,6 +8326,17 @@ decision**.
   `--danger-fg` (Ruling 2); **no line-height override**.
 - **`autocomplete="one-time-code"`**, **paste fills all cells**, and the
   **result announced politely** (§3.2).
+
+  > **Means settled 2026-10-06 — this dated record is preserved as approved
+  > and nothing above is withdrawn.** The **OtpInput Completion Announcement
+  > Ruling** of the same date settles *how* the result is announced politely:
+  > the primitive discharges its share by calling **`onComplete(value)`**,
+  > and the **consuming application** owns the localized announcement.
+  > `OtpInput` renders **no live region of its own for completion**, must not
+  > place the raw code in `role="status"` or any other live region, and must
+  > not imply that a complete entry is valid. The obligation is unchanged in
+  > substance and narrowed in means; **no prop is added**, and the error
+  > region keeps `role="alert"`.
 - **The global `:focus-visible` indicator stays intact**, and every cell is a
   real focusable control — §6: *"Real elements first."*
 - **No new design value or token**, no new export subpath, and **no change to
@@ -8453,5 +8464,149 @@ traceable rather than silent.
 exports are unchanged · the package stays **`0.2.0`** and **`private`**, with
 `v0.1.0` and `v0.2.0` unchanged and **no new tag** · **no new implementation
 is authorized**: this corrects a default inside work the Button
+Implementation Authorization of 2026-10-06 already permits, and **merging any
+pull request remains a separate manual owner decision**.
+
+---
+
+## OTPINPUT COMPLETION ANNOUNCEMENT RULING — 2026-10-06
+
+**Decided by:** human design/product owner · **Date:** 2026-10-06
+
+**Authority kind: explicit interpretation and ownership assignment, owner
+tier.** Level 3 — approved owner design/product rulings. **It creates no
+token, changes no count, adds no prop and authorizes no new
+implementation.** It settles how an obligation already placed on `OtpInput`
+is discharged, inside work the **OtpInput Implementation Authorization of
+2026-10-06** already permits.
+
+### The gap this closes
+
+Three canonical passages meet at a point none of them resolves.
+
+**v0.2 §3.2** requires of `OtpInput`:
+
+> `length` `value` `onChange` `onComplete` `error`. LTR digit order inside an
+> RTL page; paste fills all cells; `autocomplete="one-time-code"`; **result
+> announced politely**.
+
+**v0.2 §6** assigns the mechanism:
+
+> Errors `role="alert"`; **success and progress `role="status"`**; loading
+> regions `aria-busy` with one message, not one per skeleton; a blocking
+> condition receives focus.
+
+**Frozen Technical Architecture v1.1 §2.1** forbids the means:
+
+> Nothing here may ever import a framework, perform data fetching, handle
+> authentication, resolve routes, or **carry application-specific strings**.
+
+**Together these leave no conforming implementation.** A live region needs
+text; §3.2 names none; **the approved five-prop API supplies none**; and the
+package may not author one. An implementer therefore had to choose between
+announcing nothing, inventing product copy, or adding a prop — and the
+authorization forbids the third: *"The approved API and nothing more. No prop
+outside §3.2's list."*
+
+**The open implementation pull request took a fourth route**, and discloses
+it: the `role="status"` region is empty until the code is complete and then
+holds **the entered code itself**, which is the caller's data rather than
+package copy. That avoided inventing a string, and it is **not what this
+ruling approves**. A pull-request description is not a canonical record.
+
+### The new effective rule
+
+**1. `OtpInput` discharges §3.2's "result announced politely" by calling
+`onComplete(value)` when entry becomes complete.** That callback is already
+in the approved API, and reporting the result to the application *is* the
+component's part. **This adds no prop and changes no signature.**
+
+**2. The consuming application owns the announcement.** It must announce a
+meaningful, localized, polite message when entry completes or when validation
+resolves — **without repeating the OTP digits in a live region**.
+
+**3. `OtpInput` must not place the raw code in `role="status"` or in any
+other live region.** Announcing a one-time code aloud is not a meaningful
+message, and it reads out a credential to anyone within earshot of the
+device.
+
+**4. `OtpInput` must not state or imply that a completed entry is valid.**
+Completeness is not correctness: only the application can check the code, and
+a component that announced success at the fifth digit would announce it for
+a wrong code too.
+
+### What this ruling supersedes, named exactly
+
+**v0.2 §3.2's `OtpInput` clause *"result announced politely"***, **insofar as
+it could be read as requiring the primitive to render a live region of its
+own.** It is read instead as an obligation on the *product* — discharged by
+the component through `onComplete`, and completed by the application through
+its own announcement. **The rest of the `OtpInput` row is unchanged**, and
+every other clause in it — the five props, the LTR digit order, paste
+filling all cells, `autocomplete="one-time-code"` — stands exactly as
+written.
+
+**The OtpInput Implementation Authorization of 2026-10-06**, its Required
+implementation boundary bullet reading *"**`autocomplete="one-time-code"`**,
+**paste fills all cells**, and the **result announced politely** (§3.2)."*
+That bullet is **unchanged in substance and narrowed in means**: the result
+is still announced politely, and the primitive's share of it is
+`onComplete`.
+
+**Nothing else.** **§6's Announcements row is untouched** — errors keep
+`role="alert"`, and `role="status"` remains the correct mechanism for the
+application's own success and progress messages. **Frozen v1.1 §2.1 is
+untouched and is the reason this ruling exists.** **Ruling 4** of the v0.3.0
+Remaining-Primitive Rulings is untouched and is the **precedent**: an
+obligation §3.2 lists among `OtpInput`'s concerns, which the package cannot
+discharge without overstepping, belongs to the application.
+
+### Scope — narrow, and stated as such
+
+**This ruling applies to `OtpInput`'s completion announcement and to nothing
+else.**
+
+**Everything else about `OtpInput` is preserved**, and is restated here so
+the implementing pull request cannot read this as licence to change it:
+
+- the **approved five-prop API** — `length` `value` `onChange` `onComplete`
+  `error` — with **no prop added, removed or re-signed**;
+- the **error association**: `error` is a text message taking the Caption step
+  and `--danger-fg` (Ruling 2), carrying `role="alert"` per §6 and reaching
+  the cells through `aria-describedby`;
+- the **cell labels**, the **keyboard behaviour**, **paste filling all
+  cells**, **`autocomplete="one-time-code"`**, the **LTR digit order inside
+  an RTL page**, and the **unconditional 44×44 minimum**;
+- **no timer, resend control or cooldown prop** (Ruling 4, unchanged).
+
+**It creates nothing.** No token, no count change — **119 / 39 / 1** is
+unchanged — no export, no subpath, no package-owned application string, no
+sixth primitive.
+
+**It is not a general rule about live regions.** It says what `OtpInput` must
+not announce; it approves no pattern for any other component, and §6 governs
+them unchanged.
+
+### What the implementing pull request must do
+
+**Remove the raw code from the `role="status"` region.** The minimum
+conforming change is that `OtpInput` renders **no live region of its own**
+for completion, and continues to call **`onComplete(value)`** exactly as it
+does now — once per distinct complete code, reflecting the value the
+component was given rather than the one its handler proposed.
+
+**The error region is unaffected** and must keep `role="alert"`.
+
+**A consumer-integration obligation follows, to be identified rather than
+performed**: an application using `OtpInput` must supply its own polite
+announcement on completion or validation, and must not put the code in it.
+
+### Boundaries
+
+**No token identifier, value, count, artifact or export changes** · the
+exports stay the six approved keys · the package stays **`0.2.0`** and
+**`private`**, with `v0.1.0` and `v0.2.0` unchanged and **no new tag** ·
+**this record changes no code and no release state** · **no new
+implementation is authorized**: it settles a means inside work the OtpInput
 Implementation Authorization of 2026-10-06 already permits, and **merging any
 pull request remains a separate manual owner decision**.
