@@ -24,7 +24,7 @@ describe("source entry", () => {
     expect(entry).toBeDefined();
   });
 
-  it("exports exactly the Validation Helpers, Icon and the four implemented primitives, and nothing else", async () => {
+  it("exports exactly the Validation Helpers, Icon and all five primitives, and nothing else", async () => {
     // ADR 0002 and ADR 0005: the root barrel widens only by a reviewed diff.
     // `Icon` joined it with the Icon Foundation; `TextField` and `Select`
     // with their authorization of 2026-10-05; `Button` with its own of
@@ -38,6 +38,7 @@ describe("source entry", () => {
         "BottomSheet",
         "Button",
         "Icon",
+        "OtpInput",
         "Select",
         "TextField",
         "isValidIranianNationalId",
@@ -59,15 +60,19 @@ describe("source entry", () => {
     // "Icon" left it with the Icon Foundation, which the Icon Foundation
     // Implementation Authorization of 2026-10-03 permits. "BottomSheet" left
     // it with the BottomSheet Implementation Authorization of 2026-10-04.
-    // "TextField" and "Select" left it with theirs of 2026-10-05, and
-    // "Button" with its own of 2026-10-06, whose scope line reads
-    // "keeping `OtpInput` forbidden" until that primitive's own pull
-    // request.
+    // "TextField" and "Select" left it with theirs of 2026-10-05, "Button"
+    // with its own of 2026-10-06, and "OtpInput" with its own of the same
+    // date — which empties this list.
     //
-    // `OtpInput` remains, still owed its own implementation pull request
-    // although its authorization is recorded. The match is on the file's
-    // basename with separators removed, so neither `text-field.tsx` nor
-    // `otp_input.tsx` could slip past a substring test on the full path.
+    // THE LIST IS EMPTY, AND THAT IS THE POINT. All five frozen primitives
+    // are implemented, so there is no sixth to forbid by name: frozen v1.1
+    // §2.1 requires an ADR in this repository before one may exist at all,
+    // and `exports-contract` and the root-export guards are what would catch
+    // it. The assertion below is kept rather than deleted so that adding a
+    // name back is a one-line, reviewed change if a primitive is ever
+    // withdrawn — and the match stays on the basename with separators
+    // removed, so an `otp_input.tsx` could never have slipped past a
+    // substring test on the full path.
     const files = walk(srcDir);
     const basenames = files.map((file) =>
       file
@@ -76,7 +81,7 @@ describe("source entry", () => {
         .replace(/[-_]/g, ""),
     );
 
-    for (const forbidden of ["OtpInput"]) {
+    for (const forbidden of [] as readonly string[]) {
       expect(
         basenames.some((name) => name.includes(forbidden.toLowerCase())),
         `src/ contains a file matching "${forbidden}" — that belongs to a later commit`,

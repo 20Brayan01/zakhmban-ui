@@ -409,6 +409,7 @@ describe("typed token artifact — ADR 0003 §11", () => {
       "BottomSheet",
       "Button",
       "Icon",
+      "OtpInput",
       "Select",
       "TextField",
       "isValidIranianNationalId",

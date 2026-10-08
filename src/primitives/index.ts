@@ -1,7 +1,7 @@
 /**
  * Internal barrel for the primitives module.
  *
- * Four of the five frozen primitives are implemented. They are public
+ * All five frozen primitives are implemented. They are public
  * through the package's single root entry and nothing else is — no
  * `./primitives` subpath and no deep import. `Portal` and `FocusTrap` stay
  * internal to `BottomSheet` (Decision A §A.6), and `field.ts` stays internal
@@ -13,6 +13,8 @@ export { TextField } from "./text-field.js";
 export type { TextFieldProps } from "./text-field.js";
 export { Select } from "./select.js";
 export type { SelectOption, SelectProps } from "./select.js";
+export { OtpInput } from "./otp-input.js";
+export type { OtpInputProps } from "./otp-input.js";
 export { Button } from "./button.js";
 export type {
   ButtonProps,

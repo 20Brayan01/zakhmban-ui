@@ -1,0 +1,153 @@
+/**
+ * OtpInput styles — authored Styles CSS. This file is a source of truth.
+ *
+ * The five-cell code entry of the `OtpInput` primitive, delivered through the
+ * existing `@zakhmban/ui/styles` entry on the ADR 0004, ADR 0006, field.css
+ * and button.css precedent: no new public subpath, and `package.json` is
+ * unchanged.
+ *
+ * THE 44x44 MINIMUM IS UNCONDITIONAL. v0.2 §6 requires "44×44px minimum for
+ * anything tappable" with no viewport or zoom qualifier, and adds that
+ * "Spacing may not be used to justify a smaller target". `OtpInput` is NOT in
+ * §6's exception register, which holds exactly one entry, ScaleSelect. So the
+ * cell carries BOTH dimensions as minimums through `--control-min-target`,
+ * and `flex` may grow a cell but may never shrink it below either:
+ *
+ *   min-block-size  : var(--control-min-target)   44px, never less
+ *   min-inline-size : var(--control-min-target)   44px, never less
+ *   flex            : 1 1 auto                    may grow, cannot shrink past
+ *                                                 the minimums above
+ *
+ * WHAT HAPPENS BELOW 320 CSS PX. At the required 320px reflow width five 44px
+ * cells plus four `--space-2` gaps need 252px against 288px available, so the
+ * row fits with room. Narrower than that, something has to give, and the
+ * authorization is explicit that "page-level horizontal scrolling is not an
+ * acceptable outcome, and any bounded scrolling must be internal to the group
+ * with the focused cell scrolled into view". So the GROUP scrolls, not the
+ * page, and the component scrolls a focused cell back into view. Shrinking
+ * the cells is not an option: that would weaken a rule the authorization
+ * forbids weakening.
+ *
+ * TYPOGRAPHY, assigned and not chosen here.
+ *
+ *   digits   `--text-card-title` 16px / 1.5 / 600 with `--text-primary`
+ *            (Ruling 3, 2026-10-06), plus `tabular-nums`, which §2.2 already
+ *            requires for "codes". NO line-height override: Ruling 3 records
+ *            that a 16px / 1.5 digit measures a 25px line box inside a 44px
+ *            cell with no clipping.
+ *   error    the Caption step with `--danger-fg` (Ruling 2, 2026-10-06),
+ *            identical to `TextField` and `Select` so a validation message
+ *            does not change size according to which control produced it.
+ *
+ * COLOUR. The resting cell boundary takes `--text-secondary`, the same
+ * binding the Resting Control-Boundary Role Exception of 2026-10-06 gives
+ * `TextField` and `Select`: 4.9748:1 on `--surface`, against §6's 3:1 for a
+ * control boundary. That exception is scoped to those two controls by name,
+ * so this file does not claim it — it is a component binding under
+ * Decision 14, which leaves `OtpInput` unbound, and it is measured rather
+ * than assumed. The error boundary takes `--danger` at the §2.3 error width
+ * of 1.5px, matching the other two controls.
+ *
+ * No token is created, no raw colour literal appears, no `--_` source or raw
+ * palette entry is read, and this file declares no custom property of its
+ * own.
+ *
+ * NO COOLDOWN, NO RESEND. Ruling 4 puts both in the application. There is no
+ * rule here for either, because there is nothing here to style.
+ *
+ * THE FOCUS RING IS NOT HERE. D-3's two-ring indicator ships in `global.css`
+ * and applies to each cell because each cell is the focusable element.
+ * Nothing below replaces, removes or re-declares it, and no rule sets
+ * `outline`.
+ *
+ * DIRECTION. No rule sets `direction` (owner D-2). The LTR digit order §3.2
+ * requires comes from a `dir="ltr"` ATTRIBUTE the component puts on the cell
+ * row, which is §5's own isolation mechanism and not a CSS rule.
+ */
+
+.zakhmban-otp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.zakhmban-otp-cells {
+  display: flex;
+  gap: var(--space-2);
+
+  /* The group scrolls; the page never does. Below the 320px reflow width
+     this is what keeps every cell reachable without shrinking any of them
+     below the §6 minimum. */
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+
+  /* Room for D-3's 4px ring on the first and last cells, so a focused edge
+     cell is not clipped by the scrollport it lives in. */
+  padding: var(--space-1);
+  margin: calc(var(--space-1) * -1);
+}
+
+.zakhmban-otp-cell {
+  /* May grow to share the row; may never shrink past either minimum. */
+  flex: 1 1 auto;
+
+  min-block-size: var(--control-min-target);
+  min-inline-size: var(--control-min-target);
+
+  /* The approved 12px small-control geometry for an OtpInput cell. */
+  border-radius: var(--radius-control);
+  border: 1px solid var(--text-secondary);
+  background-color: var(--surface);
+
+  text-align: center;
+  font-size: var(--text-card-title-size);
+  line-height: var(--text-card-title-line-height);
+  font-weight: var(--text-card-title-weight);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+
+  /* A focused cell scrolled back into view should not sit flush against the
+     scrollport edge, where its ring would be half-hidden. */
+  scroll-margin-inline: var(--space-2);
+}
+
+.zakhmban-otp-cell:focus {
+  border-color: var(--brand-blue);
+}
+
+/* §2.3: "1.5px when a card is selected or in error". The error boundary wins
+   over the focused one — a focused invalid cell is still invalid, and D-3's
+   ring already shows that it is focused. */
+.zakhmban-otp-cell[aria-invalid="true"] {
+  border-width: 1.5px;
+  border-color: var(--danger);
+}
+
+.zakhmban-otp-cell:disabled {
+  border-color: var(--disabled-border);
+  background-color: var(--disabled-bg);
+  color: var(--disabled-text);
+}
+
+/* Ruling 2: the Caption step with `--danger-fg`, identical to the other two
+   controls that carry an `error` message. */
+.zakhmban-otp-error {
+  margin-block: 0;
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line-height);
+  font-weight: var(--text-caption-weight);
+  color: var(--danger-fg);
+}
+
+/**
+ * NO visually-hidden status rule, deliberately.
+ *
+ * An earlier draft carried a clip-rect `.zakhmban-otp-status` class for a
+ * package-owned `role="status"` region. The OtpInput Completion Announcement
+ * Ruling of 2026-10-06 removed that region: the primitive's share of §3.2's
+ * "result announced politely" is `onComplete(value)`, and the consuming
+ * application owns the message. With no region there is nothing to hide, and
+ * a visually-hidden utility left behind would be the deferred
+ * `VisuallyHidden` component of v0.2 §9 unknown 12 arriving by the back
+ * door.
+ */

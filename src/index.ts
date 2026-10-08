@@ -58,8 +58,12 @@ export type { IconName, IconProps } from "./icons/index.js";
  * exported as types so an unapproved variant, tone or size is a compile
  * error in the consuming application rather than a silently unstyled control.
  *
- * `OtpInput` is still owed its own implementation pull request; its
- * authorization of 2026-10-06 is recorded but no code for it exists here.
+ * `OtpInput` under its own authorization of 2026-10-06, completing the five.
+ * It has no cooldown prop, no timer and no resend control: Ruling 4 puts the
+ * resend cooldown and the resend action in the consuming application.
+ *
+ * The five are now complete. A SIXTH requires an ADR in this repository,
+ * per frozen v1.1 §2.1 — wanting one is not approval.
  */
 export { BottomSheet } from "./primitives/index.js";
 export type { BottomSheetProps } from "./primitives/index.js";
@@ -67,6 +71,8 @@ export { TextField } from "./primitives/index.js";
 export type { TextFieldProps } from "./primitives/index.js";
 export { Select } from "./primitives/index.js";
 export type { SelectOption, SelectProps } from "./primitives/index.js";
+export { OtpInput } from "./primitives/index.js";
+export type { OtpInputProps } from "./primitives/index.js";
 export { Button } from "./primitives/index.js";
 export type {
   ButtonProps,

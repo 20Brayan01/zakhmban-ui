@@ -40,6 +40,9 @@ const ALL_STYLES = [
   // The Button primitive, on the same entry (Button Implementation
   // Authorization, 2026-10-06). Every hygiene rule below applies to it.
   "button.css",
+  // The OtpInput primitive, on the same entry (OtpInput Implementation
+  // Authorization, 2026-10-06). Every hygiene rule below applies to it.
+  "otp-input.css",
 ];
 
 /**

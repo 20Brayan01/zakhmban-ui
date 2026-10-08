@@ -25,6 +25,7 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
         "BottomSheet",
         "Button",
         "Icon",
+        "OtpInput",
         "Select",
         "TextField",
         "isValidIranianNationalId",
@@ -111,6 +112,50 @@ describe("root export — Validation Helpers (ADR 0002)", () => {
     );
     expect(markup).toContain('for="w"');
     expect(markup).toContain('id="w"');
+  });
+
+  it("renders OtpInput through the built artifact with its approved contract", async () => {
+    // The built half of the five-cell contract: a consumer installing dist/
+    // gets five real inputs, the LTR isolation §5 requires, the one-time-code
+    // hint on the first cell, and the polite status region §3.2 asks for.
+    const { OtpInput } = await import("@zakhmban/ui");
+
+    const markup = renderToStaticMarkup(
+      createElement(OtpInput, {
+        value: "123",
+        error: "نادرست",
+        onChange: () => {},
+      }),
+    );
+    // Lower-cased before matching: HTML attribute names are ASCII
+    // case-insensitive, React's server renderer emits some of these in the
+    // camelCase it was given, and the DOM resolves them either way — the
+    // jsdom suite reads them back through `getAttribute("autocomplete")`.
+    // Asserting the exact casing would be testing the renderer, not the
+    // contract.
+    const html = markup.toLowerCase();
+    expect(markup.match(/<input/g)).toHaveLength(5);
+    expect(html).toContain('dir="ltr"');
+    expect(html).toContain('autocomplete="one-time-code"');
+    // No live region of its own, and the code never reaches one — OtpInput
+    // Completion Announcement Ruling, 2026-10-06. Asserted on the BUILT
+    // artifact because that is what a consumer installs.
+    expect(html).not.toContain('role="status"');
+    expect(html).not.toContain("aria-live");
+    expect(html).not.toContain('role="log"');
+    expect(html).toContain('role="alert"');
+    expect(html).toContain('aria-invalid="true"');
+    expect(html).toContain('inputmode="numeric"');
+    // Ruling 4: no cooldown, timer or resend reaches the artifact.
+    for (const forbidden of ["cooldown", "resend", "countdown"]) {
+      expect(html.includes(forbidden)).toBe(false);
+    }
+
+    // The error alert is the component's ONE live region and carries the
+    // application's message, never the digits.
+    const alertText = /role="alert"[^>]*>([^<]*)</.exec(markup)?.[1] ?? "";
+    expect(alertText).toBe("نادرست");
+    expect(alertText).not.toContain("123");
   });
 
   it("publishes no runtime glyph list and no registry", async () => {
