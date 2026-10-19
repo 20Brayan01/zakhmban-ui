@@ -12,12 +12,13 @@ string.
 
 **Foundation.** The package, its toolchain and its architecture guards are in
 place. Every capability allocated up to `v0.3.0` is implemented and
-**released as `v0.3.0`**.
+**released as `v0.3.0`**. A patch, `v0.3.1`, is **prepared, not released**: it
+masks phone digits in every digit script.
 
 | Area                                                                     | State                                                                             |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
 | Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                          |
-| Formatting utilities (`./utils/format`)                                  | shipped                                                                           |
+| Formatting utilities (`./utils/format`)                                  | shipped — `maskPhoneDisplay` digit fix **prepared as `v0.3.1`**, unreleased       |
 | Validation helpers (root entry, ADR 0002)                                | shipped                                                                           |
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                 |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0` |
@@ -25,12 +26,24 @@ place. Every capability allocated up to `v0.3.0` is implemented and
 | The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`** (annotated tag)                                |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                              |
 
-**`v0.3.0` is released.** It is the newest tag and carries `Icon` and the
-five primitives. **A consumer still pinned to `v0.2.0` receives neither `Icon`
-nor any of the five primitives**, and keeps the `--control-height-button`
-token that `v0.3.0` retires — bumping is a breaking change; see
-[Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
+**`v0.3.0` is released.** As of 2026-10-19 it is the newest tag and carries
+`Icon` and the five primitives. **A consumer still pinned to `v0.2.0` receives
+neither `Icon` nor any of the five primitives**, and keeps the
+`--control-height-button` token that `v0.3.0` retires — bumping is a breaking
+change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
 `git ls-remote --tags origin` is the live answer to what exists.
+
+**`v0.3.1` is prepared, not released.** It is a patch: `maskPhoneDisplay` now
+masks phone digits in every digit script — ASCII, Persian, Arabic-Indic and
+any other Unicode decimal digit — where `v0.3.0` returned a number written in
+Persian or Arabic-Indic digits, or a value mixing scripts, **unmasked**. No
+input that `v0.3.0` masked correctly changes, and no signature or export
+changes. The manifest records `0.3.1`, and **a manifest version is not a
+release**: as of **2026-10-19 no `v0.3.1` tag exists**, and none will until the
+owner runs the Release workflow against a validated `main` SHA. **A consumer
+pinned to `v0.3.0` keeps the unmasked behaviour**, so an application that
+displays phone numbers through `maskPhoneDisplay` pins `v0.3.1` once it exists.
+`git ls-remote --tags origin` is the live answer to whether `v0.3.1` exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -95,8 +108,9 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.3.0` is the newest release** and the tag
-the supported installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.3.0` is the newest release** (`v0.3.1` is
+prepared but not yet tagged — see Status) and the tag the supported
+installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
@@ -200,7 +214,11 @@ layer, `Icon` and the five primitives. An application moving up from `v0.1.0`
 or `v0.2.0` must first apply the
 [`v0.3.0` token migration](#breaking-token-change-in-v030). (`v0.2.0` is the
 Styles Foundation release; `v0.1.0` is the earlier Token Foundation release,
-whose `./styles` surface is token-only.)
+whose `./styles` surface is token-only.) Until a `v0.3.1` tag exists, `v0.3.0`
+stays the newest existing tag and the pin below is unchanged; an application
+that displays phone numbers through `maskPhoneDisplay` moves to `v0.3.1` as
+soon as it is tagged, because `v0.3.0` does not mask Persian or Arabic-Indic
+digits.
 
 ```jsonc
 "dependencies": {
