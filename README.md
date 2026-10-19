@@ -12,13 +12,13 @@ string.
 
 **Foundation.** The package, its toolchain and its architecture guards are in
 place. Every capability allocated up to `v0.3.0` is implemented and
-**released as `v0.3.0`**. A patch, `v0.3.1`, is **prepared, not released**: it
-masks phone digits in every digit script.
+**released as `v0.3.0`**. A patch, `v0.3.1`, is **released**: it masks phone
+digits in every digit script.
 
 | Area                                                                     | State                                                                             |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
 | Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                          |
-| Formatting utilities (`./utils/format`)                                  | shipped — `maskPhoneDisplay` digit fix **prepared as `v0.3.1`**, unreleased       |
+| Formatting utilities (`./utils/format`)                                  | shipped — `maskPhoneDisplay` digit fix **released as `v0.3.1`** (annotated tag)   |
 | Validation helpers (root entry, ADR 0002)                                | shipped                                                                           |
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                 |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0` |
@@ -26,24 +26,27 @@ masks phone digits in every digit script.
 | The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`** (annotated tag)                                |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                              |
 
-**`v0.3.0` is released.** As of 2026-10-19 it is the newest tag and carries
-`Icon` and the five primitives. **A consumer still pinned to `v0.2.0` receives
-neither `Icon` nor any of the five primitives**, and keeps the
+**`v0.3.0` is released.** It carries `Icon` and the five primitives;
+`v0.3.1`, below, is the newest tag. **A consumer still pinned to `v0.2.0`
+receives neither `Icon` nor any of the five primitives**, and keeps the
 `--control-height-button` token that `v0.3.0` retires — bumping is a breaking
 change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
 `git ls-remote --tags origin` is the live answer to what exists.
 
-**`v0.3.1` is prepared, not released.** It is a patch: `maskPhoneDisplay` now
-masks phone digits in every digit script — ASCII, Persian, Arabic-Indic and
-any other Unicode decimal digit — where `v0.3.0` returned a number written in
-Persian or Arabic-Indic digits, or a value mixing scripts, **unmasked**. No
-input that `v0.3.0` masked correctly changes, and no signature or export
-changes. The manifest records `0.3.1`, and **a manifest version is not a
-release**: as of **2026-10-19 no `v0.3.1` tag exists**, and none will until the
-owner runs the Release workflow against a validated `main` SHA. **A consumer
-pinned to `v0.3.0` keeps the unmasked behaviour**, so an application that
-displays phone numbers through `maskPhoneDisplay` pins `v0.3.1` once it exists.
-`git ls-remote --tags origin` is the live answer to whether `v0.3.1` exists.
+**`v0.3.1` is released.** It is a patch: `maskPhoneDisplay` now masks phone
+digits in every digit script — ASCII, Persian, Arabic-Indic and any other
+Unicode decimal digit — where `v0.3.0` returned a number written in Persian or
+Arabic-Indic digits, or a value mixing scripts, **unmasked**. No input that
+`v0.3.0` masked correctly changes, and no signature or export changes. It is
+an **annotated tag** (tag object `8d08989073d3fca3dfa68f9741d5553db22a9cf0`),
+created on 2026-10-19 by run #4 of the owner-triggered Release workflow and
+pointing at commit **`59684ff89ef6aed84eca92e4f3b1dcc8c0f86561`**; the run
+validated that commit before tagging, and `verify-created-tag` read the tag
+back from the remote and confirmed it is annotated and points at it. As with
+the earlier tags, **no GitHub Release object and no npm publication exists**.
+**A consumer still pinned to `v0.3.0` keeps the unmasked behaviour**, so an
+application that displays phone numbers through `maskPhoneDisplay` pins
+`v0.3.1`. `git ls-remote --tags origin` is the live answer to what exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -108,13 +111,12 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.3.0` is the newest release** (`v0.3.1` is
-prepared but not yet tagged — see Status) and the tag the supported
-installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.3.1` is the newest release** and the tag
+the supported installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
-"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.0"
+"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.1"
 ```
 
 **Styles Foundation is released as `v0.2.0`.** It is an **annotated tag**,
@@ -157,17 +159,14 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. As verified on **2026-10-04**, and re-verified
-  read-only on **2026-10-08** at its `main` `3631656`, it pins
-  `github:20Brayan01/zakhmban-ui#v0.2.0` and **has migrated to Styles
-  `v0.2.0`**, so it receives the full `./styles` surface; its lockfile
-  resolves that pin to the `v0.2.0` tag object
-  `957a397b2dc919459772344a3ea8b612ef4378a8`. It does **not** receive `Icon`
-  or any of the five primitives, which `v0.3.0` carries, and it still
-  references the `--control-height-button` token that `v0.3.0` retires. Any
-  later bump is a separate change in that
-  repository, not part of this package; its own `package.json` is the live
-  answer.
+  Therapist application. As verified read-only on **2026-10-19** at its
+  `main` `000645419cc6b1ef0f20131c2424d4a755e96f46` (the squash merge of its
+  pull request #25), it pins `github:20Brayan01/zakhmban-ui#v0.3.1`; its
+  lockfile resolves that pin to the `v0.3.1` tag object
+  `8d08989073d3fca3dfa68f9741d5553db22a9cf0`. It therefore receives the full
+  `./styles` surface, `Icon`, the five primitives and the `maskPhoneDisplay`
+  fix. Any later bump is a separate change in that repository, not part of
+  this package; its own `package.json` is the live answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
   ecosystem**, not the Therapist consumer. Their Phase 1 design-system legacy
   annotations are **valid** and exist in **local, unpushed** documentation
@@ -184,8 +183,9 @@ Where the design values stand, precisely:
   defaults, the D-3 `:focus-visible` rings and the four D-4 keyframes with
   their D-5 reduced-motion definitions. `v0.3.0` carries it unchanged.
 - **Icons, the five primitives and the overlay-root contract are implemented
-  and released as `v0.3.0`.** **The supported consumption path is a pin to
-  the annotated `v0.3.0` tag.**
+  and released as `v0.3.0`.** `v0.3.1` carries them unchanged and masks phone
+  digits in every digit script. **The supported consumption path is a pin to
+  the annotated `v0.3.1` tag.**
 - The **Typography Alias Ruling** (2026-09-19) fixes each of the eight
   typography aliases as a **Semantic Typography Size Alias**, authored
   `--text-<step>: var(--text-<step>-size)`. It changed no identifier, no
@@ -209,20 +209,19 @@ in `docs/architecture/canonical-document-registry.md`.
 
 The package is installed as an external dependency pinned to an **exact git
 tag**, never a range, never `workspace:`, never `file:` or `link:`. The tag
-below is `v0.3.0`, the newest release, which carries the tokens, the Styles
-layer, `Icon` and the five primitives. An application moving up from `v0.1.0`
-or `v0.2.0` must first apply the
-[`v0.3.0` token migration](#breaking-token-change-in-v030). (`v0.2.0` is the
-Styles Foundation release; `v0.1.0` is the earlier Token Foundation release,
-whose `./styles` surface is token-only.) Until a `v0.3.1` tag exists, `v0.3.0`
-stays the newest existing tag and the pin below is unchanged; an application
-that displays phone numbers through `maskPhoneDisplay` moves to `v0.3.1` as
-soon as it is tagged, because `v0.3.0` does not mask Persian or Arabic-Indic
-digits.
+below is `v0.3.1`, the newest release, which carries the tokens, the Styles
+layer, `Icon` and the five primitives, and masks phone digits in every digit
+script. An application moving up from `v0.1.0` or `v0.2.0` must first apply
+the [`v0.3.0` token migration](#breaking-token-change-in-v030). (`v0.2.0` is
+the Styles Foundation release; `v0.1.0` is the earlier Token Foundation
+release, whose `./styles` surface is token-only.) An application on `v0.3.0`
+moves to `v0.3.1` with no migration, and one that displays phone numbers
+through `maskPhoneDisplay` should, because `v0.3.0` does not mask Persian or
+Arabic-Indic digits.
 
 ```jsonc
 "dependencies": {
-  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.0"
+  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.1"
 }
 ```
 
@@ -359,9 +358,11 @@ is unchanged.
 **Being in the source tree is not the same as being released.** Frozen §2.2
 and v0.2 §7.3 fix consumption at an **exact tag** — never a range, never
 `workspace:`, never `file:` or `link:`. **The supported way to consume the
-package is a pin to the annotated `v0.3.0` tag**, which points at commit
-`ae8dccd97765b5a308e91eba579dc47c5d43ec5e`; the Styles layer was first
-released by `v0.2.0` at `bd495bf493c519334a2525588d8d80edb0c6ac68`. A raw
+package is a pin to the annotated `v0.3.1` tag**, which points at commit
+`59684ff89ef6aed84eca92e4f3b1dcc8c0f86561`; `Icon` and the five primitives
+were first released by `v0.3.0` at `ae8dccd97765b5a308e91eba579dc47c5d43ec5e`,
+and the Styles layer by `v0.2.0` at
+`bd495bf493c519334a2525588d8d80edb0c6ac68`. A raw
 commit SHA is technically
 resolvable by git but is **not a released version and is not the supported
 path**. Later work on `main` is not released until a later tag carries it —
