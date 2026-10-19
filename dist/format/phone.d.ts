@@ -19,14 +19,27 @@
  * the technical values that "stay Latin and LTR" — the same list as request
  * codes, tracking numbers and IBANs. Converting them here would contradict
  * that rule for every consumer of this function.
+ *
+ * A phone number can reach this function in any digit script a person types
+ * it in: ASCII (`0`–`9`), Persian (`۰`–`۹`, U+06F0–U+06F9) or Arabic-Indic
+ * (`٠`–`٩`, U+0660–U+0669), alone or mixed within one value. Masking is a
+ * privacy control, so every one of them is a digit here: a number whose digits
+ * were not recognised would be returned in full, which is the opposite of what
+ * the function is for. The masked digits are all replaced by the same `*`
+ * whatever their script, and the visible last four are left exactly as they
+ * arrived — the documents say nothing about re-scripting them, so this keeps
+ * the behaviour the ASCII case has always had.
  */
 /**
  * Masks every digit in `phone` except the last four, replacing each masked
  * digit with `*` and leaving every other character — spaces, hyphens, a
- * leading `+` — exactly where it was:
+ * leading `+` — exactly where it was. Digits are counted across scripts, so
+ * the last four digits are the last four however they were typed:
  *
  * - `maskPhoneDisplay("09121234567")` → `"*******4567"`
  * - `maskPhoneDisplay("0912 123 4567")` → `"**** *** 4567"`
+ * - `maskPhoneDisplay("۰۹۱۲۱۲۳۴۵۶۷")` → `"*******۴۵۶۷"` (the visible digits
+ *   keep the script they arrived in)
  *
  * When `phone` contains four or fewer digits, there are no digits *before*
  * the last four to mask, so all of them stay visible — this is the literal
