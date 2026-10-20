@@ -11,7 +11,7 @@
  *
  * Inputs   node_modules/lucide/dist/esm/icons/<kebab>.mjs  — one file per glyph
  *          node_modules/lucide/LICENSE                     — the notice
- * Outputs  src/icons/registry.ts            the eleven-entry registry
+ * Outputs  src/icons/registry.ts            the fifteen-entry registry
  *          src/icons/LUCIDE-LICENSE.txt     a verbatim copy of the notice
  *
  * Usage    node scripts/generate-icons.mjs           write
@@ -52,9 +52,10 @@ const upstreamIcons = join(lucideDir, "dist", "esm", "icons");
 const EXPECTED_VERSION = "1.51.0";
 
 /**
- * The eleven public names ADR 0005 §7 admits, in the order its table lists
- * them, each mapped to the canonical upstream file and carrying its mirroring
- * decision as an explicit boolean.
+ * The fifteen public names ADR 0005 §7 admits, in the order its table lists
+ * them — the original eleven, then the four the 2026-10-20 owner ruling adds
+ * for the Therapist app's BottomNav (§7.1) — each mapped to the canonical
+ * upstream file and carrying its mirroring decision as an explicit boolean.
  *
  * `mirror` is v0.2 §5's declared property, not an inference from the name and
  * not a default. The two directional glyphs store the LTR-authored base
@@ -74,10 +75,17 @@ const GLYPHS = [
   { name: "trash", upstream: "trash", mirror: false },
   { name: "plus", upstream: "plus", mirror: false },
   { name: "star", upstream: "star", mirror: false },
+  // ADR 0005 §7.1 — the four BottomNav destinations, in UX Specification §4.1
+  // order. None is directional, so none mirrors; v0.2 §5 names `wallet` in
+  // its never-mirror list outright.
+  { name: "listing", upstream: "store", mirror: false },
+  { name: "folder", upstream: "folder", mirror: false },
+  { name: "wallet", upstream: "wallet", mirror: false },
+  { name: "person", upstream: "user", mirror: false },
 ];
 
 /**
- * The SVG element names the eleven glyphs are allowed to use. A closed list,
+ * The SVG element names the fifteen glyphs are allowed to use. A closed list,
  * so an upstream change that introduces a shape the component does not render
  * fails generation instead of rendering nothing.
  */
@@ -115,7 +123,7 @@ function assertUpstreamVersion() {
     fail(
       `lucide ${manifest.version} is installed but this generator is verified ` +
         `against ${EXPECTED_VERSION}. Upstream renames glyphs and may move ` +
-        `dist/esm/icons/, so re-verify the eleven mappings and the LICENSE, ` +
+        `dist/esm/icons/, so re-verify the fifteen mappings and the LICENSE, ` +
         `then update EXPECTED_VERSION in this file.`,
     );
   }
@@ -203,7 +211,7 @@ function renderRegistry(glyphs) {
  *
  * ADR 0005 — the contract this file must satisfy:
  *
- *   - exactly the eleven approved public names, in §7's order;
+ *   - exactly the fifteen approved public names, in §7's order;
  *   - each entry carries its drawing instructions and its mirroring decision
  *     as an EXPLICIT boolean — v0.2 §5 makes mirroring a declared property,
  *     never inferred from the name and never defaulted;

@@ -6,6 +6,15 @@
   implementation. **No clause of this ADR changes on acceptance**: the
   representation contract, the eleven-name inventory, the mirroring flags and
   every recorded deferral stand exactly as written.
+- **Amended 2026-10-20, by owner ruling — §7.1.** The inventory grows from
+  eleven names to fifteen: four glyphs for the Therapist app's BottomNav are
+  admitted, for that stated purpose. **Nothing else in this ADR changes** —
+  the closed `IconName` union, the internal registry, the generated and
+  parity-checked artifact, the pinned upstream version, the explicit mirroring
+  flag, the verbatim notice, the single root entry, and the rule that
+  consuming applications never import an icon library all stand as written.
+  Every statement below that says "eleven" describes the **original**
+  inventory and is left as the record of what §1–§7 decided on 2026-10-02/03.
 - **Upstream facts, verified before acceptance.** §3 deliberately recorded
   three facts as unverified. They were checked read-only against
   **`lucide@1.51.0`** (`license: ISC`; `dist.shasum`
@@ -493,6 +502,10 @@ confirmation item, not as an invented ruling.
 
 ### 7 · The initial glyph inventory
 
+> **Amended 2026-10-20 — see §7.1.** The table below is the original
+> eleven-name inventory and is unchanged. §7.1 appends four names; the
+> exclusion of `wallet` in the second admission rule's list is superseded by it.
+
 **Proposed by this ADR, not quoted from authority** — no canonical source
 enumerates glyph names. Two admission rules keep the proposal honest:
 
@@ -554,6 +567,103 @@ destinations and their icons.
 *"the ZakhmBan glyph set that replaces Lucide behind the abstraction does not
 exist yet"* — is untouched. This inventory is the **initial** Lucide-backed
 set, and Phase 7 replaces its data source wholesale without renaming anything.
+
+### 7.1 · Amendment, 2026-10-20 — four BottomNav glyphs (owner ruling)
+
+**The ruling.** The owner of this repository admits **exactly four additional
+public names**, for **one stated purpose**: the Therapist app's
+four-destination BottomNav. Therapist App UX Specification §4.1 (workspace
+`therapist-docs/`) fixes the destinations — آگهی‌ها, سوابق, کیف پول, پروفایل —
+and gives each an **icon intent**: *marketplace listing*, *clinical folder*,
+*wallet*, *person*. None of the eleven names above covers any of them, so the
+Therapist app cannot render its root navigation through `Icon`, and §3.1
+forbids it from importing an icon library instead. Which destination uses
+which glyph, and its route and badge, stay product decisions in the
+application, exactly as v0.2 §7.1 says; this amendment admits glyphs, not
+destinations.
+
+**What the ruling does not change.** `IconName` stays a closed union and the
+registry stays package-internal; no icon library is imported by a consuming
+application; no fourth subpath is added; upstream stays **`lucide@1.51.0`**;
+every entry still carries an explicit mirroring boolean; the notice is still
+one verbatim copy. No artwork is drawn, edited or combined. Adding a name is
+additive under §4.
+
+**The two admission rules, applied.** Rule 1 — canonical evidence: `wallet` is
+**named** (N) by v0.2 §5's never-mirror list; the other three rest on a
+surface that cannot render without a glyph (R). Rule 2 — a specified surface
+must consume it: the BottomNav of Therapist UX Specification §4.1 and v0.2's
+four-item `BottomNav` consume all four. That is the second rule §7 used to
+exclude `wallet` — *no surface claimed it* — and a surface now does, so
+`wallet` moves from §7's excluded list to the inventory. The other nine
+excluded names (`forward`, `next`/`previous`, `trending`, `undo`, `phone`,
+`map pin`, `lock`, `shield`, `clock`) stay excluded.
+
+| Name | Upstream (`lucide@1.51.0`) | Mirror | Ev. | Why this name exists |
+| --- | --- | --- | --- | --- |
+| `listing` | `store` | no | **R** | Intent *marketplace listing* — the Ads destination, آگهی‌ها. The public name is the intent, not the artwork's, on the precedent of `alert` over `circle-alert`, so a Phase 7 swap keeps the name. |
+| `folder` | `folder` | no | **R** | Intent *clinical folder* — the Records destination, سوابق. Upstream has no clinical-folder glyph; the plain folder carries the metaphor and the destination's label carries the clinical meaning. |
+| `wallet` | `wallet` | no | **N** | Intent *wallet* — the Wallet destination, کیف پول. Named in v0.2 §5's **never mirror** list. |
+| `person` | `user` | no | **R** | Intent *person* — the Profile destination, پروفایل. |
+
+**Fifteen names, two of them mirrored, six resting on a named glyph and nine on
+a specified surface.** The new entries follow the original eleven in the order
+of Therapist UX Specification §4.1, so the registry's order stays a reviewable
+list and the original eleven keep their positions.
+
+**Mirroring.** All four are `mirror: false`, by the rule the original eleven
+follow: mirroring belongs to glyphs with a direction of travel (v0.2 §5's list
+— back, forward, chevron, next/previous, trending, send, undo), and these have
+none. `wallet` is the §5 example of the opposite. Two of the four are
+visually asymmetric — the folder's tab and the wallet's clasp — but §5 keys the
+rule to direction, not symmetry, and does not mirror the wallet, so the
+artwork is stored as authored and never flipped.
+
+**Upstream verified, 2026-10-20, at the same pinned version.** Each of
+`store`, `folder`, `wallet` and `user` exists as a canonical file under
+`dist/esm/icons/` as pure `[tag, attrs]` data using only `path` and `circle`,
+inside the generator's closed tag list; none is an alias. None of the four
+appears in the notice's list of Feather-derived icons, so each is covered by
+the ISC grant and the single notice, which this amendment does not change
+(`LUCIDE-LICENSE.txt` is byte-identical to the upstream copy before and after).
+The verification is version-scoped, as above.
+
+**Considered and rejected.**
+
+- **`tag` for `listing`** — the first choice, rejected on a defect, not on
+  taste. Upstream draws the tag's hole as `<circle … fill="currentColor">`.
+  `Icon` paints through `stroke` on the root `<svg>`, so `currentColor` there
+  is the *inherited CSS colour*, not the `color` prop: the dot would stay one
+  colour while the outline took another the first time a caller passed an
+  active colour. Fixing it means editing artwork or special-casing `fill` in
+  `Icon`, and the ruling permits neither. A test now asserts that **no
+  registry entry carries its own paint attribute**, so the defect cannot enter
+  unseen. `tags` has the same dot.
+- **`megaphone`** — reads as the therapist broadcasting or promoting, and as
+  notifications, which this product keeps under Profile; the Ads destination is
+  demand arriving, not supply advertised.
+- **`shopping-bag`** and **`shopping-cart`** — commerce glyphs, and the
+  Therapist app has a product catalog (the consumables picker) they would
+  suggest.
+- **`newspaper`, `layout-list`, `clipboard-list`** — each draws a `rect`, which
+  the generator's closed `path`/`circle`/`line` list excludes. Widening that
+  list is a change to the generator's contract, outside this ruling.
+- **`list`** — the generic list glyph; in a four-item bar beside a folder it
+  reads as "a list of things", not a marketplace.
+- **`folder-heart`** — a heart on a folder reads as *favourites*, which in a
+  bar whose first destination is a feed suggests saved advertisements.
+- **`folder-open`, `folder-closed`** — `folder` is one path and the least busy
+  of the three at 24px and 1.8 stroke.
+- **`wallet-minimal`** and **`wallet-cards`** — the former drops the clasp that
+  makes the glyph unambiguous; the latter draws a `rect`.
+- **`user-round`** and **`circle-user`** — the first rounds the shoulders for no
+  gain; the second encloses the glyph in a circle, unlike the plain glyphs
+  beside it.
+
+**Versioning and release.** The amendment is **additive** and is not a
+release: the version stays `0.3.1`, no tag is created, and consumers pinned at
+`v0.3.1` do not receive the four names. They arrive with the next tag, which is
+a separate prepare change.
 
 ## Consequences
 
@@ -651,6 +761,9 @@ border widths · any sixth primitive · any fourth public subpath.
   only"*; primitives frozen at five), §2.2 (git-tag consumption, committed
   `dist/`, no prepare step, *"its CI builds a smoke page per primitive"*) —
   workspace `project-reference/architecture/`.
+- Therapist App UX Specification §4.1 (workspace `therapist-docs/`) — the
+  BottomNav destinations and their icon intents, which §7.1 admits glyphs for.
+  Owner ruling of 2026-10-20, recorded by §7.1.
 - UI System Specification v0.2 — design decision 5 (Icons), §3.1 (Icon), §5
   (RTL and icon direction), §6 (Targets, Semantics, Non-colour signalling), §7
   (package structure, exports, dependency policy), §7.1 (boundary), §7.2
