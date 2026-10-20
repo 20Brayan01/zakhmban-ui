@@ -51,6 +51,25 @@ describe("icon registry generation", () => {
     expect(generator).not.toContain('upstream: "trash-2"');
   });
 
+  it("maps the four BottomNav glyphs to canonical upstream files by name", () => {
+    // ADR 0005 §7.1. The public names are intents and survive a Phase 7 swap;
+    // the upstream names are Lucide's. Both sides are asserted, so neither
+    // can move without a test saying so.
+    const generator = readFileSync(`${root}scripts/generate-icons.mjs`, "utf8");
+    const registry = readFileSync(registryPath, "utf8");
+    for (const [name, upstream] of [
+      ["listing", "store"],
+      ["folder", "folder"],
+      ["wallet", "wallet"],
+      ["person", "user"],
+    ] as const) {
+      expect(generator).toContain(
+        `{ name: "${name}", upstream: "${upstream}", mirror: false }`,
+      );
+      expect(registry).toContain(`// lucide ${upstream}\n  ${name}: {`);
+    }
+  });
+
   it("marks the registry as generated so nobody hand-edits it", () => {
     expect(readFileSync(registryPath, "utf8")).toContain(
       "GENERATED FILE — do not edit",
@@ -78,8 +97,9 @@ describe("glyph notice", () => {
   });
 
   it("carries both the ISC grant and the Feather MIT attribution", () => {
-    // One file covers the whole set: nine of the eleven glyphs are
-    // Feather-derived and two are Lucide-only. Neither notice may be trimmed.
+    // One file covers the whole set: nine of the fifteen glyphs are
+    // Feather-derived and six are Lucide-only — `camera`, `star` and the four
+    // BottomNav additions of ADR 0005 §7.1. Neither notice may be trimmed.
     const notice = readFileSync(noticePath, "utf8");
     expect(notice).toContain("ISC License");
     expect(notice).toContain("Lucide Icons and Contributors");

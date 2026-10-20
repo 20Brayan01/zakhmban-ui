@@ -61,7 +61,7 @@ read it rather than inferring an order from this file.
 | [0002](0002-validation-helpers-contract.md) | Validation Helpers Public Contract | Accepted | 2026-09-13 |
 | [0003](0003-token-representation-and-artifact-contract.md) | Token Representation and Artifact Contract | Accepted | 2026-09-18 |
 | [0004](0004-styles-keyframe-representation-contract.md) | Styles Keyframe Representation Contract | Accepted | 2026-09-24 · behaviour resolved 2026-09-25 |
-| [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | Accepted | 2026-10-02 · accepted 2026-10-03 |
+| [0005](0005-icon-representation-contract.md) | Icon Representation and Glyph Delivery Contract | Accepted | 2026-10-02 · accepted 2026-10-03 · amended 2026-10-20 |
 | [0006](0006-overlay-root-representation-contract.md) | Overlay-Root Representation Contract | Accepted | 2026-10-04 |
 
 **ADR 0003 is accepted.** It settles the representation questions the Token
@@ -134,6 +134,15 @@ upstream renames are recorded rather than worked around: the glyphs behind
 version, with `alert-circle` and `trash-2` surviving only as alias exports.
 The verification is **version-scoped** — a later Lucide version must be
 re-checked, not assumed.
+
+**Amended 2026-10-20 (§7.1), by owner ruling.** The inventory grows from eleven
+names to fifteen: `listing`, `folder`, `wallet` and `person` are admitted, for
+one purpose — the Therapist app's four-destination BottomNav (Therapist UX
+Specification §4.1). Same upstream (`lucide@1.51.0`), same generator and
+`--check`, same notice, no mirroring on any of the four, no change to the
+closed `IconName` union, the internal registry or the rule that applications
+never import an icon library. Additive; the version is unchanged and the four
+names reach consumers with the next tag.
 
 **§1.1 settles the Icon colour question without an owner decision.** v0.2
 §3.1's approved prop list is `name†` `size` `color` `strokeWidth` — no `tone`,

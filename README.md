@@ -321,6 +321,33 @@ consuming application must know, none of which can be enforced from here:
 - **`Button`** defaults to `variant="secondary"` and `size="md"`; a primary
   button is selected explicitly at its use site.
 
+### Icons — the glyph set
+
+`Icon` takes a closed `IconName`: an unknown name is a compile error, not an
+empty box. The registry behind it is internal and generated from
+`lucide@1.51.0` by `scripts/generate-icons.mjs` (`node scripts/generate-icons.mjs
+--check` fails the build if the committed registry disagrees with it); the
+Lucide notice ships beside it as `dist/icons/LUCIDE-LICENSE.txt`. Applications
+reference glyphs by name and never import an icon library (ADR 0005). Defaults:
+a 24px box, a 1.8px stroke, rounded caps, navy (`--text-primary`), decorative
+(`aria-hidden`).
+
+Fifteen names, in registry order. **Only `back` and `chevron` mirror in an RTL
+document**; the flag is declared per glyph and is never a per-use choice.
+
+| Names                                                                                     | Mirror | Released in    |
+| ----------------------------------------------------------------------------------------- | ------ | -------------- |
+| `back`, `chevron`                                                                         | yes    | `v0.3.0`       |
+| `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`, `star`            | no     | `v0.3.0`       |
+| `listing`, `folder`, `wallet`, `person` — the four BottomNav destinations (ADR 0005 §7.1) | no     | **unreleased** |
+
+**The four BottomNav names are on `main` and are in no tag yet.** They were
+admitted by owner ruling on 2026-10-20 for the Therapist app's bottom
+navigation (marketplace listing, clinical folder, wallet, person); an
+application pinned to `v0.3.1` does not have them and gets a compile error if
+it names one. They arrive with the next release tag. The public names are
+intents, not Lucide's, so a later swap of the glyph source keeps them.
+
 ## Tokens
 
 119 public tokens: 48 colour, 36 typography, 8 spacing, 5 radius, 3 elevation,

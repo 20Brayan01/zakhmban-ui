@@ -19,8 +19,8 @@ function render(props: IconProps): string {
   return renderToStaticMarkup(createElement(Icon, props));
 }
 
-/** The eleven approved names, in ADR 0005 §7's order. */
-const APPROVED: readonly IconName[] = [
+/** The eleven names ADR 0005 §7 originally admitted, in its order. */
+const ORIGINAL: readonly IconName[] = [
   "back",
   "chevron",
   "search",
@@ -34,11 +34,25 @@ const APPROVED: readonly IconName[] = [
   "star",
 ];
 
+/**
+ * The four names the 2026-10-20 owner ruling adds (ADR 0005 §7.1), in UX
+ * Specification §4.1's order: Ads, Records, Wallet, Profile.
+ */
+const BOTTOM_NAV: readonly IconName[] = [
+  "listing",
+  "folder",
+  "wallet",
+  "person",
+];
+
+/** All fifteen approved names, in registry order. */
+const APPROVED: readonly IconName[] = [...ORIGINAL, ...BOTTOM_NAV];
+
 /** v0.2 §5's mirror list, intersected with the inventory. */
 const MIRRORED: readonly IconName[] = ["back", "chevron"];
 
 describe("Icon · the approved inventory", () => {
-  it("is exactly the eleven approved names, in order", () => {
+  it("is exactly the fifteen approved names, in order", () => {
     expect(Object.keys(ICON_REGISTRY)).toEqual([...APPROVED]);
   });
 
@@ -52,15 +66,16 @@ describe("Icon · the approved inventory", () => {
     }
   });
 
-  it("admits no twelfth name, and no excluded one", () => {
+  it("admits no sixteenth name, and no excluded one", () => {
     // `clock` is the worked example: v0.2 §5 names it, no specified surface
     // consumes it, and ADR 0005 §7 excludes it on that second rule. It and
-    // the nine others must not have drifted in.
+    // the others must not have drifted in. `wallet` is no longer on this
+    // list: it was excluded by §7 and admitted by §7.1, whose BottomNav is
+    // the specified surface that consumes it.
     for (const excluded of [
       "clock",
       "forward",
       "lock",
-      "wallet",
       "shield",
       "phone",
       "undo",
@@ -68,7 +83,35 @@ describe("Icon · the approved inventory", () => {
     ]) {
       expect(Object.keys(ICON_REGISTRY)).not.toContain(excluded);
     }
-    expect(Object.keys(ICON_REGISTRY)).toHaveLength(11);
+    expect(Object.keys(ICON_REGISTRY)).toHaveLength(15);
+  });
+});
+
+describe("Icon · the BottomNav additions (ADR 0005 §7.1)", () => {
+  it("appends exactly the four destination glyphs after the original eleven", () => {
+    expect(Object.keys(ICON_REGISTRY).slice(ORIGINAL.length)).toEqual([
+      ...BOTTOM_NAV,
+    ]);
+  });
+
+  it("mirrors none of them — non-directional, and wallet is v0.2 §5's own example", () => {
+    // v0.2 §5 lists wallet among the glyphs that are never mirrored, and the
+    // other three carry no direction of travel. The flag is declared false on
+    // each entry rather than left to a default.
+    for (const name of BOTTOM_NAV) {
+      expect(ICON_REGISTRY[name].mirror, name).toBe(false);
+      expect(render({ name }), name).not.toContain("<g transform=");
+    }
+  });
+
+  it("renders each as a drawn glyph in the same box, stroke and colour as the rest", () => {
+    for (const name of BOTTOM_NAV) {
+      const markup = render({ name });
+      expect(markup, name).toContain('viewBox="0 0 24 24"');
+      expect(markup, name).toContain('stroke-width="1.8"');
+      expect(markup, name).toContain('stroke="var(--text-primary)"');
+      expect(markup, name).toMatch(/<(path|circle|line)\b/);
+    }
   });
 });
 
@@ -125,6 +168,29 @@ describe("Icon · colour", () => {
     expect(render({ name: "trash", color: "currentColor" })).toContain(
       'stroke="currentColor"',
     );
+  });
+
+  it("lets the colour prop govern every glyph — no entry paints itself", () => {
+    // Icon sets fill, stroke and stroke geometry once, on the root <svg>. A
+    // node that carried its own — upstream Lucide's `tag` has a
+    // `fill="currentColor"` dot — would take the inherited CSS colour instead
+    // of the `color` prop, and the glyph would split into two colours the
+    // moment a caller passes one. No registry entry may do that.
+    const PAINT = [
+      "fill",
+      "stroke",
+      "strokeWidth",
+      "strokeLinecap",
+      "strokeLinejoin",
+      "opacity",
+    ];
+    for (const [name, entry] of Object.entries(ICON_REGISTRY)) {
+      for (const [, attributes] of entry.nodes) {
+        for (const key of Object.keys(attributes)) {
+          expect(PAINT, `${name} carries its own ${key}`).not.toContain(key);
+        }
+      }
+    }
   });
 
   it("exposes no tone, state or variant prop", () => {
