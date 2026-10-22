@@ -13,8 +13,8 @@ string.
 **Foundation.** The package, its toolchain and its architecture guards are in
 place. Every capability allocated up to `v0.3.0` is implemented and
 **released as `v0.3.0`**. A patch, `v0.3.1`, is **released**: it masks phone
-digits in every digit script. A minor, `v0.4.0`, is **prepared, not released**:
-it adds the four BottomNav glyphs to `Icon`.
+digits in every digit script. A minor, `v0.4.0`, is **released**: it adds the
+four BottomNav glyphs to `Icon`.
 
 | Area                                                                     | State                                                                             |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -23,13 +23,14 @@ it adds the four BottomNav glyphs to `Icon`.
 | Validation helpers (root entry, ADR 0002)                                | shipped                                                                           |
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                 |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0` |
-| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **prepared as `v0.4.0`**          |
+| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**          |
 | The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`** (annotated tag)                                |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                              |
 
 **`v0.3.0` is released.** It carries `Icon` and the five primitives;
-`v0.3.1`, below, is — as of 2026-10-21 — the newest tag. **A consumer still
-pinned to `v0.2.0` receives neither `Icon` nor any of the five primitives**,
+`v0.3.1`, below, was the newest tag until `v0.4.0`, below it, which is the
+newest tag now. **A consumer still pinned to `v0.2.0` receives neither `Icon`
+nor any of the five primitives**,
 and keeps the `--control-height-button` token that `v0.3.0` retires — bumping
 is a breaking change; see
 [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
@@ -50,16 +51,19 @@ the earlier tags, **no GitHub Release object and no npm publication exists**.
 application that displays phone numbers through `maskPhoneDisplay` pins
 `v0.3.1`. `git ls-remote --tags origin` is the live answer to what exists.
 
-**`v0.4.0` is prepared, not released.** It is a minor: four names join the
-closed `IconName` union — `listing`, `folder`, `wallet` and `person`, the
-Therapist app's four BottomNav destinations, admitted by ADR 0005 §7.1. The
-change is additive; no existing name, signature, token or export changes. The
-manifest records `0.4.0`, and **a manifest version is not a release**: as of
-**2026-10-21 no `v0.4.0` tag exists**, and none will until the owner runs the
-Release workflow against a validated `main` SHA. **A consumer pinned to
-`v0.3.1` does not have the four names** and gets a compile error if it uses
-one, so an application that renders them pins `v0.4.0` once it exists.
-`git ls-remote --tags origin` is the live answer to whether `v0.4.0` exists.
+**`v0.4.0` is released.** It is a minor: four names join the closed
+`IconName` union — `listing`, `folder`, `wallet` and `person`, the Therapist
+app's four BottomNav destinations, admitted by ADR 0005 §7.1. The change is
+additive; no existing name, signature, token or export changes. It is an
+**annotated tag** (tag object `79a514acef5437995e73aaab28a02e47ad3b1dba`),
+created on 2026-10-22 by run #5 of the owner-triggered Release workflow and
+pointing at commit **`28f8a3c2d28857f32f717fe25d75714e45406dac`**; the run
+validated that commit before tagging, and `verify-created-tag` read the tag
+back from the remote and confirmed it is annotated and points at it. As with
+the earlier tags, **no GitHub Release object and no npm publication exists**.
+**A consumer still pinned to `v0.3.1` does not have the four names** and gets
+a compile error if it uses one, so an application that renders them pins
+`v0.4.0`. `git ls-remote --tags origin` is the live answer to what exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -124,13 +128,12 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.3.1` is the newest release** (`v0.4.0` is
-prepared but not yet tagged — see Status) and the tag the supported
-installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.4.0` is the newest release** and the tag
+the supported installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
-"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.1"
+"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.4.0"
 ```
 
 **Styles Foundation is released as `v0.2.0`.** It is an **annotated tag**,
@@ -173,14 +176,15 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. As verified read-only on **2026-10-19** at its
-  `main` `000645419cc6b1ef0f20131c2424d4a755e96f46` (the squash merge of its
-  pull request #25), it pins `github:20Brayan01/zakhmban-ui#v0.3.1`; its
-  lockfile resolves that pin to the `v0.3.1` tag object
-  `8d08989073d3fca3dfa68f9741d5553db22a9cf0`. It therefore receives the full
-  `./styles` surface, `Icon`, the five primitives and the `maskPhoneDisplay`
-  fix. Any later bump is a separate change in that repository, not part of
-  this package; its own `package.json` is the live answer.
+  Therapist application. As verified read-only on **2026-10-22** at its
+  `main` `2a375cd89536ebb4c9a9e95474187eb098e2efe7` (its pull request #27,
+  squash-merged as `1e18d72daf3e437b219433b6fea1a827727218b5`, moved the pin),
+  it pins `github:20Brayan01/zakhmban-ui#v0.4.0`; its lockfile resolves that
+  pin to the `v0.4.0` tag object `79a514acef5437995e73aaab28a02e47ad3b1dba`.
+  It therefore receives the full `./styles` surface, `Icon` with the four
+  BottomNav glyphs, the five primitives and the `maskPhoneDisplay` fix. Any
+  later bump is a separate change in that repository, not part of this
+  package; its own `package.json` is the live answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
   ecosystem**, not the Therapist consumer. Their Phase 1 design-system legacy
   annotations are **valid** and exist in **local, unpushed** documentation
@@ -198,8 +202,9 @@ Where the design values stand, precisely:
   their D-5 reduced-motion definitions. `v0.3.0` carries it unchanged.
 - **Icons, the five primitives and the overlay-root contract are implemented
   and released as `v0.3.0`.** `v0.3.1` carries them unchanged and masks phone
-  digits in every digit script. **The supported consumption path is a pin to
-  the annotated `v0.3.1` tag.**
+  digits in every digit script; `v0.4.0` adds the four BottomNav glyphs to
+  `Icon`. **The supported consumption path is a pin to the annotated `v0.4.0`
+  tag.**
 - The **Typography Alias Ruling** (2026-09-19) fixes each of the eight
   typography aliases as a **Semantic Typography Size Alias**, authored
   `--text-<step>: var(--text-<step>-size)`. It changed no identifier, no
@@ -223,22 +228,21 @@ in `docs/architecture/canonical-document-registry.md`.
 
 The package is installed as an external dependency pinned to an **exact git
 tag**, never a range, never `workspace:`, never `file:` or `link:`. The tag
-below is `v0.3.1`, the newest release, which carries the tokens, the Styles
-layer, `Icon` and the five primitives, and masks phone digits in every digit
-script. An application moving up from `v0.1.0` or `v0.2.0` must first apply
+below is `v0.4.0`, the newest release, which carries the tokens, the Styles
+layer, `Icon` with the four BottomNav glyphs and the five primitives, and masks
+phone digits in every digit script. An application moving up from `v0.1.0` or `v0.2.0` must first apply
 the [`v0.3.0` token migration](#breaking-token-change-in-v030). (`v0.2.0` is
 the Styles Foundation release; `v0.1.0` is the earlier Token Foundation
 release, whose `./styles` surface is token-only.) An application on `v0.3.0`
 moves to `v0.3.1` with no migration, and one that displays phone numbers
 through `maskPhoneDisplay` should, because `v0.3.0` does not mask Persian or
-Arabic-Indic digits. Until a `v0.4.0` tag exists, `v0.3.1` stays the newest
-existing tag and the pin below is unchanged; an application that renders the
-BottomNav glyphs (`listing`, `folder`, `wallet`, `person`) moves to `v0.4.0` as
-soon as it is tagged, because `v0.3.1` does not have them.
+Arabic-Indic digits. An application on `v0.3.1` moves to `v0.4.0` with no
+migration, and one that renders the BottomNav glyphs (`listing`, `folder`,
+`wallet`, `person`) must, because `v0.3.1` does not have them.
 
 ```jsonc
 "dependencies": {
-  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.3.1"
+  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.4.0"
 }
 ```
 
@@ -352,17 +356,16 @@ a 24px box, a 1.8px stroke, rounded caps, navy (`--text-primary`), decorative
 Fifteen names, in registry order. **Only `back` and `chevron` mirror in an RTL
 document**; the flag is declared per glyph and is never a per-use choice.
 
-| Names                                                                                     | Mirror | Released in    |
-| ----------------------------------------------------------------------------------------- | ------ | -------------- |
-| `back`, `chevron`                                                                         | yes    | `v0.3.0`       |
-| `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`, `star`            | no     | `v0.3.0`       |
-| `listing`, `folder`, `wallet`, `person` — the four BottomNav destinations (ADR 0005 §7.1) | no     | **unreleased** |
+| Names                                                                                     | Mirror | Released in |
+| ----------------------------------------------------------------------------------------- | ------ | ----------- |
+| `back`, `chevron`                                                                         | yes    | `v0.3.0`    |
+| `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`, `star`            | no     | `v0.3.0`    |
+| `listing`, `folder`, `wallet`, `person` — the four BottomNav destinations (ADR 0005 §7.1) | no     | `v0.4.0`    |
 
-**The four BottomNav names are on `main` and are in no tag yet.** They were
-admitted by owner ruling on 2026-10-20 for the Therapist app's bottom
-navigation (marketplace listing, clinical folder, wallet, person); an
-application pinned to `v0.3.1` does not have them and gets a compile error if
-it names one. They arrive with `v0.4.0`, which is prepared, not released. The
+**The four BottomNav names are released in `v0.4.0`.** They were admitted by
+owner ruling on 2026-10-20 for the Therapist app's bottom navigation
+(marketplace listing, clinical folder, wallet, person); an application pinned
+to `v0.3.1` does not have them and gets a compile error if it names one. The
 public names are intents, not Lucide's, so a later swap of the glyph source
 keeps them.
 
@@ -403,8 +406,8 @@ is unchanged.
 **Being in the source tree is not the same as being released.** Frozen §2.2
 and v0.2 §7.3 fix consumption at an **exact tag** — never a range, never
 `workspace:`, never `file:` or `link:`. **The supported way to consume the
-package is a pin to the annotated `v0.3.1` tag**, which points at commit
-`59684ff89ef6aed84eca92e4f3b1dcc8c0f86561`; `Icon` and the five primitives
+package is a pin to the annotated `v0.4.0` tag**, which points at commit
+`28f8a3c2d28857f32f717fe25d75714e45406dac`; `Icon` and the five primitives
 were first released by `v0.3.0` at `ae8dccd97765b5a308e91eba579dc47c5d43ec5e`,
 and the Styles layer by `v0.2.0` at
 `bd495bf493c519334a2525588d8d80edb0c6ac68`. A raw
