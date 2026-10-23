@@ -146,8 +146,10 @@ describe("OtpInput — controlled entry", () => {
     const onChange = vi.fn();
     render(<Host onChange={onChange} />);
     fireEvent.keyDown(cells()[0]!, { key: "a" });
-    fireEvent.keyDown(cells()[0]!, { key: "۵" });
+    fireEvent.keyDown(cells()[0]!, { key: "-" });
+    fireEvent.keyDown(cells()[0]!, { key: " " });
     expect(onChange).not.toHaveBeenCalled();
+    // A Persian digit is no longer refused: see "every Unicode decimal digit".
   });
 });
 
@@ -540,5 +542,440 @@ describe("OtpInput — RTL, focus and the §3 pass-through", () => {
       .getAllByRole("alert")
       .map((alert) => alert.getAttribute("id"));
     expect(ids[0]).not.toBe(ids[1]);
+  });
+});
+
+/**
+ * Every Unicode decimal digit is a digit — zakhmban-therapists CS-17.
+ *
+ * An Iranian keyboard produces Persian digits, and the primitive used to drop
+ * them silently, so those users could not enter a code. The owner ruling of
+ * 2026-10-23: accept every Unicode decimal digit, typed, pasted or autofilled,
+ * normalise it to the ASCII digit the primitive already emits, and behave as
+ * Latin input does.
+ *
+ * DISPLAY. The cells show the LATIN digit. UI System Specification v0.2 §5
+ * ("Mixed Persian / Latin") lists "OTP cells" among the technical values that
+ * "stay Latin and LTR", which the component's own header and `dir="ltr"`
+ * isolation already follow; §5's "Persian digits everywhere in product copy"
+ * governs copy, and a code cell is not copy. `toPersianDigits` is a display
+ * formatter for copy and is not applied here. The assertions below pin both
+ * halves: what is accepted, and what is shown and emitted.
+ */
+describe("OtpInput — every Unicode decimal digit", () => {
+  /** "12345" written with the digits whose zero is `zero`. */
+  const inScript = (ascii: string, zero: number): string =>
+    [...ascii]
+      .map((digit) => String.fromCodePoint(zero + Number(digit)))
+      .join("");
+
+  const PERSIAN = 0x06f0;
+  const ARABIC_INDIC = 0x0660;
+  const DEVANAGARI = 0x0966;
+  const FULLWIDTH = 0xff10;
+  const MATH_BOLD = 0x1d7ce;
+
+  const paste = (cell: HTMLInputElement, text: string): void => {
+    fireEvent.paste(cell, { clipboardData: { getData: () => text } });
+  };
+
+  const type = (text: string): void => {
+    for (const key of text) {
+      fireEvent.keyDown(document.activeElement!, { key });
+    }
+  };
+
+  describe("typed", () => {
+    it.each([
+      ["Persian", PERSIAN],
+      ["Arabic-Indic", ARABIC_INDIC],
+      ["Devanagari", DEVANAGARI],
+      ["fullwidth", FULLWIDTH],
+      ["Mathematical bold", MATH_BOLD],
+    ])("accepts %s digits keystroke by keystroke", (_name, zero) => {
+      const onChange = vi.fn();
+      const onComplete = vi.fn();
+      render(<Host onChange={onChange} onComplete={onComplete} />);
+      cells()[0]!.focus();
+      type(inScript("13579", zero));
+      expect(onChange).toHaveBeenLastCalledWith("13579");
+      expect(onChange).toHaveBeenCalledTimes(5);
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(onComplete).toHaveBeenCalledWith("13579");
+    });
+
+    it("accepts the three scripts mixed within one code", () => {
+      const onComplete = vi.fn();
+      render(<Host onComplete={onComplete} />);
+      cells()[0]!.focus();
+      type("1" + "۲" + "٣" + "4" + "۵");
+      expect(onComplete).toHaveBeenCalledWith("12345");
+    });
+
+    it("maps every digit value, 0 to 9, to the same ASCII digit in each script", () => {
+      for (const zero of [PERSIAN, ARABIC_INDIC]) {
+        const onChange = vi.fn();
+        const { unmount } = render(<Host length={10} onChange={onChange} />);
+        cells()[0]!.focus();
+        type(inScript("0123456789", zero));
+        expect(onChange).toHaveBeenLastCalledWith("0123456789");
+        unmount();
+      }
+    });
+
+    it("advances focus after a Persian digit exactly as after a Latin one", () => {
+      render(<Host />);
+      cells()[0]!.focus();
+      fireEvent.keyDown(document.activeElement!, { key: "۱" });
+      expect(document.activeElement).toBe(cells()[1]);
+      fireEvent.keyDown(document.activeElement!, { key: "٢" });
+      expect(document.activeElement).toBe(cells()[2]);
+    });
+
+    it("replaces a filled cell with a Persian digit rather than appending", () => {
+      const onChange = vi.fn();
+      render(<Host initial="12345" onChange={onChange} />);
+      fireEvent.keyDown(cells()[2]!, { key: "۹" });
+      expect(onChange).toHaveBeenLastCalledWith("12945");
+    });
+
+    it("accepts a Persian digit arriving through the change event", () => {
+      // The path an IME or virtual keyboard that reports no usable `key`
+      // takes: the keydown carries nothing, the digit arrives in the value.
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      fireEvent.change(cells()[0]!, { target: { value: "۷" } });
+      expect(onChange).toHaveBeenLastCalledWith("7");
+      expect(document.activeElement).toBe(cells()[1]);
+    });
+  });
+
+  describe("pasted", () => {
+    it.each([
+      ["Persian", PERSIAN],
+      ["Arabic-Indic", ARABIC_INDIC],
+      ["Devanagari", DEVANAGARI],
+      ["fullwidth", FULLWIDTH],
+      ["Mathematical bold", MATH_BOLD],
+    ])("fills every cell from %s digits", (_name, zero) => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, inScript("24680", zero));
+      expect(onChange).toHaveBeenLastCalledWith("24680");
+    });
+
+    it("fills from a mixed-script paste", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, "1۲٣4۵");
+      expect(onChange).toHaveBeenLastCalledWith("12345");
+    });
+
+    it("fills from whichever cell received it", () => {
+      const onChange = vi.fn();
+      render(<Host initial="12" onChange={onChange} />);
+      paste(cells()[2]!, "۳۴۵");
+      expect(onChange).toHaveBeenLastCalledWith("12345");
+    });
+
+    it("truncates a Persian paste longer than the remaining cells", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, "۱۲۳۴۵۶۷۸۹");
+      expect(onChange).toHaveBeenLastCalledWith("12345");
+    });
+
+    it("strips separators and invisible marks copied with a Persian code", () => {
+      // A code copied out of a Persian SMS arrives with spaces, hyphens and
+      // the direction marks a bidi renderer adds around it.
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, "‏۱۲۳‌-‎۴۵ ");
+      expect(onChange).toHaveBeenLastCalledWith("12345");
+    });
+
+    it("completes once when the paste fills the row", () => {
+      const onComplete = vi.fn();
+      render(<Host onComplete={onComplete} />);
+      paste(cells()[0]!, "۱۲۳۴۵");
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(onComplete).toHaveBeenCalledWith("12345");
+    });
+  });
+
+  describe("autofilled", () => {
+    it.each([
+      ["Persian", PERSIAN],
+      ["Arabic-Indic", ARABIC_INDIC],
+    ])("spreads a whole %s code arriving as one insertion", (_name, zero) => {
+      // `one-time-code` autofill delivers the code as one multi-character
+      // change on the first cell.
+      const onChange = vi.fn();
+      const onComplete = vi.fn();
+      render(<Host onChange={onChange} onComplete={onComplete} />);
+      fireEvent.change(cells()[0]!, {
+        target: { value: inScript("24680", zero) },
+      });
+      expect(onChange).toHaveBeenLastCalledWith("24680");
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(onComplete).toHaveBeenCalledWith("24680");
+    });
+
+    it("spreads a mixed-script insertion", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      fireEvent.change(cells()[0]!, { target: { value: "2۴٦8۰" } });
+      expect(onChange).toHaveBeenLastCalledWith("24680");
+    });
+  });
+
+  describe("shown and emitted as Latin", () => {
+    // §5: OTP cells are Latin technical values.
+    it("shows a Latin digit in the cell however the digit was typed", () => {
+      render(<Host />);
+      cells()[0]!.focus();
+      type("۱٢3۴");
+      expect(cells().map((c) => c.value)).toEqual(["1", "2", "3", "4", ""]);
+      for (const cell of cells()) {
+        expect(cell.value).toMatch(/^[0-9]?$/);
+      }
+    });
+
+    it("shows a Latin digit after a paste or an autofill", () => {
+      render(<Host />);
+      paste(cells()[0]!, "۱۲۳۴۵");
+      expect(cells().map((c) => c.value)).toEqual(["1", "2", "3", "4", "5"]);
+    });
+
+    it("shows a Latin digit when a rejecting parent leaves the old value", () => {
+      // The DOM must not be left holding the character the user typed.
+      render(<OtpInput value="5" onChange={() => {}} />);
+      fireEvent.change(cells()[0]!, { target: { value: "۵" } });
+      expect(cells()[0]!.value).toBe("5");
+    });
+
+    it("emits only ASCII digits, whatever script went in", () => {
+      const seen: string[] = [];
+      render(<Host onChange={(value) => seen.push(value)} />);
+      cells()[0]!.focus();
+      type("۱٢3");
+      paste(cells()[3]!, "۴۵");
+      expect(seen.length).toBeGreaterThan(0);
+      for (const value of seen) {
+        expect(value).toMatch(/^[0-9]*$/);
+      }
+    });
+
+    it("renders a `value` held in any digit script as Latin digits", () => {
+      const { rerender } = render(<OtpInput value="۱۲۳" onChange={() => {}} />);
+      expect(cells().map((c) => c.value)).toEqual(["1", "2", "3", "", ""]);
+      rerender(<OtpInput value="٤٥٦٧٨" onChange={() => {}} />);
+      expect(cells().map((c) => c.value)).toEqual(["4", "5", "6", "7", "8"]);
+      rerender(<OtpInput value="1۲٣x4۵" onChange={() => {}} />);
+      expect(cells().map((c) => c.value)).toEqual(["1", "2", "3", "4", "5"]);
+    });
+
+    it("fires onComplete for a `value` that is complete in a non-Latin script", () => {
+      const onComplete = vi.fn();
+      render(
+        <OtpInput value="۱۲۳۴۵" onChange={() => {}} onComplete={onComplete} />,
+      );
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(onComplete).toHaveBeenCalledWith("12345");
+    });
+  });
+
+  describe("behaves identically to Latin input", () => {
+    /**
+     * One scripted session — type, delete, step, paste, retype — driven once
+     * in each script. The reports, the completion calls, the cell contents and
+     * the focus position after every step must match step for step: if a
+     * Persian digit took any path a Latin one does not, they diverge here.
+     */
+    function session(script: (ascii: string) => string) {
+      const reports: string[] = [];
+      const completes: string[] = [];
+      const snapshots: string[] = [];
+      const focus: number[] = [];
+      const { unmount } = render(
+        <Host
+          onChange={(value) => reports.push(value)}
+          onComplete={(value) => completes.push(value)}
+        />,
+      );
+      const snap = (): void => {
+        snapshots.push(
+          cells()
+            .map((c) => c.value)
+            .join("|"),
+        );
+        focus.push(cells().indexOf(document.activeElement as HTMLInputElement));
+      };
+
+      cells()[0]!.focus();
+      for (const digit of script("123")) {
+        fireEvent.keyDown(document.activeElement!, { key: digit });
+        snap();
+      }
+      fireEvent.keyDown(document.activeElement!, { key: "Backspace" });
+      snap();
+      fireEvent.keyDown(cells()[0]!, { key: "Delete" });
+      snap();
+      fireEvent.keyDown(cells()[1]!, { key: "ArrowLeft" });
+      snap();
+      paste(cells()[2]!, script("789"));
+      snap();
+      fireEvent.change(cells()[0]!, { target: { value: script("9") } });
+      snap();
+      paste(cells()[0]!, script("55555"));
+      snap();
+      fireEvent.keyDown(cells()[4]!, { key: "Backspace" });
+      snap();
+      fireEvent.keyDown(cells()[4]!, { key: script("1") });
+      snap();
+
+      unmount();
+      return { reports, completes, snapshots, focus };
+    }
+
+    it.each([
+      ["Persian", PERSIAN],
+      ["Arabic-Indic", ARABIC_INDIC],
+    ])("%s digits trace the same session as ASCII digits", (_name, zero) => {
+      const latin = session((ascii) => ascii);
+      const other = session((ascii) => inScript(ascii, zero));
+      expect(latin.reports.length).toBeGreaterThan(5);
+      expect(latin.completes.length).toBeGreaterThan(0);
+      expect(other).toEqual(latin);
+    });
+
+    it("a mixed-script session traces the same as ASCII too", () => {
+      const mixed = (ascii: string): string =>
+        [...ascii]
+          .map((digit, index) =>
+            String.fromCodePoint(
+              [0x30, PERSIAN, ARABIC_INDIC][index % 3]! + Number(digit),
+            ),
+          )
+          .join("");
+      expect(session(mixed)).toEqual(session((ascii) => ascii));
+    });
+  });
+
+  describe("non-digits are still rejected", () => {
+    // None of these is a decimal digit (not Unicode category Nd), though
+    // several look like one or sit beside one in the same block.
+    const NON_DIGITS = [
+      "a",
+      "Z",
+      "e",
+      "-",
+      " ",
+      "٫", // ARABIC DECIMAL SEPARATOR
+      "٬", // ARABIC THOUSANDS SEPARATOR
+      "²", // SUPERSCRIPT TWO (No)
+      "①", // CIRCLED DIGIT ONE (No)
+      "½", // VULGAR FRACTION ONE HALF (No)
+      "Ⅷ", // ROMAN NUMERAL EIGHT (Nl)
+      "一", // CJK NUMERAL ONE (Lo)
+      "‌", // ZWNJ
+      "‏", // RIGHT-TO-LEFT MARK
+    ];
+
+    it.each(NON_DIGITS.map((character) => [character]))(
+      "refuses %j as a keystroke",
+      (character) => {
+        const onChange = vi.fn();
+        render(<Host onChange={onChange} />);
+        fireEvent.keyDown(cells()[0]!, { key: character });
+        expect(onChange).not.toHaveBeenCalled();
+      },
+    );
+
+    it("fills nothing from a paste that contains no digit", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, NON_DIGITS.join(""));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("fills nothing from an insertion that contains no digit", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      fireEvent.change(cells()[0]!, { target: { value: "ab٫²" } });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("keeps the digits and drops the rest of a mixed paste", () => {
+      const onChange = vi.fn();
+      render(<Host onChange={onChange} />);
+      paste(cells()[0]!, "۱a۲²٣①4٫۵");
+      expect(onChange).toHaveBeenLastCalledWith("12345");
+    });
+
+    it("renders no digit for a `value` made only of non-digits", () => {
+      render(<OtpInput value="a٫²①-" onChange={() => {}} />);
+      expect(cells().map((c) => c.value)).toEqual(["", "", "", "", ""]);
+    });
+  });
+
+  describe("the digit-to-value rule holds across the whole code space", () => {
+    // `asciiDigit` derives a digit's value from its position in a run of
+    // consecutive decimal-digit code points. That is a property of the
+    // Unicode this runtime ships, so it is checked rather than assumed.
+    const runs: { start: number; length: number }[] = [];
+    const isDigit = /^\p{Nd}$/u;
+    let open: { start: number; length: number } | null = null;
+    for (let code = 0; code <= 0x10ffff; code += 1) {
+      if (isDigit.test(String.fromCodePoint(code))) {
+        if (open === null) {
+          open = { start: code, length: 0 };
+        }
+        open.length += 1;
+      } else if (open !== null) {
+        runs.push(open);
+        open = null;
+      }
+    }
+
+    it("finds the scripts the product depends on", () => {
+      const starts = runs.map((run) => run.start);
+      for (const zero of [0x30, ARABIC_INDIC, PERSIAN, DEVANAGARI, FULLWIDTH]) {
+        expect(starts, `U+${zero.toString(16)}`).toContain(zero);
+      }
+    });
+
+    it("has only runs that are a whole number of tens", () => {
+      expect(runs.length).toBeGreaterThan(40);
+      for (const run of runs) {
+        expect(
+          run.length % 10,
+          `run at U+${run.start.toString(16)} has ${run.length} digits`,
+        ).toBe(0);
+      }
+    });
+
+    it("maps every block of ten, wherever it sits, to 0123456789", () => {
+      let blocks = 0;
+      for (const run of runs) {
+        for (let at = run.start; at < run.start + run.length; at += 10) {
+          const block = Array.from({ length: 10 }, (_, i) =>
+            String.fromCodePoint(at + i),
+          ).join("");
+          const { unmount } = render(
+            <OtpInput length={10} value={block} onChange={() => {}} />,
+          );
+          expect(
+            cells()
+              .map((c) => c.value)
+              .join(""),
+            `block at U+${at.toString(16)}`,
+          ).toBe("0123456789");
+          unmount();
+          blocks += 1;
+        }
+      }
+      expect(blocks).toBeGreaterThan(60);
+    });
   });
 });

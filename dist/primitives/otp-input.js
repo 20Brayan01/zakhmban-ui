@@ -41,11 +41,21 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *     there is no single element whose event means "the code changed", so a
  *     value callback is the only coherent shape. `TextField` and `Select`
  *     use native handlers for the opposite reason: each wraps one control.
- *   - cells accept ASCII digits only. §5 classifies OTP cells as Latin
- *     technical values, so storing a Persian digit would put a non-Latin
- *     character into a value the application compares against a code, and
- *     silently transliterating one would be a value transformation nobody
- *     approved.
+ *   - cells accept every Unicode decimal digit (`\p{Nd}`) — ASCII, Persian
+ *     (`۰`–`۹`), Arabic-Indic (`٠`–`٩`) and any other script, alone or mixed
+ *     — typed, pasted or autofilled, and hold the ASCII digit of the same
+ *     value. §5 classifies OTP cells as Latin technical values, so a cell
+ *     SHOWS a Latin digit and `onChange` / `onComplete` carry Latin digits,
+ *     which is what the application compares against a code. Iranian
+ *     keyboards produce Persian digits, and refusing them left those users
+ *     unable to enter a code (zakhmban-therapists CS-17); the owner ruling
+ *     of 2026-10-23 replaces this file's earlier choice of ASCII only, which
+ *     had called the transliteration "a value transformation nobody
+ *     approved". Characters that are not decimal digits (`²`, `①`, `٫`,
+ *     letters, separators) are still refused, and a paste or autofill is
+ *     filtered, not rejected, as it always was. The same normalisation
+ *     reads the `value` prop, so a code held in any digit script renders in
+ *     the cells rather than as empty ones.
  *   - `autocomplete="one-time-code"` sits on the FIRST cell. Platforms fill
  *     the first field carrying it, delivering the whole code at once, and
  *     the change handler spreads a multi-character insertion across the
@@ -69,9 +79,47 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  * None of those is a public contract, and each can change without a ruling.
  */
 import { useEffect, useId, useRef, } from "react";
-/** §5: OTP cells are Latin technical values. */
-const DIGIT = /[0-9]/;
-const NON_DIGITS = /[^0-9]/g;
+/**
+ * A decimal digit in any script, one code point. The same class `maskPhoneDisplay`
+ * counts as a digit (`\p{Nd}`), so a digit form nobody listed is accepted
+ * rather than silently dropped.
+ */
+const DECIMAL_DIGIT = /^\p{Nd}$/u;
+/**
+ * The ASCII digit with the same value as `char`, a single decimal digit.
+ *
+ * Unicode lays every decimal-digit script out as a run of consecutive code
+ * points beginning at its zero, and a run is always a multiple of ten long
+ * (the Mathematical digits are five runs back to back). So the value is the
+ * distance from the start of the run, modulo ten, and no per-script table
+ * exists to fall out of date. `tests/primitives/otp-input.test.tsx` asserts
+ * both facts across the whole code space for the Unicode this runtime ships.
+ */
+function asciiDigit(char) {
+    const code = char.codePointAt(0) ?? 0;
+    if (code >= 0x30 && code <= 0x39) {
+        return char;
+    }
+    let offset = 0;
+    while (DECIMAL_DIGIT.test(String.fromCodePoint(code - offset - 1))) {
+        offset += 1;
+    }
+    return String(offset % 10);
+}
+/**
+ * Every decimal digit of `text`, in order, as ASCII; everything else dropped.
+ * §5: OTP cells are Latin technical values, so this is where a Persian or
+ * Arabic-Indic digit becomes the Latin one the primitive has always emitted.
+ */
+function digitsOf(text) {
+    let digits = "";
+    for (const char of text) {
+        if (DECIMAL_DIGIT.test(char)) {
+            digits += asciiDigit(char);
+        }
+    }
+    return digits;
+}
 /** §3.2: "Five-cell code entry". */
 const DEFAULT_LENGTH = 5;
 export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComplete, error, className, style, ref, id, ...rest }) {
@@ -82,7 +130,7 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
     /** The last complete code `onComplete` was called for, so it fires once. */
     const announced = useRef(null);
     const invalid = typeof error === "string" && error.length > 0;
-    const digits = value.replace(NON_DIGITS, "").slice(0, length);
+    const digits = digitsOf(value).slice(0, length);
     const complete = digits.length === length && length > 0;
     /**
      * The last value this component reported, held across a synchronous burst
@@ -161,7 +209,7 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
     const commit = (next, at) => {
         const code = current();
         const start = Math.min(at, code.length);
-        const incoming = next.replace(NON_DIGITS, "").slice(0, length - start);
+        const incoming = digitsOf(next).slice(0, length - start);
         if (incoming === "") {
             return;
         }
@@ -236,7 +284,7 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
                 /* Single digits are handled here rather than in the change
                    handler, so typing over a filled cell replaces it instead of
                    appending to it. */
-                if (event.key.length === 1 && DIGIT.test(event.key)) {
+                if (DECIMAL_DIGIT.test(event.key)) {
                     event.preventDefault();
                     commit(event.key, index);
                 }
