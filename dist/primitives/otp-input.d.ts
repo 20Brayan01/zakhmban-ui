@@ -40,11 +40,21 @@
  *     there is no single element whose event means "the code changed", so a
  *     value callback is the only coherent shape. `TextField` and `Select`
  *     use native handlers for the opposite reason: each wraps one control.
- *   - cells accept ASCII digits only. §5 classifies OTP cells as Latin
- *     technical values, so storing a Persian digit would put a non-Latin
- *     character into a value the application compares against a code, and
- *     silently transliterating one would be a value transformation nobody
- *     approved.
+ *   - cells accept every Unicode decimal digit (`\p{Nd}`) — ASCII, Persian
+ *     (`۰`–`۹`), Arabic-Indic (`٠`–`٩`) and any other script, alone or mixed
+ *     — typed, pasted or autofilled, and hold the ASCII digit of the same
+ *     value. §5 classifies OTP cells as Latin technical values, so a cell
+ *     SHOWS a Latin digit and `onChange` / `onComplete` carry Latin digits,
+ *     which is what the application compares against a code. Iranian
+ *     keyboards produce Persian digits, and refusing them left those users
+ *     unable to enter a code (zakhmban-therapists CS-17); the owner ruling
+ *     of 2026-10-23 replaces this file's earlier choice of ASCII only, which
+ *     had called the transliteration "a value transformation nobody
+ *     approved". Characters that are not decimal digits (`²`, `①`, `٫`,
+ *     letters, separators) are still refused, and a paste or autofill is
+ *     filtered, not rejected, as it always was. The same normalisation
+ *     reads the `value` prop, so a code held in any digit script renders in
+ *     the cells rather than as empty ones.
  *   - `autocomplete="one-time-code"` sits on the FIRST cell. Platforms fill
  *     the first field carrying it, delivering the whole code at once, and
  *     the change handler spreads a multi-character insertion across the
