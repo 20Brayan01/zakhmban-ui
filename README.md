@@ -14,7 +14,8 @@ string.
 place. Every capability allocated up to `v0.3.0` is implemented and
 **released as `v0.3.0`**. A patch, `v0.3.1`, is **released**: it masks phone
 digits in every digit script. A minor, `v0.4.0`, is **released**: it adds the
-four BottomNav glyphs to `Icon`.
+four BottomNav glyphs to `Icon`. A patch, `v0.4.1`, is **prepared, not
+released**: `OtpInput` accepts Persian and Arabic-Indic digits.
 
 | Area                                                                     | State                                                                             |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -24,16 +25,15 @@ four BottomNav glyphs to `Icon`.
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                 |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0` |
 | Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**          |
-| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`** (annotated tag)                                |
+| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`**; `OtpInput` digit fix **prepared as `v0.4.1`** |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                              |
 
 **`v0.3.0` is released.** It carries `Icon` and the five primitives;
-`v0.3.1`, below, was the newest tag until `v0.4.0`, below it, which is the
-newest tag now. **A consumer still pinned to `v0.2.0` receives neither `Icon`
-nor any of the five primitives**,
-and keeps the `--control-height-button` token that `v0.3.0` retires — bumping
-is a breaking change; see
-[Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
+`v0.3.1`, below, was the newest tag until `v0.4.0`, below it, which is — as of
+2026-10-23 — the newest tag. **A consumer still pinned to `v0.2.0` receives
+neither `Icon` nor any of the five primitives**, and keeps the
+`--control-height-button` token that `v0.3.0` retires — bumping is a breaking
+change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
 `git ls-remote --tags origin` is the live answer to what exists.
 
 **`v0.3.1` is released.** It is a patch: `maskPhoneDisplay` now masks phone
@@ -64,6 +64,20 @@ the earlier tags, **no GitHub Release object and no npm publication exists**.
 **A consumer still pinned to `v0.3.1` does not have the four names** and gets
 a compile error if it uses one, so an application that renders them pins
 `v0.4.0`. `git ls-remote --tags origin` is the live answer to what exists.
+
+**`v0.4.1` is prepared, not released.** It is a patch: `OtpInput` now accepts
+every Unicode decimal digit — ASCII, Persian, Arabic-Indic and any other
+script, typed, pasted or autofilled — and normalises it to the Latin digit it
+has always emitted, where `v0.4.0` silently dropped Persian and Arabic-Indic
+digits, so a user on a Persian keyboard could not enter a code. The cells keep
+showing Latin digits, characters that are not decimal digits are still
+refused, and no prop, signature, export or style changes. The manifest records
+`0.4.1`, and **a manifest version is not a release**: as of **2026-10-23 no
+`v0.4.1` tag exists**, and none will until the owner runs the Release workflow
+against a validated `main` SHA. **A consumer pinned to `v0.4.0` keeps the
+dropped digits**, so an application whose users type a one-time code into
+`OtpInput` pins `v0.4.1` once it exists. `git ls-remote --tags origin` is the
+live answer to whether `v0.4.1` exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -128,8 +142,9 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.4.0` is the newest release** and the tag
-the supported installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.4.0` is the newest release** (`v0.4.1` is
+prepared but not yet tagged — see Status) and the tag the supported
+installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
@@ -238,7 +253,11 @@ moves to `v0.3.1` with no migration, and one that displays phone numbers
 through `maskPhoneDisplay` should, because `v0.3.0` does not mask Persian or
 Arabic-Indic digits. An application on `v0.3.1` moves to `v0.4.0` with no
 migration, and one that renders the BottomNav glyphs (`listing`, `folder`,
-`wallet`, `person`) must, because `v0.3.1` does not have them.
+`wallet`, `person`) must, because `v0.3.1` does not have them. Until a `v0.4.1`
+tag exists, `v0.4.0` stays the newest existing tag and the pin below is
+unchanged; an application that takes a one-time code through `OtpInput` moves
+to `v0.4.1` as soon as it is tagged, because `v0.4.0` does not accept Persian
+or Arabic-Indic digits.
 
 ```jsonc
 "dependencies": {
