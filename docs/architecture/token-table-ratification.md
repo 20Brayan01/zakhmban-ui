@@ -8693,3 +8693,52 @@ identifier, add a dependency or a subpath, bump the version, tag or release, or
 touch `zakhmban-therapists` or `zakhmban-api-client`. **Token Foundation is now
 125 public tokens, 39 internal properties and one role without an approved
 literal (`--radius-pill`).**
+
+---
+
+## OWNER RULINGS ON PULL REQUEST #44 AND v0.5.0 RELEASE PREPARATION — 2026-10-25
+
+**Status:** approved by the owner. **Governs:** how two of the additions
+recorded in the Owner Decision of the same date may be used, and the scope of
+the v0.5.0 release-preparation change. **Supersedes in v0.2:** nothing.
+**Release state:** none. The manifest reads `0.5.0`; no tag, release or
+publication exists.
+
+**Source.** The owner's instruction for the v0.5.0 release preparation, which
+states the first two rulings as posted on pull request #44 (merged as
+`fe209b9134d3d0376b8b6f71e3a497a3f8199736`). They are recorded here because this
+document is where the repository records rulings.
+
+### The rulings
+
+1. **`Button fill="brand"` stays an opt-in.** It remains documented with its
+   **3.94:1** contrast against white text at rest (`#3c9220`; hover 5.00:1 and
+   press 5.59:1 pass). **The Therapist application keeps the default primary
+   green** — it does not use `fill="brand"`. The `--action-green-brand-*`
+   tokens are therefore read by no first-party consumer today.
+2. **`--text-tertiary` (3.19:1) is for non-essential text only** — decorative
+   or disabled. It is **never** for text a user must read. Readable
+   de-emphasis stays `--text-secondary`. This tightens the "Two properties the
+   owner should know" note of the Owner Decision above, which left such a use
+   to the consumer; it creates no token and changes no value.
+3. **Release preparation only.** The v0.5.0 preparation change bumps
+   `package.json` from `0.4.1` to `0.5.0`, records the release state in the
+   README, and records these rulings. It makes **no code, token, icon or
+   behaviour change**; `src/`, `dist/`, `scripts/` and `tests/` are untouched.
+
+### Where the restrictions are stated
+
+The README's "Opt-in additions for the Therapist design" section and its
+"Additive tokens in `v0.5.0`" table (each token's note), and the ADR 0003
+amendment of 2026-10-25. The in-source comments on `--text-tertiary` and on
+`ButtonFill` predate these rulings and carry the contrast figures but not the
+restrictions; editing them would change `src/` and the generated `dist/`, so it
+is outside a release-preparation change and is left to a later decision.
+
+### What this record does not do
+
+Change any token, value, count, icon, export or artifact, un-retire
+`--text-muted`, tag, release or publish, change `zakhmban-therapists` or
+`zakhmban-api-client`, or update the README's statement of which version the
+Therapist application pins — that statement is re-verified read-only in the
+post-release documentation pull request, as for `v0.4.0` and `v0.4.1`.

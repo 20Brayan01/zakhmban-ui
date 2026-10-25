@@ -1107,8 +1107,23 @@ token source of truth. `--radius-pill` stays unimplemented. The count tests
 and `tests/architecture/additive-v0-5-0.test.ts` holds the 119 `v0.4.1` values
 independently, so a changed value fails there.
 
+**Owner rulings on pull request #44, recorded 2026-10-25.** They bound how two
+of these tokens are used, and they change no token, value or count. (1)
+`--text-tertiary` (3.19:1 on white) is for **non-essential text only —
+decorative or disabled — and never for text a user must read**; the sentence
+above that leaves such a use to the consumer's own accessibility decision is
+tightened accordingly, and readable de-emphasis remains `--text-secondary`. (2)
+`--action-green-brand-rest`, `-hover` and `-press` are read only by the opt-in
+`Button fill="brand"`, which stays an opt-in documented with its **3.94:1**
+contrast with white text at rest; **the Therapist application keeps the default
+primary green** and does not use it. The ruling is recorded in full in the
+[Token Table](../architecture/token-table-ratification.md).
+
 **Not a release.** The version stays `0.4.1`; the version bump, the tag and the
-release are separate steps.
+release are separate steps. *Dated supersession marker, 2026-10-25 (v0.5.0
+release preparation):* the manifest now reads `0.5.0`. That is the version bump
+this paragraph deferred and nothing more — no tag or release exists, and the
+amendment above is unchanged.
 
 ## Sources
 

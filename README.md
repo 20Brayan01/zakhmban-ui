@@ -15,25 +15,27 @@ place. Every capability allocated up to `v0.3.0` is implemented and
 **released as `v0.3.0`**. A patch, `v0.3.1`, is **released**: it masks phone
 digits in every digit script. A minor, `v0.4.0`, is **released**: it adds the
 four BottomNav glyphs to `Icon`. A patch, `v0.4.1`, is **released**:
-`OtpInput` accepts Persian and Arabic-Indic digits.
+`OtpInput` accepts Persian and Arabic-Indic digits. A minor, `v0.5.0`, is
+**prepared, not released**: the Therapist design's additive tokens, two opt-in
+primitive options and four icon names.
 
-| Area                                                                     | State                                                                             |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                          |
-| Formatting utilities (`./utils/format`)                                  | shipped — `maskPhoneDisplay` digit fix **released as `v0.3.1`** (annotated tag)   |
-| Validation helpers (root entry, ADR 0002)                                | shipped                                                                           |
-| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                 |
-| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0` |
-| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**          |
-| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`**; `OtpInput` digit fix **released as `v0.4.1`** |
-| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                              |
+| Area                                                                     | State                                                                                                                          |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Package, TypeScript, ESLint, Prettier, Vitest, build, dist verification  | in place                                                                                                                       |
+| Formatting utilities (`./utils/format`)                                  | shipped — `maskPhoneDisplay` digit fix **released as `v0.3.1`** (annotated tag)                                                |
+| Validation helpers (root entry, ADR 0002)                                | shipped                                                                                                                        |
+| Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                                                              |
+| Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0`                                              |
+| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**; four more **prepared as `v0.5.0`**                   |
+| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`**; `OtpInput` digit fix **released as `v0.4.1`**; two opt-in options **prepared as `v0.5.0`** |
+| Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                                                                           |
 
 **`v0.3.0` is released.** It carries `Icon` and the five primitives;
 `v0.3.1` and `v0.4.0`, below, were each the newest tag in turn; `v0.4.1`,
-below them, is the newest tag now. **A consumer still pinned to `v0.2.0`
-receives neither `Icon` nor any of the five primitives**, and keeps the
-`--control-height-button` token that `v0.3.0` retires — bumping is a breaking
-change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
+below them, is — as of 2026-10-25 — the newest tag. **A consumer still
+pinned to `v0.2.0` receives neither `Icon` nor any of the five primitives**,
+and keeps the `--control-height-button` token that `v0.3.0` retires — bumping
+is a breaking change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
 `git ls-remote --tags origin` is the live answer to what exists.
 
 **`v0.3.1` is released.** It is a patch: `maskPhoneDisplay` now masks phone
@@ -81,6 +83,28 @@ GitHub Release object and no npm publication exists**. **A consumer still
 pinned to `v0.4.0` drops those digits**, so an application whose users type a
 one-time code into `OtpInput` pins `v0.4.1`. `git ls-remote --tags origin` is
 the live answer to what exists.
+
+**`v0.5.0` is prepared, not released.** It is a minor, and it is additive: it
+adds what the Therapist design needs and the library could not produce, and
+changes nothing that renders today. Six public tokens take the set from 119 to
+125 — `--text-tertiary`, `--action-green-brand-rest`, `-hover` and `-press`,
+`--control-width-otp-cell` and `--control-height-otp-cell`; `Button` takes an
+opt-in `fill="brand"`; `OtpInput` takes an opt-in `appearance="filled"`; and
+four names join the closed `IconName` union — `smartphone`, `monitor`, `feed`
+and `folder-open`. Omit the new props and the output is byte-for-byte what
+`v0.4.1` rendered. The merged content is pull request #44 (owner decision of
+2026-10-25); this change only bumps the manifest to `0.5.0` and records the
+release state. Two owner rulings bound how the additions are used and are
+stated where each is documented: the Therapist application keeps the default
+primary green and does not use `Button fill="brand"`, and `--text-tertiary`
+(3.19:1) is for non-essential text only — never for text a user must read. The
+manifest records `0.5.0`, and **a manifest version is not a release**: as of
+**2026-10-25 no `v0.5.0` tag exists**, and none will until the owner runs the
+Release workflow against a validated `main` SHA. **A consumer pinned to
+`v0.4.1` does not have the new tokens, options or names** and gets a compile
+error if it uses one, so an application that uses them pins `v0.5.0` once it
+exists. `git ls-remote --tags origin` is the live answer to whether `v0.5.0`
+exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
 request #7. The final implementation audit closed both blocking findings —
@@ -145,8 +169,9 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.4.1` is the newest release** and the tag
-the supported installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.4.1` is the newest release** (`v0.5.0` is
+prepared but not yet tagged — see Status) and the tag the supported
+installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
@@ -261,7 +286,11 @@ migration, and one that renders the BottomNav glyphs (`listing`, `folder`,
 `wallet`, `person`) must, because `v0.3.1` does not have them. An application
 on `v0.4.0` moves to `v0.4.1` with no migration, and one that takes a one-time
 code through `OtpInput` should, because `v0.4.0` does not accept Persian or
-Arabic-Indic digits.
+Arabic-Indic digits. Until a `v0.5.0` tag exists, `v0.4.1` stays the newest
+existing tag and the pin below is unchanged; an application that uses the
+`v0.5.0` additions (the six tokens, `fill="brand"`, `appearance="filled"` or
+the four new icon names) moves to `v0.5.0` as soon as it is tagged, because
+`v0.4.1` does not have them.
 
 ```jsonc
 "dependencies": {
@@ -379,7 +408,11 @@ from the `v0.4.1` tree. The patient application is unaffected.
   `#347f1b`, press `#0c7912`) instead of the default ladder. Any other variant
   or tone ignores it. **Accessibility note:** white on `#3c9220` measures
   3.94:1 — below the 4.5:1 for normal text that the default ladder (5.00:1)
-  clears. Hover (5.00:1) and press (5.59:1) pass. Use it knowingly.
+  clears. Hover (5.00:1) and press (5.59:1) pass. **Owner ruling, 2026-10-25:
+  `fill="brand"` stays an opt-in, documented with its 3.94:1 contrast with white
+  text, and the Therapist application keeps the default primary green — it does
+  not use `fill="brand"`.** Any other consumer that opts in has made its own
+  accessibility decision.
 - **`OtpInput appearance="filled"`** draws the design's cell: fixed 48 × 52
   cells (`--control-width-otp-cell`, `--control-height-otp-cell`) packed at the
   start of the row, and a cell holding a digit takes the brand-green border and
@@ -496,14 +529,14 @@ values). Each is defined in the file that already holds its siblings, resolves
 through an existing raw-palette entry (the palette stays at thirty), and is
 documented in the ADR 0003 amendment of 2026-10-25.
 
-| Token                        | Value     | Where        | Read by                        | Note                                                                                                                                                                  |
-| ---------------------------- | --------- | ------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--text-tertiary`            | `#8a9384` | `colors.css` | the application                | The design's muted ink (inactive labels, captions). **3.19:1 on white — fails 4.5:1 for text a user must read.** A new name: the retired `--text-muted` stays absent. |
-| `--action-green-brand-rest`  | `#3c9220` | `colors.css` | `Button fill="brand"`          | The design's primary green. White on it is 3.94:1 — below 4.5:1 for normal text.                                                                                      |
-| `--action-green-brand-hover` | `#347f1b` | `colors.css` | `Button fill="brand"`          | 5.00:1 with white.                                                                                                                                                    |
-| `--action-green-brand-press` | `#0c7912` | `colors.css` | `Button fill="brand"`          | 5.59:1 with white.                                                                                                                                                    |
-| `--control-width-otp-cell`   | `48px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell width. Geometry is not mapped into Tailwind.                                                                                                        |
-| `--control-height-otp-cell`  | `52px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell height.                                                                                                                                             |
+| Token                        | Value     | Where        | Read by                        | Note                                                                                                                                                                                                                                                                                                            |
+| ---------------------------- | --------- | ------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--text-tertiary`            | `#8a9384` | `colors.css` | the application                | The design's muted ink (inactive labels, captions). **3.19:1 on white — fails 4.5:1.** **Owner ruling, 2026-10-25: for non-essential text only (decorative or disabled), never for text a user must read; readable de-emphasis stays `--text-secondary`.** A new name: the retired `--text-muted` stays absent. |
+| `--action-green-brand-rest`  | `#3c9220` | `colors.css` | `Button fill="brand"`          | The design's primary green. White on it is 3.94:1 — below 4.5:1 for normal text. **Owner ruling, 2026-10-25: the Therapist application keeps the default primary green.**                                                                                                                                       |
+| `--action-green-brand-hover` | `#347f1b` | `colors.css` | `Button fill="brand"`          | 5.00:1 with white.                                                                                                                                                                                                                                                                                              |
+| `--action-green-brand-press` | `#0c7912` | `colors.css` | `Button fill="brand"`          | 5.59:1 with white.                                                                                                                                                                                                                                                                                              |
+| `--control-width-otp-cell`   | `48px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell width. Geometry is not mapped into Tailwind.                                                                                                                                                                                                                                                  |
+| `--control-height-otp-cell`  | `52px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell height.                                                                                                                                                                                                                                                                                       |
 
 `--text-tertiary` and the three `--action-green-brand-*` colours are mapped into
 the Tailwind artifact like every other colour (`text-tertiary`,
