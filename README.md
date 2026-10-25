@@ -16,8 +16,8 @@ place. Every capability allocated up to `v0.3.0` is implemented and
 digits in every digit script. A minor, `v0.4.0`, is **released**: it adds the
 four BottomNav glyphs to `Icon`. A patch, `v0.4.1`, is **released**:
 `OtpInput` accepts Persian and Arabic-Indic digits. A minor, `v0.5.0`, is
-**prepared, not released**: the Therapist design's additive tokens, two opt-in
-primitive options and four icon names.
+**released**: the Therapist design's additive tokens, two opt-in primitive
+options and four icon names.
 
 | Area                                                                     | State                                                                                                                          |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -26,14 +26,14 @@ primitive options and four icon names.
 | Validation helpers (root entry, ADR 0002)                                | shipped                                                                                                                        |
 | Token Foundation V1 (`./tokens`, `./tokens/tailwind-preset`, `./styles`) | shipped — merged and verified on `main`; **released as `v0.1.0`**                                                              |
 | Styles Foundation (`./styles` — fonts, reset, body, focus, keyframes)    | shipped — **released as `v0.2.0`** (annotated tag); carried unchanged by `v0.3.0`                                              |
-| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**; four more **prepared as `v0.5.0`**                   |
-| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`**; `OtpInput` digit fix **released as `v0.4.1`**; two opt-in options **prepared as `v0.5.0`** |
+| Icons (root entry — `Icon`, ADR 0005)                                    | shipped — **released as `v0.3.0`**; four glyphs **released as `v0.4.0`**; four more **released as `v0.5.0`**                   |
+| The five primitives · overlay root (ADR 0006)                            | shipped — **released as `v0.3.0`**; `OtpInput` digit fix **released as `v0.4.1`**; two opt-in options **released as `v0.5.0`** |
 | Phase 6 · Harden (v0.2 §8)                                               | not yet — target `v1.0.0`, unchanged                                                                                           |
 
 **`v0.3.0` is released.** It carries `Icon` and the five primitives;
-`v0.3.1` and `v0.4.0`, below, were each the newest tag in turn; `v0.4.1`,
-below them, is — as of 2026-10-25 — the newest tag. **A consumer still
-pinned to `v0.2.0` receives neither `Icon` nor any of the five primitives**,
+`v0.3.1`, `v0.4.0` and `v0.4.1`, below, were each the newest tag in turn;
+`v0.5.0`, below them, is the newest tag now. **A consumer still pinned to
+`v0.2.0` receives neither `Icon` nor any of the five primitives**,
 and keeps the `--control-height-button` token that `v0.3.0` retires — bumping
 is a breaking change; see [Breaking change in `v0.3.0`](#breaking-token-change-in-v030).
 `git ls-remote --tags origin` is the live answer to what exists.
@@ -84,26 +84,28 @@ pinned to `v0.4.0` drops those digits**, so an application whose users type a
 one-time code into `OtpInput` pins `v0.4.1`. `git ls-remote --tags origin` is
 the live answer to what exists.
 
-**`v0.5.0` is prepared, not released.** It is a minor, and it is additive: it
-adds what the Therapist design needs and the library could not produce, and
-changes nothing that renders today. Six public tokens take the set from 119 to
-125 — `--text-tertiary`, `--action-green-brand-rest`, `-hover` and `-press`,
+**`v0.5.0` is released.** It is a minor, and it is additive: it adds what the
+Therapist design needs and the library could not produce, and changes nothing
+that renders today. Six public tokens take the set from 119 to 125 —
+`--text-tertiary`, `--action-green-brand-rest`, `-hover` and `-press`,
 `--control-width-otp-cell` and `--control-height-otp-cell`; `Button` takes an
 opt-in `fill="brand"`; `OtpInput` takes an opt-in `appearance="filled"`; and
 four names join the closed `IconName` union — `smartphone`, `monitor`, `feed`
 and `folder-open`. Omit the new props and the output is byte-for-byte what
-`v0.4.1` rendered. The merged content is pull request #44 (owner decision of
-2026-10-25); this change only bumps the manifest to `0.5.0` and records the
-release state. Two owner rulings bound how the additions are used and are
-stated where each is documented: the Therapist application keeps the default
-primary green and does not use `Button fill="brand"`, and `--text-tertiary`
-(3.19:1) is for non-essential text only — never for text a user must read. The
-manifest records `0.5.0`, and **a manifest version is not a release**: as of
-**2026-10-25 no `v0.5.0` tag exists**, and none will until the owner runs the
-Release workflow against a validated `main` SHA. **A consumer pinned to
-`v0.4.1` does not have the new tokens, options or names** and gets a compile
-error if it uses one, so an application that uses them pins `v0.5.0` once it
-exists. `git ls-remote --tags origin` is the live answer to whether `v0.5.0`
+`v0.4.1` rendered. The content is pull request #44 (owner decision of
+2026-10-25). Two owner rulings bound how the additions are used and are stated
+where each is documented: the Therapist application keeps the default primary
+green and does not use `Button fill="brand"`, and `--text-tertiary` (3.19:1) is
+for non-essential text only — never for text a user must read. It is an
+**annotated tag** (tag object `ffb4559ea3d63f650e0d873767e191ea767bd74c`),
+created on 2026-10-25 by run #8 of the owner-triggered Release workflow and
+pointing at commit **`479323b48e6015b3cc8f02c246207de5acf5ca95`**; the run
+validated that commit before tagging, and `verify-created-tag` read the tag
+back from the remote and confirmed it is annotated and points at it. As with
+the earlier tags, **no GitHub Release object and no npm publication exists**.
+**A consumer still pinned to `v0.4.1` does not have the new tokens, options or
+names** and gets a compile error if it uses one, so an application that uses
+them pins `v0.5.0`. `git ls-remote --tags origin` is the live answer to what
 exists.
 
 **Token Foundation V1 is merged and verified on `main`**, through pull
@@ -169,13 +171,12 @@ to npm**. `private: true` stays set, which is what makes a registry publish
 fail by design. **It says nothing about the GitHub repository's visibility**,
 which is a separate setting and is unchanged by any of this.
 
-Consumers install from a tag. **`v0.4.1` is the newest release** (`v0.5.0` is
-prepared but not yet tagged — see Status) and the tag the supported
-installation pins — pin whichever tag carries the capability the
+Consumers install from a tag. **`v0.5.0` is the newest release** and the tag
+the supported installation pins — pin whichever tag carries the capability the
 application needs, and check `git ls-remote --tags origin` for what exists:
 
 ```jsonc
-"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.4.1"
+"@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.5.0"
 ```
 
 **Styles Foundation is released as `v0.2.0`.** It is an **annotated tag**,
@@ -218,17 +219,17 @@ Where the design values stand, precisely:
   Its **TypeScript public API correction is complete**, and the **final
   contract-readiness audit passed**.
 - **`zakhmban-therapists` is the intended current consumer** — the active
-  Therapist application. As verified read-only on **2026-10-23** at its
-  `main` `e94f01faa8ac55230e67c1202eba43a7c7afd534` (the squash merge of its
-  pull request #36; its pull request #27, squash-merged as
-  `1e18d72daf3e437b219433b6fea1a827727218b5`, moved the pin), it still pins
-  `github:20Brayan01/zakhmban-ui#v0.4.0`; its lockfile resolves that pin to the
-  `v0.4.0` tag object `79a514acef5437995e73aaab28a02e47ad3b1dba`. It therefore
+  Therapist application. As verified read-only on **2026-10-25** at its
+  `main` `e05210e62382c00c80bd20e76da7e7a758992526` (the squash merge of its
+  pull request #43; its pull request #38, squash-merged as
+  `bde61484c79b68ae43c995f26ed502aa4c97c06a`, moved the pin), it pins
+  `github:20Brayan01/zakhmban-ui#v0.4.1`; its lockfile resolves that pin to the
+  `v0.4.1` tag object `b44afc3c1d138fbeefc8d6a8d6bf5c02d37ee017`. It therefore
   receives the full `./styles` surface, `Icon` with the four BottomNav glyphs,
-  the five primitives and the `maskPhoneDisplay` fix, and **not yet** the
-  `v0.4.1` `OtpInput` digit fix. Any later bump is a separate change in that
-  repository, not part of this package; its own `package.json` is the live
-  answer.
+  the five primitives, the `maskPhoneDisplay` fix and the `v0.4.1` `OtpInput`
+  digit fix, and **not yet** the `v0.5.0` additions. A move to `v0.5.0`, like
+  any later bump, is a separate change in that repository, not part of this
+  package; its own `package.json` is the live answer.
 - **`zakhmban-website` and `zakhmban-pwa` are other applications in the wider
   ecosystem**, not the Therapist consumer. Their Phase 1 design-system legacy
   annotations are **valid** and exist in **local, unpushed** documentation
@@ -247,8 +248,10 @@ Where the design values stand, precisely:
 - **Icons, the five primitives and the overlay-root contract are implemented
   and released as `v0.3.0`.** `v0.3.1` carries them unchanged and masks phone
   digits in every digit script; `v0.4.0` adds the four BottomNav glyphs to
-  `Icon`; `v0.4.1` makes `OtpInput` accept Persian and Arabic-Indic digits.
-  **The supported consumption path is a pin to the annotated `v0.4.1` tag.**
+  `Icon`; `v0.4.1` makes `OtpInput` accept Persian and Arabic-Indic digits;
+  `v0.5.0` adds the Therapist design's additive tokens, two opt-in primitive
+  options and four icon names.
+  **The supported consumption path is a pin to the annotated `v0.5.0` tag.**
 - The **Typography Alias Ruling** (2026-09-19) fixes each of the eight
   typography aliases as a **Semantic Typography Size Alias**, authored
   `--text-<step>: var(--text-<step>-size)`. It changed no identifier, no
@@ -272,10 +275,11 @@ in `docs/architecture/canonical-document-registry.md`.
 
 The package is installed as an external dependency pinned to an **exact git
 tag**, never a range, never `workspace:`, never `file:` or `link:`. The tag
-below is `v0.4.1`, the newest release, which carries the tokens, the Styles
+below is `v0.5.0`, the newest release, which carries the tokens, the Styles
 layer, `Icon` with the four BottomNav glyphs and the five primitives, masks
-phone digits in every digit script, and lets `OtpInput` accept Persian and
-Arabic-Indic digits. An application moving up from `v0.1.0` or `v0.2.0` must
+phone digits in every digit script, lets `OtpInput` accept Persian and
+Arabic-Indic digits, and adds the Therapist design's additive tokens, opt-in
+options and icon names. An application moving up from `v0.1.0` or `v0.2.0` must
 first apply the [`v0.3.0` token migration](#breaking-token-change-in-v030). (`v0.2.0` is
 the Styles Foundation release; `v0.1.0` is the earlier Token Foundation
 release, whose `./styles` surface is token-only.) An application on `v0.3.0`
@@ -286,15 +290,14 @@ migration, and one that renders the BottomNav glyphs (`listing`, `folder`,
 `wallet`, `person`) must, because `v0.3.1` does not have them. An application
 on `v0.4.0` moves to `v0.4.1` with no migration, and one that takes a one-time
 code through `OtpInput` should, because `v0.4.0` does not accept Persian or
-Arabic-Indic digits. Until a `v0.5.0` tag exists, `v0.4.1` stays the newest
-existing tag and the pin below is unchanged; an application that uses the
-`v0.5.0` additions (the six tokens, `fill="brand"`, `appearance="filled"` or
-the four new icon names) moves to `v0.5.0` as soon as it is tagged, because
-`v0.4.1` does not have them.
+Arabic-Indic digits. An application on `v0.4.1` moves to `v0.5.0` with no
+migration, because every addition is opt-in, and one that uses them (the six
+tokens, `fill="brand"`, `appearance="filled"` or the four new icon names)
+must, because `v0.4.1` does not have them.
 
 ```jsonc
 "dependencies": {
-  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.4.1"
+  "@zakhmban/ui": "github:20Brayan01/zakhmban-ui#v0.5.0"
 }
 ```
 
@@ -449,12 +452,12 @@ to `v0.3.1` does not have them and gets a compile error if it names one. The
 public names are intents, not Lucide's, so a later swap of the glyph source
 keeps them.
 
-**Four more names are added for `v0.5.0`** (ADR 0005 §7.2, owner decision of
+**Four more names are released in `v0.5.0`** (ADR 0005 §7.2, owner decision of
 2026-10-25): `smartphone` and `monitor` for per-device rows, and `feed`
 (Lucide `layout-list`) and `folder-open` for the design's Ads and Records
 navigation glyphs. `listing` and `folder` are unchanged and stay available.
 Three of the four are drawn with `<rect>`, which the generator's tag list
-admits from this release. They exist only in a tag released after `v0.4.1`.
+admits from this release. The `v0.4.1` tag does not have them.
 
 ## Tokens
 
@@ -495,9 +498,11 @@ is unchanged.
 **Being in the source tree is not the same as being released.** Frozen §2.2
 and v0.2 §7.3 fix consumption at an **exact tag** — never a range, never
 `workspace:`, never `file:` or `link:`. **The supported way to consume the
-package is a pin to the annotated `v0.4.1` tag**, which points at commit
-`a40a6056d0e2df0b89fb06b8c8b9db5cfd5eb8bc`; the four BottomNav glyphs were
-first released by `v0.4.0` at `28f8a3c2d28857f32f717fe25d75714e45406dac`,
+package is a pin to the annotated `v0.5.0` tag**, which points at commit
+`479323b48e6015b3cc8f02c246207de5acf5ca95`; the `OtpInput` digit fix was
+released by `v0.4.1` at `a40a6056d0e2df0b89fb06b8c8b9db5cfd5eb8bc`, the four
+BottomNav glyphs first by `v0.4.0` at
+`28f8a3c2d28857f32f717fe25d75714e45406dac`,
 `Icon` and the five primitives by `v0.3.0` at
 `ae8dccd97765b5a308e91eba579dc47c5d43ec5e`, and the Styles layer by `v0.2.0` at
 `bd495bf493c519334a2525588d8d80edb0c6ac68`. A raw
