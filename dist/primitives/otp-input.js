@@ -122,7 +122,7 @@ function digitsOf(text) {
 }
 /** §3.2: "Five-cell code entry". */
 const DEFAULT_LENGTH = 5;
-export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComplete, error, className, style, ref, id, ...rest }) {
+export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComplete, error, appearance = "default", className, style, ref, id, ...rest }) {
     const generatedId = useId();
     const groupId = id ?? generatedId;
     const errorId = `${groupId}-error`;
@@ -300,11 +300,21 @@ export function OtpInput({ length = DEFAULT_LENGTH, value = "", onChange, onComp
         event.preventDefault();
         commit(pasted, index);
     };
-    return (_jsxs("div", { ref: ref, className: className === undefined ? "zakhmban-otp" : `zakhmban-otp ${className}`, ...(style === undefined ? {} : { style }), children: [_jsx("div", { ...rest, id: groupId, className: "zakhmban-otp-cells", dir: "ltr", role: "group", children: Array.from({ length }, (_, index) => {
+    /* Only the non-default appearance adds a class or an attribute, so a
+       default OtpInput's markup is byte-identical to v0.4.1's. */
+    const filledAppearance = appearance === "filled";
+    const rootClass = [
+        "zakhmban-otp",
+        ...(filledAppearance ? ["zakhmban-otp-filled"] : []),
+        ...(className === undefined ? [] : [className]),
+    ].join(" ");
+    return (_jsxs("div", { ref: ref, className: rootClass, ...(style === undefined ? {} : { style }), children: [_jsx("div", { ...rest, id: groupId, className: "zakhmban-otp-cells", dir: "ltr", role: "group", children: Array.from({ length }, (_, index) => {
                     const digit = digits[index] ?? "";
                     return (_jsx("input", { ref: (element) => {
                             cells.current[index] = element;
-                        }, className: "zakhmban-otp-cell", value: digit, onChange: handleChange(index), onKeyDown: handleKeyDown(index), onPaste: handlePaste(index), inputMode: "numeric", "aria-label": String(index + 1), "aria-invalid": invalid || undefined, "aria-describedby": invalid ? errorId : undefined, ...(index === 0 ? { autoComplete: "one-time-code" } : {}) }, index));
+                        }, className: "zakhmban-otp-cell", value: digit, onChange: handleChange(index), onKeyDown: handleKeyDown(index), onPaste: handlePaste(index), inputMode: "numeric", "aria-label": String(index + 1), "aria-invalid": invalid || undefined, "aria-describedby": invalid ? errorId : undefined, ...(filledAppearance && digit !== ""
+                            ? { "data-zakhmban-otp-digit": "" }
+                            : {}), ...(index === 0 ? { autoComplete: "one-time-code" } : {}) }, index));
                 }) }), invalid ? (_jsx("p", { className: "zakhmban-otp-error", id: errorId, role: "alert", children: error })) : null] }));
 }
 //# sourceMappingURL=otp-input.js.map

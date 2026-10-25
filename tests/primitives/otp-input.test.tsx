@@ -979,3 +979,102 @@ describe("OtpInput — every Unicode decimal digit", () => {
     });
   });
 });
+
+describe("OtpInput — appearance, the v0.5.0 opt-in (owner decision of 2026-10-25)", () => {
+  function FilledHost(props: { initial?: string; error?: string }) {
+    const [value, setValue] = useState(props.initial ?? "");
+    return (
+      <OtpInput
+        appearance="filled"
+        length={6}
+        {...(props.error === undefined ? {} : { error: props.error })}
+        value={value}
+        onChange={setValue}
+        aria-label="کد تأیید"
+      />
+    );
+  }
+
+  /** Cells that carry the filled-digit marker, by their position. */
+  function marked(): number[] {
+    return cells().flatMap((cell, index) =>
+      cell.hasAttribute("data-zakhmban-otp-digit") ? [index] : [],
+    );
+  }
+
+  it("keeps six cells, Latin digits and the LTR row under the filled appearance", () => {
+    const { container } = render(<FilledHost initial="123" />);
+    expect(cells()).toHaveLength(6);
+    expect(container.firstElementChild?.className).toContain(
+      "zakhmban-otp-filled",
+    );
+    expect(screen.getByRole("group").getAttribute("dir")).toBe("ltr");
+    expect(cells().map((c) => c.value)).toEqual(["1", "2", "3", "", "", ""]);
+  });
+
+  it("marks exactly the cells that hold a digit, and follows typing and deleting", () => {
+    render(<FilledHost />);
+    expect(marked()).toEqual([]);
+    fireEvent.keyDown(cells()[0]!, { key: "4" });
+    fireEvent.keyDown(cells()[1]!, { key: "8" });
+    expect(marked()).toEqual([0, 1]);
+    fireEvent.keyDown(cells()[1]!, { key: "Backspace" });
+    expect(marked()).toEqual([0]);
+  });
+
+  it("behaves exactly as the default appearance does: a Persian-digit paste fills all six cells", () => {
+    const onComplete = vi.fn();
+    const onChange = vi.fn();
+    render(
+      <OtpInput
+        appearance="filled"
+        length={6}
+        value=""
+        onChange={onChange}
+        onComplete={onComplete}
+      />,
+    );
+    fireEvent.paste(cells()[0]!, {
+      clipboardData: { getData: () => "۱۲۳۴۵۶" },
+    });
+    expect(onChange).toHaveBeenLastCalledWith("123456");
+  });
+
+  it("calls onComplete once, with the Latin code, when the last cell fills", () => {
+    const onComplete = vi.fn();
+    function CompleteHost() {
+      const [value, setValue] = useState("");
+      return (
+        <OtpInput
+          appearance="filled"
+          length={6}
+          value={value}
+          onChange={setValue}
+          onComplete={onComplete}
+          aria-label="کد تأیید"
+        />
+      );
+    }
+    render(<CompleteHost />);
+    fireEvent.paste(cells()[0]!, {
+      clipboardData: { getData: () => "۱۲۳۴۵۶" },
+    });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(onComplete).toHaveBeenCalledWith("123456");
+  });
+
+  it("still takes the error state, and the marker does not suppress aria-invalid", () => {
+    render(<FilledHost initial="12" error="کد نادرست است" />);
+    expect(screen.getByRole("alert").textContent).toBe("کد نادرست است");
+    for (const cell of cells()) {
+      expect(cell.getAttribute("aria-invalid")).toBe("true");
+    }
+    expect(marked()).toEqual([0, 1]);
+  });
+
+  it("puts no marker and no class on the default appearance", () => {
+    const { container } = render(<Host initial="123" />);
+    expect(container.querySelector("[data-zakhmban-otp-digit]")).toBeNull();
+    expect(container.innerHTML).not.toContain("zakhmban-otp-filled");
+  });
+});

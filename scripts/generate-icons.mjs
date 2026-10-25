@@ -11,7 +11,7 @@
  *
  * Inputs   node_modules/lucide/dist/esm/icons/<kebab>.mjs  — one file per glyph
  *          node_modules/lucide/LICENSE                     — the notice
- * Outputs  src/icons/registry.ts            the fifteen-entry registry
+ * Outputs  src/icons/registry.ts            the nineteen-entry registry
  *          src/icons/LUCIDE-LICENSE.txt     a verbatim copy of the notice
  *
  * Usage    node scripts/generate-icons.mjs           write
@@ -52,9 +52,10 @@ const upstreamIcons = join(lucideDir, "dist", "esm", "icons");
 const EXPECTED_VERSION = "1.51.0";
 
 /**
- * The fifteen public names ADR 0005 §7 admits, in the order its table lists
+ * The public names ADR 0005 §7, §7.1 and §7.2 admit, in the order its table lists
  * them — the original eleven, then the four the 2026-10-20 owner ruling adds
- * for the Therapist app's BottomNav (§7.1) — each mapped to the canonical
+ * for the Therapist app's BottomNav (§7.1), then the four v0.5.0 adds (§7.2) —
+ * each mapped to the canonical
  * upstream file and carrying its mirroring decision as an explicit boolean.
  *
  * `mirror` is v0.2 §5's declared property, not an inference from the name and
@@ -82,14 +83,26 @@ const GLYPHS = [
   { name: "folder", upstream: "folder", mirror: false },
   { name: "wallet", upstream: "wallet", mirror: false },
   { name: "person", upstream: "user", mirror: false },
+  // ADR 0005 §7.2 — v0.5.0, owner decision of 2026-10-25, for the Therapist
+  // design. `smartphone` and `monitor` are J5's per-device row glyphs;
+  // `feed` and `folder-open` are the design's BottomNav glyphs for آگهی‌ها and
+  // پرونده‌ها. None is directional, so none mirrors. Appended after the
+  // fifteen so every earlier entry keeps its position and its artwork.
+  { name: "smartphone", upstream: "smartphone", mirror: false },
+  { name: "monitor", upstream: "monitor", mirror: false },
+  { name: "feed", upstream: "layout-list", mirror: false },
+  { name: "folder-open", upstream: "folder-open", mirror: false },
 ];
 
 /**
- * The SVG element names the fifteen glyphs are allowed to use. A closed list,
+ * The SVG element names the glyphs are allowed to use. `rect` joined the list
+ * in v0.5.0 (ADR 0005 §7.2): `smartphone`, `monitor` and `feed` are drawn with
+ * it upstream, and rewriting a rectangle as a path would edit the artwork,
+ * which the ADR forbids. A closed list,
  * so an upstream change that introduces a shape the component does not render
  * fails generation instead of rendering nothing.
  */
-const ALLOWED_TAGS = ["circle", "line", "path"];
+const ALLOWED_TAGS = ["circle", "line", "path", "rect"];
 
 /**
  * Attribute names must be plain camelCase or lowercase, because they are
@@ -123,7 +136,7 @@ function assertUpstreamVersion() {
     fail(
       `lucide ${manifest.version} is installed but this generator is verified ` +
         `against ${EXPECTED_VERSION}. Upstream renames glyphs and may move ` +
-        `dist/esm/icons/, so re-verify the fifteen mappings and the LICENSE, ` +
+        `dist/esm/icons/, so re-verify every mapping and the LICENSE, ` +
         `then update EXPECTED_VERSION in this file.`,
     );
   }
@@ -211,7 +224,7 @@ function renderRegistry(glyphs) {
  *
  * ADR 0005 — the contract this file must satisfy:
  *
- *   - exactly the fifteen approved public names, in §7's order;
+ *   - exactly the nineteen approved public names, in §7's order;
  *   - each entry carries its drawing instructions and its mirroring decision
  *     as an EXPLICIT boolean — v0.2 §5 makes mirroring a declared property,
  *     never inferred from the name and never defaulted;
@@ -241,7 +254,7 @@ export interface IconRegistryEntry {
     .map(
       ({ name, upstream, mirror, nodes }) =>
         `  // lucide ${upstream}\n` +
-        `  ${name}: { nodes: [${nodes.map(renderNode).join(", ")}], mirror: ${mirror} },`,
+        `  ${/^[a-z][a-z0-9]*$/.test(name) ? name : quote(name)}: { nodes: [${nodes.map(renderNode).join(", ")}], mirror: ${mirror} },`,
     )
     .join("\n");
 

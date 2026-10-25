@@ -45,14 +45,30 @@ const BOTTOM_NAV: readonly IconName[] = [
   "person",
 ];
 
-/** All fifteen approved names, in registry order. */
-const APPROVED: readonly IconName[] = [...ORIGINAL, ...BOTTOM_NAV];
+/**
+ * The four names v0.5.0 adds (ADR 0005 §7.2, owner decision of 2026-10-25):
+ * J5's per-device row glyphs and the design's BottomNav glyphs for Ads and
+ * Records. Appended after the fifteen.
+ */
+const THERAPIST_DESIGN: readonly IconName[] = [
+  "smartphone",
+  "monitor",
+  "feed",
+  "folder-open",
+];
+
+/** All nineteen approved names, in registry order. */
+const APPROVED: readonly IconName[] = [
+  ...ORIGINAL,
+  ...BOTTOM_NAV,
+  ...THERAPIST_DESIGN,
+];
 
 /** v0.2 §5's mirror list, intersected with the inventory. */
 const MIRRORED: readonly IconName[] = ["back", "chevron"];
 
 describe("Icon · the approved inventory", () => {
-  it("is exactly the fifteen approved names, in order", () => {
+  it("is exactly the nineteen approved names, in order", () => {
     expect(Object.keys(ICON_REGISTRY)).toEqual([...APPROVED]);
   });
 
@@ -62,11 +78,11 @@ describe("Icon · the approved inventory", () => {
       expect(markup, name).toContain('viewBox="0 0 24 24"');
       // A glyph that renders an empty <svg> is the reference kit's failure
       // mode: no error anywhere, just a blank box.
-      expect(markup, name).toMatch(/<(path|circle|line)\b/);
+      expect(markup, name).toMatch(/<(path|circle|line|rect)\b/);
     }
   });
 
-  it("admits no sixteenth name, and no excluded one", () => {
+  it("admits no twentieth name, and no excluded one", () => {
     // `clock` is the worked example: v0.2 §5 names it, no specified surface
     // consumes it, and ADR 0005 §7 excludes it on that second rule. It and
     // the others must not have drifted in. `wallet` is no longer on this
@@ -83,15 +99,18 @@ describe("Icon · the approved inventory", () => {
     ]) {
       expect(Object.keys(ICON_REGISTRY)).not.toContain(excluded);
     }
-    expect(Object.keys(ICON_REGISTRY)).toHaveLength(15);
+    expect(Object.keys(ICON_REGISTRY)).toHaveLength(19);
   });
 });
 
 describe("Icon · the BottomNav additions (ADR 0005 §7.1)", () => {
   it("appends exactly the four destination glyphs after the original eleven", () => {
-    expect(Object.keys(ICON_REGISTRY).slice(ORIGINAL.length)).toEqual([
-      ...BOTTOM_NAV,
-    ]);
+    expect(
+      Object.keys(ICON_REGISTRY).slice(
+        ORIGINAL.length,
+        ORIGINAL.length + BOTTOM_NAV.length,
+      ),
+    ).toEqual([...BOTTOM_NAV]);
   });
 
   it("mirrors none of them — non-directional, and wallet is v0.2 §5's own example", () => {
@@ -111,6 +130,42 @@ describe("Icon · the BottomNav additions (ADR 0005 §7.1)", () => {
       expect(markup, name).toContain('stroke-width="1.8"');
       expect(markup, name).toContain('stroke="var(--text-primary)"');
       expect(markup, name).toMatch(/<(path|circle|line)\b/);
+    }
+  });
+});
+
+describe("Icon · the therapist-design additions (ADR 0005 §7.2)", () => {
+  it("appends exactly four names after the fifteen, and nothing follows them", () => {
+    expect(Object.keys(ICON_REGISTRY).slice(15)).toEqual([...THERAPIST_DESIGN]);
+  });
+
+  it("mirrors none of them — none has a direction of travel", () => {
+    for (const name of THERAPIST_DESIGN) {
+      expect(ICON_REGISTRY[name].mirror, name).toBe(false);
+      expect(render({ name }), name).not.toContain("<g transform=");
+    }
+  });
+
+  it("draws smartphone, monitor and feed with the <rect> upstream draws them with", () => {
+    // `rect` joined the generator's closed tag list for these three; the
+    // artwork is upstream's, not a path rewrite of it.
+    for (const name of ["smartphone", "monitor", "feed"] as const) {
+      const tags = ICON_REGISTRY[name].nodes.map(([tag]) => tag);
+      expect(tags, name).toContain("rect");
+      expect(render({ name }), name).toContain("<rect");
+    }
+    expect(ICON_REGISTRY["folder-open"].nodes.map(([tag]) => tag)).toEqual([
+      "path",
+    ]);
+  });
+
+  it("renders each in the same box, stroke and colour as the rest", () => {
+    for (const name of THERAPIST_DESIGN) {
+      const markup = render({ name });
+      expect(markup, name).toContain('viewBox="0 0 24 24"');
+      expect(markup, name).toContain('stroke-width="1.8"');
+      expect(markup, name).toContain('stroke="var(--text-primary)"');
+      expect(markup, name).toContain('aria-hidden="true"');
     }
   });
 });

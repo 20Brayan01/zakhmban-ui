@@ -65,6 +65,15 @@ export type ButtonTone = "green" | "blue" | "red";
 export type ButtonSize = "sm" | "md" | "lg";
 
 /**
+ * The fill of a `primary` `green` button. `action` is the default and the
+ * only value any release before v0.5.0 produced: the Decision 3a ladder
+ * (`--action-green-*`, white on rest 5.0:1). `brand` is the therapist
+ * design's lighter green (`--action-green-brand-*`, white on rest 3.94:1 —
+ * below 4.5:1 for normal text). Owner decision of 2026-10-25; ADR 0003, Amendment of 2026-10-25.
+ */
+export type ButtonFill = "action" | "brand";
+
+/**
  * Native attributes that pass straight through to the real `<button>`:
  * `type`, `name`, `value`, `form`, `autoFocus`, `onFocus`, `onBlur`,
  * `data-*`, `aria-*` and the rest. The four this component owns are removed
@@ -82,6 +91,12 @@ export interface ButtonProps extends PassThrough {
   tone?: ButtonTone;
   /** Control size. Defaults to `md`. */
   size?: ButtonSize;
+  /**
+   * Opt-in, since v0.5.0. `brand` paints a `primary` `green` button with the
+   * therapist design's brand green; every other variant and tone ignores it.
+   * Defaults to `action`, which renders exactly what v0.4.1 rendered.
+   */
+  fill?: ButtonFill;
   /** Fills the inline axis of its container. */
   block?: boolean;
   /** Disables the control. §3.2: never disable without a visible reason nearby. */
@@ -107,6 +122,7 @@ export function Button({
   variant = "secondary",
   tone = "green",
   size = "md",
+  fill = "action",
   block,
   disabled,
   loading,
@@ -147,6 +163,11 @@ export function Button({
   ];
   if (block === true) {
     classes.push("zakhmban-button-block");
+  }
+  /* Only the non-default fill adds a class, so a default Button's markup is
+     byte-identical to v0.4.1's. */
+  if (fill === "brand") {
+    classes.push("zakhmban-button-fill-brand");
   }
   if (className !== undefined) {
     classes.push(className);

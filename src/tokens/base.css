@@ -95,6 +95,15 @@
    * Decision B §B.3. */
   --control-height-button-md: 48px;
   --control-height-button-lg: 52px;
+
+  /* v0.5.0 addition — owner decision, 2026-10-25. The therapist design's
+   * OtpInput cell, used only by `OtpInput appearance="filled"`: 48 wide, 52
+   * tall (the design's 48 and `--control-h-lg`). Both clear the 44px target
+   * minimum. Their own role, not a borrowed one — `--control-height-input`
+   * and the Button heights are other controls' roles. See ADR 0003, Amendment of 2026-10-25. */
+  --control-width-otp-cell: 48px;
+  --control-height-otp-cell: 52px;
+
   --app-bar-height: 56px;
   --bottom-nav-height: 64px;
   --bottom-nav-safe-area: 20px;

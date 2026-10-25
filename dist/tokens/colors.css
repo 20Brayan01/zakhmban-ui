@@ -109,6 +109,16 @@
   --text-primary: var(--blue-900);
   --text-secondary: var(--neutral-600);
 
+  /* v0.5.0 addition — owner decision, 2026-10-25. The therapist design's
+   * muted ink (inactive navigation labels, captions). ADDITIVE: it does not
+   * restore `--text-muted`, which stays retired and absent (Owner Contrast
+   * Ruling, 2026-09-18), and it changes no existing token. It is
+   * `--neutral-500` #8a9384, which measures 3.1879:1 on `--surface` and so
+   * FAILS 4.5:1 for normal text. A consumer that uses it for text a user must
+   * read has made an accessibility decision of its own; readable
+   * de-emphasis remains `--text-secondary`. See ADR 0003, Amendment of 2026-10-25. */
+  --text-tertiary: var(--neutral-500);
+
   /* Surfaces. Decision 14: Page Background and Surface/Card are distinct
    * roles at one value. `--surface-subtle` is never a full-page canvas. */
   --background: var(--white);
@@ -138,6 +148,17 @@
   --action-red-rest: var(--red-550);
   --action-red-hover: var(--red-600);
   --action-red-press: var(--red-700);
+
+  /* v0.5.0 addition — owner decision, 2026-10-25. The therapist design's
+   * primary fill is the brand green itself, one step lighter than
+   * `--action-green-*` above, whose values are UNCHANGED. Rest, hover and
+   * press are the design's own: green-500, green-550, green-600. White on the
+   * rest value measures 3.94:1, which FAILS 4.5:1 for normal text (hover
+   * 5.00:1 and press 5.59:1 pass). Opt-in only, through Button's `fill`
+   * prop; no default output reads these. See ADR 0003, Amendment of 2026-10-25. */
+  --action-green-brand-rest: var(--green-500);
+  --action-green-brand-hover: var(--green-550);
+  --action-green-brand-press: var(--green-600);
 
   /* On-brand foregrounds — Decision 12a and 12b. Kept separate: the Icon
    * contract is an additive amendment to §3.1 and is not the Text contract. */
