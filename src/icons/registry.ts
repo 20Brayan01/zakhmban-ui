@@ -9,7 +9,7 @@
  *
  * ADR 0005 — the contract this file must satisfy:
  *
- *   - exactly the fifteen approved public names, in §7's order;
+ *   - exactly the nineteen approved public names, in §7's order;
  *   - each entry carries its drawing instructions and its mirroring decision
  *     as an EXPLICIT boolean — v0.2 §5 makes mirroring a declared property,
  *     never inferred from the name and never defaulted;
@@ -22,7 +22,7 @@
  * indexes cannot drift apart.
  */
 
-export type IconNodeTag = "circle" | "line" | "path";
+export type IconNodeTag = "circle" | "line" | "path" | "rect";
 
 export type IconNode = readonly [
   tag: IconNodeTag,
@@ -163,6 +163,47 @@ export const ICON_REGISTRY = {
     nodes: [
       ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" }],
       ["circle", { cx: "12", cy: "7", r: "4" }],
+    ],
+    mirror: false,
+  },
+  // lucide smartphone
+  smartphone: {
+    nodes: [
+      ["rect", { width: "14", height: "20", x: "5", y: "2", rx: "2", ry: "2" }],
+      ["path", { d: "M12 18h.01" }],
+    ],
+    mirror: false,
+  },
+  // lucide monitor
+  monitor: {
+    nodes: [
+      ["rect", { width: "20", height: "14", x: "2", y: "3", rx: "2" }],
+      ["line", { x1: "8", x2: "16", y1: "21", y2: "21" }],
+      ["line", { x1: "12", x2: "12", y1: "17", y2: "21" }],
+    ],
+    mirror: false,
+  },
+  // lucide layout-list
+  feed: {
+    nodes: [
+      ["rect", { width: "7", height: "7", x: "3", y: "3", rx: "1" }],
+      ["rect", { width: "7", height: "7", x: "3", y: "14", rx: "1" }],
+      ["path", { d: "M14 4h7" }],
+      ["path", { d: "M14 9h7" }],
+      ["path", { d: "M14 15h7" }],
+      ["path", { d: "M14 20h7" }],
+    ],
+    mirror: false,
+  },
+  // lucide folder-open
+  "folder-open": {
+    nodes: [
+      [
+        "path",
+        {
+          d: "m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2",
+        },
+      ],
     ],
     mirror: false,
   },

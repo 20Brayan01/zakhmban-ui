@@ -54,6 +54,9 @@
   --color-action-blue-hover: var(--action-blue-hover);
   --color-action-blue-press: var(--action-blue-press);
   --color-action-blue-rest: var(--action-blue-rest);
+  --color-action-green-brand-hover: var(--action-green-brand-hover);
+  --color-action-green-brand-press: var(--action-green-brand-press);
+  --color-action-green-brand-rest: var(--action-green-brand-rest);
   --color-action-green-hover: var(--action-green-hover);
   --color-action-green-press: var(--action-green-press);
   --color-action-green-rest: var(--action-green-rest);
@@ -99,6 +102,7 @@
   --color-surface-subtle: var(--surface-subtle);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
 
   /* Type steps — size, with line height and weight attached. */
   --text-body: var(--text-body-size);

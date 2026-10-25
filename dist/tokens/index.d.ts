@@ -31,6 +31,9 @@ export declare const tokens: {
     readonly "--action-blue-hover": "#0062ac";
     readonly "--action-blue-press": "#045398";
     readonly "--action-blue-rest": "#0273b6";
+    readonly "--action-green-brand-hover": "#347f1b";
+    readonly "--action-green-brand-press": "#0c7912";
+    readonly "--action-green-brand-rest": "#3c9220";
     readonly "--action-green-hover": "#0c7912";
     readonly "--action-green-press": "#026e1e";
     readonly "--action-green-rest": "#347f1b";
@@ -55,7 +58,9 @@ export declare const tokens: {
     readonly "--control-height-button-lg": "52px";
     readonly "--control-height-button-md": "48px";
     readonly "--control-height-input": "48px";
+    readonly "--control-height-otp-cell": "52px";
     readonly "--control-min-target": "44px";
+    readonly "--control-width-otp-cell": "48px";
     readonly "--danger": "#ec1417";
     readonly "--danger-bg": "#fdebec";
     readonly "--danger-fg": "#c80303";
@@ -140,6 +145,7 @@ export declare const tokens: {
     readonly "--text-section-title-line-height": "1.42";
     readonly "--text-section-title-size": "19px";
     readonly "--text-section-title-weight": "600";
+    readonly "--text-tertiary": "#8a9384";
     readonly "--weight-bold": "700";
     readonly "--weight-medium": "500";
     readonly "--weight-regular": "400";

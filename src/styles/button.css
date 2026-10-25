@@ -341,3 +341,42 @@
   cursor: progress;
   opacity: 0.7;
 }
+
+/* ----------------------------------------------------------------------
+ * v0.5.0 addition — `fill="brand"`, owner decision of 2026-10-25.
+ *
+ * Everything above this banner is byte-for-byte what v0.4.1 shipped and is
+ * guarded as such by tests/architecture/additive-v0-5-0.test.ts. The rules
+ * below apply only to a primary green Button that also carries
+ * `zakhmban-button-fill-brand`, which the component adds only for
+ * `fill="brand"`; no default Button matches them.
+ *
+ * The therapist design paints its primary green with the brand green and
+ * hovers and presses one step darker (green-500 / 550 / 600). White on the
+ * rest value measures 3.9440:1 — below the 4.5:1 §6 asks of normal text, which
+ * is why the default ladder is darker and why this is opt-in. Hover 5.0029:1
+ * and press 5.5861:1 pass.
+ *
+ * A disabled button keeps the disabled triplet: every rule excludes
+ * `:disabled`, because this selector is more specific than the disabled rule
+ * and would otherwise paint over it. Same enabled guard as the rules above on
+ * hover and press.
+ * -------------------------------------------------------------------- */
+
+.zakhmban-button-primary.zakhmban-button-green.zakhmban-button-fill-brand:not(
+    :disabled
+  ) {
+  background-color: var(--action-green-brand-rest);
+}
+
+.zakhmban-button-primary.zakhmban-button-green.zakhmban-button-fill-brand:hover:not(
+    :disabled
+  ):not([aria-disabled="true"]) {
+  background-color: var(--action-green-brand-hover);
+}
+
+.zakhmban-button-primary.zakhmban-button-green.zakhmban-button-fill-brand:active:not(
+    :disabled
+  ):not([aria-disabled="true"]) {
+  background-color: var(--action-green-brand-press);
+}

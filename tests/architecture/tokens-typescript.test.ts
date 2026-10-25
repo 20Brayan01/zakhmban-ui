@@ -52,6 +52,9 @@ const APPROVED_PUBLIC_TOKENS: Record<string, string> = {
   // Ink — --text-muted is retired.
   "--text-primary": "#002a5e",
   "--text-secondary": "#667085",
+  // v0.5.0, owner decision of 2026-10-25 (ADR 0003, Amendment of 2026-10-25). A NEW name for the
+  // design's muted ink; the retired `--text-muted` stays absent below.
+  "--text-tertiary": "#8a9384",
 
   // Surfaces — Decision 14.
   "--background": "#ffffff",
@@ -76,6 +79,12 @@ const APPROVED_PUBLIC_TOKENS: Record<string, string> = {
   "--action-red-rest": "#d51013",
   "--action-red-hover": "#c80303",
   "--action-red-press": "#b90304",
+  // v0.5.0, owner decision of 2026-10-25 (ADR 0003, Amendment of 2026-10-25): the design's
+  // lighter primary green, read only by `Button fill="brand"`. The nine
+  // `--action-*` values above are unchanged.
+  "--action-green-brand-rest": "#3c9220",
+  "--action-green-brand-hover": "#347f1b",
+  "--action-green-brand-press": "#0c7912",
 
   // On-brand foregrounds — Decision 12a and 12b, kept separate.
   "--on-brand-text": "#ffffff",
@@ -178,6 +187,10 @@ const APPROVED_PUBLIC_TOKENS: Record<string, string> = {
   // The old identifier is asserted absent below — no compatibility alias.
   "--control-height-button-md": "48px",
   "--control-height-button-lg": "52px",
+  // v0.5.0, owner decision of 2026-10-25 (ADR 0003, Amendment of 2026-10-25): the therapist
+  // design's OtpInput cell, read only by `appearance="filled"`.
+  "--control-width-otp-cell": "48px",
+  "--control-height-otp-cell": "52px",
   "--app-bar-height": "56px",
   "--bottom-nav-height": "64px",
   "--bottom-nav-safe-area": "20px",
@@ -280,10 +293,10 @@ describe("typed token artifact — ADR 0003 §11", () => {
     expect(code(distSource)).not.toContain("Object.freeze");
   });
 
-  it("holds exactly 118 keys", async () => {
+  it("holds exactly 125 keys — the 119 of v0.4.1 plus six v0.5.0 additions", async () => {
     const { tokens } = await import("@zakhmban/ui/tokens");
-    expect(Object.keys(tokens)).toHaveLength(119);
-    expect(Object.keys(APPROVED_PUBLIC_TOKENS)).toHaveLength(119);
+    expect(Object.keys(tokens)).toHaveLength(125);
+    expect(Object.keys(APPROVED_PUBLIC_TOKENS)).toHaveLength(125);
   });
 
   it("keys every entry with the canonical CSS identifier, leading -- included", async () => {

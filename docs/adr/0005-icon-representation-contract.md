@@ -6,6 +6,9 @@
   implementation. **No clause of this ADR changes on acceptance**: the
   representation contract, the eleven-name inventory, the mirroring flags and
   every recorded deferral stand exactly as written.
+- **Amended 2026-10-25, by owner decision — §7.2.** Four more names
+  (`smartphone`, `monitor`, `feed`, `folder-open`) bring the inventory to
+  nineteen, and the generator's tag list admits `rect`. Additive; see §7.2.
 - **Amended 2026-10-20, by owner ruling — §7.1.** The inventory grows from
   eleven names to fifteen: four glyphs for the Therapist app's BottomNav are
   admitted, for that stated purpose. **Nothing else in this ADR changes** —
@@ -664,6 +667,77 @@ The verification is version-scoped, as above.
 release: the version stays `0.3.1`, no tag is created, and consumers pinned at
 `v0.3.1` do not receive the four names. They arrive with the next tag, which is
 a separate prepare change.
+
+### 7.2 · Amendment, 2026-10-25 — four Therapist-design glyphs (owner decision)
+
+**The decision.** The owner approved, on 2026-10-25, the design's
+smartphone and monitor device glyphs, "added only as new tokens or new
+exports", and instructed that every gap recorded by the Therapist application
+that can be met additively be met. Four names are admitted, for one stated
+purpose — the Therapist design — in the order of the generator's table:
+
+| Name | Upstream (`lucide@1.51.0`) | Mirror | Ev. | Why this name exists |
+| --- | --- | --- | --- | --- |
+| `smartphone` | `smartphone` | no | **R** | The design's glyph for a phone-class device: the Profile row «دستگاه‌ها و نشست‌ها» and the device rows of the session list (frames M1 and A5). Recorded as a gap by `zakhmban-therapists` (Design alignment, 2026-10-24). |
+| `monitor` | `monitor` | no | **R** | The design's glyph for a computer-class device in the same list (frame A5). Same record. |
+| `feed` | `layout-list` | no | **R** | The design's BottomNav glyph for آگهی‌ها (frame navItems). The public name is the intent, on the precedent of `listing`. Recorded as a gap in the same entry. |
+| `folder-open` | `folder-open` | no | **R** | The design's BottomNav glyph for پرونده‌ها. The same record. |
+
+**Existing names are untouched.** `listing` (`store`), `folder` and `person`
+keep their artwork and their position; `feed` and `folder-open` are *additional*
+names, and an application that keeps `listing` and `folder` is unaffected. The
+new entries follow the existing fifteen, so every earlier entry keeps its
+position. `tests/architecture/additive-v0-5-0.test.ts` holds the fifteen
+`v0.4.1` entries and their rendered output and fails if either moves.
+
+**One change to the generator's contract, and why it is not avoidable.** §7.1
+recorded that `layout-list` "draws a `rect`, which the generator's closed
+`path`/`circle`/`line` list excludes. Widening that list is a change to the
+generator's contract". Three of the four names — `smartphone`, `monitor` and
+`feed` — are drawn with upstream `<rect>`. This amendment therefore widens
+`ALLOWED_TAGS` to `circle`, `line`, `path`, **`rect`**, and `IconNodeTag`
+follows (it is derived from the tags actually used). The alternative — rewriting
+each rectangle as a path — would edit upstream artwork, which this ADR
+prohibits (§7.1: "No artwork is drawn, edited or combined"). The rest of the
+contract stands: the attribute-name rule (plain camelCase, so `rx`, `ry`,
+`width`, `height`, `x`, `y` pass), the exact upstream pin, the explicit mirror
+boolean, and the test that no entry carries its own paint attribute — it holds
+for these four (none draws a `fill`).
+
+**A second, mechanical change.** `folder-open` is the first public name that is
+not a bare identifier. The generator quotes a key that is not a plain
+lower-case word; the emitted registry is otherwise formatted as before, and
+`IconName` gains `"folder-open"` as a string-literal member. No other name is
+affected.
+
+**Upstream verified, 2026-10-25, at the same pinned version.** Each of
+`smartphone`, `monitor`, `layout-list` and `folder-open` exists as a canonical
+file under `dist/esm/icons/` as pure `[tag, attrs]` data using `rect`, `path`
+and `line` only; none is an alias. **Two of the four are Feather-derived**:
+`monitor` and `smartphone` appear in the notice's Feather list (`layout-list`
+and `folder-open` do not, and are covered by the ISC grant alone). That needs no
+new notice: §3 records that the one verbatim `LUCIDE-LICENSE.txt` carries
+**both** the ISC text and the Feather MIT attribution, and it already covers
+the Feather-derived glyphs of the original eleven (`search`, `x`, `check`,
+`info`, `plus`). The file is byte-identical to upstream's before and after this
+amendment. Version-scoped, as above.
+
+**Mirroring.** All four `mirror: false`: a device, a feed and an open folder
+have no direction of travel.
+
+**Considered and not done.** The design uses many more Lucide names in frames
+whose Therapist screens do not exist yet — `map-pin`, `key-round`,
+`arrow-down-left`, `upload`, `shield-check`, `timer-off`, `phone`, `lock`,
+`headset`, `file-x`, `file-warning`, `file-badge`, `clock`, `briefcase-medical`,
+`award`, `sliders-horizontal`. Rule 2 above admits a name only when a
+specified surface consumes it, and §7 explicitly excluded `phone`, `lock` and
+`clock`; no application has recorded any of them as a gap. They stay out until
+an owner names them. `user-round` for Profile is **not** added: §7.1 considered
+and rejected it for `person`, and the Therapist application records the pair as
+a near match.
+
+**Versioning and release.** Additive under §4: the version stays `0.4.1`, no tag
+is created, and a consumer pinned to `v0.4.1` does not receive the four names.
 
 ## Consequences
 

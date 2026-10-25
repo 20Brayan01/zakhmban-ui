@@ -56,7 +56,7 @@ export function Button({
    primary-by-default control would make every Button whose `variant` a
    caller forgot into a primary one. A `primary` Button must be asked for.
    `tone` is §3.2's own default and is unchanged. */
-variant = "secondary", tone = "green", size = "md", block, disabled, loading, iconStart, onClick, children, className, ref, ...rest }) {
+variant = "secondary", tone = "green", size = "md", fill = "action", block, disabled, loading, iconStart, onClick, children, className, ref, ...rest }) {
     const isLoading = loading === true;
     const isDisabled = disabled === true;
     /**
@@ -85,6 +85,11 @@ variant = "secondary", tone = "green", size = "md", block, disabled, loading, ic
     ];
     if (block === true) {
         classes.push("zakhmban-button-block");
+    }
+    /* Only the non-default fill adds a class, so a default Button's markup is
+       byte-identical to v0.4.1's. */
+    if (fill === "brand") {
+        classes.push("zakhmban-button-fill-brand");
     }
     if (className !== undefined) {
         classes.push(className);

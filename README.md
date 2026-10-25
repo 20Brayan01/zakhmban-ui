@@ -299,12 +299,14 @@ import {
 } from "@zakhmban/ui";
 import type {
   BottomSheetProps,
+  ButtonFill,
   ButtonProps,
   ButtonSize,
   ButtonTone,
   ButtonVariant,
   IconName,
   IconProps,
+  OtpInputAppearance,
   OtpInputProps,
   SelectOption,
   SelectProps,
@@ -365,6 +367,27 @@ consuming application must know, none of which can be enforced from here:
 - **`Button`** defaults to `variant="secondary"` and `size="md"`; a primary
   button is selected explicitly at its use site.
 
+#### Opt-in additions for the Therapist design (v0.5.0, additive)
+
+Owner decision of 2026-10-25. Each is **opt-in**: omitting the prop renders
+byte-for-byte what `v0.4.1` rendered, which
+`tests/architecture/additive-v0-5-0.test.ts` proves against baselines recorded
+from the `v0.4.1` tree. The patient application is unaffected.
+
+- **`Button fill="brand"`** paints a `primary` `green` button with the
+  design's brand green (`--action-green-brand-rest`, `#3c9220`; hover
+  `#347f1b`, press `#0c7912`) instead of the default ladder. Any other variant
+  or tone ignores it. **Accessibility note:** white on `#3c9220` measures
+  3.94:1 — below the 4.5:1 for normal text that the default ladder (5.00:1)
+  clears. Hover (5.00:1) and press (5.59:1) pass. Use it knowingly.
+- **`OtpInput appearance="filled"`** draws the design's cell: fixed 48 × 52
+  cells (`--control-width-otp-cell`, `--control-height-otp-cell`) packed at the
+  start of the row, and a cell holding a digit takes the brand-green border and
+  the subtle fill. The cell count stays `length` (six where the application
+  asks for six), digits stay Latin, and every behaviour is unchanged. The empty
+  cell's border stays `--text-secondary` (the design's `--border` measures
+  1.27:1 and fails the 3:1 control boundary) and the digits keep the 16px step.
+
 ### Icons — the glyph set
 
 `Icon` takes a closed `IconName`: an unknown name is a compile error, not an
@@ -376,14 +399,15 @@ reference glyphs by name and never import an icon library (ADR 0005). Defaults:
 a 24px box, a 1.8px stroke, rounded caps, navy (`--text-primary`), decorative
 (`aria-hidden`).
 
-Fifteen names, in registry order. **Only `back` and `chevron` mirror in an RTL
+Nineteen names, in registry order. **Only `back` and `chevron` mirror in an RTL
 document**; the flag is declared per glyph and is never a per-use choice.
 
-| Names                                                                                     | Mirror | Released in |
-| ----------------------------------------------------------------------------------------- | ------ | ----------- |
-| `back`, `chevron`                                                                         | yes    | `v0.3.0`    |
-| `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`, `star`            | no     | `v0.3.0`    |
-| `listing`, `folder`, `wallet`, `person` — the four BottomNav destinations (ADR 0005 §7.1) | no     | `v0.4.0`    |
+| Names                                                                                                                | Mirror | Released in |
+| -------------------------------------------------------------------------------------------------------------------- | ------ | ----------- |
+| `back`, `chevron`                                                                                                    | yes    | `v0.3.0`    |
+| `search`, `close`, `check`, `alert`, `info`, `camera`, `trash`, `plus`, `star`                                       | no     | `v0.3.0`    |
+| `listing`, `folder`, `wallet`, `person` — the four BottomNav destinations (ADR 0005 §7.1)                            | no     | `v0.4.0`    |
+| `smartphone`, `monitor`, `feed`, `folder-open` — the Therapist design's device and navigation glyphs (ADR 0005 §7.2) | no     | `v0.5.0`    |
 
 **The four BottomNav names are released in `v0.4.0`.** They were admitted by
 owner ruling on 2026-10-20 for the Therapist app's bottom navigation
@@ -392,12 +416,21 @@ to `v0.3.1` does not have them and gets a compile error if it names one. The
 public names are intents, not Lucide's, so a later swap of the glyph source
 keeps them.
 
+**Four more names are added for `v0.5.0`** (ADR 0005 §7.2, owner decision of
+2026-10-25): `smartphone` and `monitor` for per-device rows, and `feed`
+(Lucide `layout-list`) and `folder-open` for the design's Ads and Records
+navigation glyphs. `listing` and `folder` are unchanged and stay available.
+Three of the four are drawn with `<rect>`, which the generator's tag list
+admits from this release. They exist only in a tag released after `v0.4.1`.
+
 ## Tokens
 
-119 public tokens: 48 colour, 36 typography, 8 spacing, 5 radius, 3 elevation,
-6 motion, 1 font, 9 geometry and 3 layering. (The released `v0.1.0` and
+125 public tokens: 52 colour, 36 typography, 8 spacing, 5 radius, 3 elevation,
+6 motion, 1 font, 11 geometry and 3 layering. (`v0.5.0` adds six to `v0.4.1`'s
+119 — see [Additive tokens in `v0.5.0`](#additive-tokens-in-v050) — and changes
+none of them.) The released `v0.1.0` and
 `v0.2.0` tags carry 118, with 8 geometry tokens — see
-[Breaking change in `v0.3.0`](#breaking-token-change-in-v030).) The raw
+[Breaking change in `v0.3.0`](#breaking-token-change-in-v030). The raw
 palette, the eight `--_` sources and `--radius-checkbox` are
 package-internal and reach no public
 artifact. `--radius-pill` is a named role with **no approved literal** and is
@@ -453,6 +486,28 @@ Ruling's **D-6**:
 Earlier text placing the overlay-root technique in Styles v0.2.0 is
 superseded for that technique only; everything else still arrives with
 Styles.
+
+### Additive tokens in `v0.5.0`
+
+Owner decision of 2026-10-25, for the Therapist design. **Six tokens are added
+and no existing token's value changes** (guarded by
+`tests/architecture/additive-v0-5-0.test.ts`, which holds the 119 `v0.4.1`
+values). Each is defined in the file that already holds its siblings, resolves
+through an existing raw-palette entry (the palette stays at thirty), and is
+documented in the ADR 0003 amendment of 2026-10-25.
+
+| Token                        | Value     | Where        | Read by                        | Note                                                                                                                                                                  |
+| ---------------------------- | --------- | ------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--text-tertiary`            | `#8a9384` | `colors.css` | the application                | The design's muted ink (inactive labels, captions). **3.19:1 on white — fails 4.5:1 for text a user must read.** A new name: the retired `--text-muted` stays absent. |
+| `--action-green-brand-rest`  | `#3c9220` | `colors.css` | `Button fill="brand"`          | The design's primary green. White on it is 3.94:1 — below 4.5:1 for normal text.                                                                                      |
+| `--action-green-brand-hover` | `#347f1b` | `colors.css` | `Button fill="brand"`          | 5.00:1 with white.                                                                                                                                                    |
+| `--action-green-brand-press` | `#0c7912` | `colors.css` | `Button fill="brand"`          | 5.59:1 with white.                                                                                                                                                    |
+| `--control-width-otp-cell`   | `48px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell width. Geometry is not mapped into Tailwind.                                                                                                        |
+| `--control-height-otp-cell`  | `52px`    | `base.css`   | `OtpInput appearance="filled"` | The design's cell height.                                                                                                                                             |
+
+`--text-tertiary` and the three `--action-green-brand-*` colours are mapped into
+the Tailwind artifact like every other colour (`text-tertiary`,
+`bg-action-green-brand-rest`, …).
 
 ### Breaking token change in `v0.3.0`
 

@@ -1048,6 +1048,68 @@ the three `box-shadow` tokens and nothing else. Historical wording in the
 sign-off and in the Token Table's own ADR 0003 input-list disposition is
 **left as written**, for the audit trail.
 
+## Amendment — 2026-10-25: six additive tokens for v0.5.0 (owner decision)
+
+**The decision.** The owner approved, on 2026-10-25, adding what the Therapist
+design needs and the library cannot produce — the design's primary green, its
+muted ink and its larger OTP cell — **only as new tokens or new exports, with
+the value of every existing token unchanged**, because the patient
+application consumes this library. The decision is recorded in full in the
+[Token Table](../architecture/token-table-ratification.md) and inventoried in
+the [registry](../architecture/canonical-document-registry.md); this section
+records its **representation** consequences, which are this ADR's business.
+
+**What changes.** Six public tokens join the typed object and, for the four
+colours, the Tailwind artifact. The public count goes from 119 to **125**
+(colour 48 → 52, geometry 9 → 11); the internal properties stay at **39** and
+the raw palette at **thirty** — every new colour resolves through an entry the
+palette already holds.
+
+| Token | Authored in | Resolves to | Read by |
+| --- | --- | --- | --- |
+| `--text-tertiary` | `colors.css` | `--neutral-500` → `#8a9384` | the application |
+| `--action-green-brand-rest` | `colors.css` | `--green-500` → `#3c9220` | `Button fill="brand"` |
+| `--action-green-brand-hover` | `colors.css` | `--green-550` → `#347f1b` | `Button fill="brand"` |
+| `--action-green-brand-press` | `colors.css` | `--green-600` → `#0c7912` | `Button fill="brand"` |
+| `--control-width-otp-cell` | `base.css` | `48px` | `OtpInput appearance="filled"` |
+| `--control-height-otp-cell` | `base.css` | `52px` | `OtpInput appearance="filled"` |
+
+**Where each is defined.** Colours in `colors.css`, geometry in `base.css`: the
+file that holds their siblings (§2). Nothing is declared twice (§3), no hex
+appears outside `colors.css` (§4), and every semantic colour still references a
+palette entry. The Tailwind artifact maps the four colours by the existing
+`colors.css` rule; geometry stays unmapped (§12).
+
+**Why `--text-tertiary` and not `--text-muted`.** `--text-muted` is retired,
+and §18 assertion 6 and `tokens-authored-css.test.ts` assert that it appears
+**nowhere**; the registry records that **no replacement `--text-muted` alias is
+created**. The owner approved a muted ink as a **new** token, so it arrives
+under a **different name** and the retirement stands, unweakened. It is the
+same raw value the retired token had (`#8a9384`) and **fails 4.5:1 on white
+(3.1879:1)**; the Owner Contrast Ruling's finding is unchanged by this
+amendment and is restated on the property itself. A consumer that uses it for
+text a user must read has made its own accessibility decision — readable
+de-emphasis remains `--text-secondary`.
+
+**Why the brand ladder is separate.** `--action-green-rest` (`#347f1b`) was
+chosen darker so white clears 4.5:1 (5.0029:1). The design's rest is the brand
+green itself (`#3c9220`), against which white measures **3.9440:1**. The
+approved ladder cannot be edited without changing the patient application, so a
+second three-step green ladder exists beside it, read only by an opt-in
+`Button` prop. Hover and press are the design's own and pass (5.0029:1 and
+5.5861:1).
+
+**What it does not change.** No existing identifier or value; the nine
+`--action-*` tokens; the thirty-entry palette; the 39 internal properties; the
+generator's classification rules (it needed no change); the exports map; the
+token source of truth. `--radius-pill` stays unimplemented. The count tests
+(`tokens-typescript`, `tokens-consumer`, `tokens-generation`) now state 125,
+and `tests/architecture/additive-v0-5-0.test.ts` holds the 119 `v0.4.1` values
+independently, so a changed value fails there.
+
+**Not a release.** The version stays `0.4.1`; the version bump, the tag and the
+release are separate steps.
+
 ## Sources
 
 - **Scoped Token Foundation V1 Owner Sign-off**, 2026-09-18 — §1 signed-off

@@ -271,3 +271,68 @@ describe("Button — RTL and the §3 pass-through contract", () => {
     expect(screen.getByRole("button").hasAttribute("type")).toBe(false);
   });
 });
+
+describe("Button — fill, the v0.5.0 opt-in (owner decision of 2026-10-25)", () => {
+  it('adds the brand-fill class only when fill is "brand"', () => {
+    render(
+      <Button variant="primary" fill="brand">
+        ادامه
+      </Button>,
+    );
+    expect(screen.getByRole("button").className.split(" ")).toContain(
+      "zakhmban-button-fill-brand",
+    );
+  });
+
+  it("adds no class for the default fill, so a default Button is unchanged", () => {
+    render(<Button variant="primary">ادامه</Button>);
+    expect(screen.getByRole("button").className).not.toContain("fill");
+    cleanup();
+    render(
+      <Button variant="primary" fill="action">
+        ادامه
+      </Button>,
+    );
+    expect(screen.getByRole("button").className).not.toContain("fill");
+  });
+
+  it("keeps every other class, behaviour and state when the brand fill is on", () => {
+    const onClick = vi.fn();
+    render(
+      <Button variant="primary" fill="brand" size="lg" block onClick={onClick}>
+        ادامه
+      </Button>,
+    );
+    const control = screen.getByRole("button");
+    for (const expected of [
+      "zakhmban-button",
+      "zakhmban-button-primary",
+      "zakhmban-button-green",
+      "zakhmban-button-lg",
+      "zakhmban-button-block",
+    ]) {
+      expect(control.className.split(" ")).toContain(expected);
+    }
+    fireEvent.click(control);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays inert when disabled or loading, with the brand fill on", () => {
+    const onClick = vi.fn();
+    const { rerender } = render(
+      <Button variant="primary" fill="brand" disabled onClick={onClick}>
+        ادامه
+      </Button>,
+    );
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true);
+    rerender(
+      <Button variant="primary" fill="brand" loading onClick={onClick}>
+        ادامه
+      </Button>,
+    );
+    fireEvent.click(screen.getByRole("button"));
+    expect(onClick).not.toHaveBeenCalled();
+    expect(screen.getByRole("button").getAttribute("aria-busy")).toBe("true");
+  });
+});

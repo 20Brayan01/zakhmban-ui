@@ -14,7 +14,7 @@ export type { TextFieldProps } from "./text-field.js";
 export { Select } from "./select.js";
 export type { SelectOption, SelectProps } from "./select.js";
 export { OtpInput } from "./otp-input.js";
-export type { OtpInputProps } from "./otp-input.js";
+export type { OtpInputAppearance, OtpInputProps } from "./otp-input.js";
 export { Button } from "./button.js";
-export type { ButtonProps, ButtonSize, ButtonTone, ButtonVariant, } from "./button.js";
+export type { ButtonFill, ButtonProps, ButtonSize, ButtonTone, ButtonVariant, } from "./button.js";
 //# sourceMappingURL=index.d.ts.map

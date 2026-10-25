@@ -151,3 +151,43 @@
  * `VisuallyHidden` component of v0.2 §9 unknown 12 arriving by the back
  * door.
  */
+
+/* ----------------------------------------------------------------------
+ * v0.5.0 addition — `appearance="filled"`, owner decision of 2026-10-25.
+ *
+ * Everything above this banner is byte-for-byte what v0.4.1 shipped and is
+ * guarded as such by tests/architecture/additive-v0-5-0.test.ts. The rules
+ * below match only inside `.zakhmban-otp-filled`, a class the component adds
+ * only for `appearance="filled"`; no default OtpInput matches them.
+ *
+ * Cells: the design's 48 x 52, fixed in width (a cell holds one digit) and a
+ * MINIMUM in height so 200% text zoom grows the cell instead of clipping it,
+ * packed at the start of the row rather than sharing it. Both dimensions clear
+ * the unconditional 44px target (§6). The group still scrolls inside itself
+ * below 320px, and flex still cannot shrink a cell: `flex: 0 0 auto`.
+ *
+ * A cell holding a digit takes the brand-green border and the subtle fill.
+ * Brand green on the subtle surface measures 3.7231:1, clearing §6's 3:1 for a
+ * control boundary. Error, focus and disabled keep precedence: this selector
+ * is more specific than theirs, so each is excluded here rather than
+ * out-ranked. The resting (empty) boundary is NOT the design's pale
+ * `--border`, which measures 1.2653:1 and fails 3:1; it stays
+ * `--text-secondary`, as in the default appearance.
+ *
+ * Digits keep the Ruling 3 step (16px); the design's 20px is outside the
+ * closed type scale and is not drawn.
+ * -------------------------------------------------------------------- */
+
+.zakhmban-otp-filled .zakhmban-otp-cell {
+  flex: 0 0 auto;
+  inline-size: var(--control-width-otp-cell);
+  min-block-size: var(--control-height-otp-cell);
+}
+
+.zakhmban-otp-filled
+  .zakhmban-otp-cell[data-zakhmban-otp-digit]:not(:focus):not(:disabled):not(
+    [aria-invalid="true"]
+  ) {
+  border-color: var(--brand-green);
+  background-color: var(--surface-subtle);
+}

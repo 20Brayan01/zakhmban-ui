@@ -57,7 +57,7 @@ describe("token generation", () => {
     const result = run(generator, ["--check"]);
     expect(result.stderr).toBe("");
     expect(result.status, result.stdout + result.stderr).toBe(0);
-    expect(result.stdout).toContain("119 public tokens");
+    expect(result.stdout).toContain("125 public tokens");
     expect(result.stdout).toContain("39 internal properties");
   });
 

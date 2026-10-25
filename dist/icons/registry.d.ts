@@ -9,7 +9,7 @@
  *
  * ADR 0005 — the contract this file must satisfy:
  *
- *   - exactly the fifteen approved public names, in §7's order;
+ *   - exactly the nineteen approved public names, in §7's order;
  *   - each entry carries its drawing instructions and its mirroring decision
  *     as an EXPLICIT boolean — v0.2 §5 makes mirroring a declared property,
  *     never inferred from the name and never defaulted;
@@ -21,7 +21,7 @@
  * `IconName` is derived from this object, so the public union and the data it
  * indexes cannot drift apart.
  */
-export type IconNodeTag = "circle" | "line" | "path";
+export type IconNodeTag = "circle" | "line" | "path" | "rect";
 export type IconNode = readonly [
     tag: IconNodeTag,
     attributes: Readonly<Record<string, string>>
@@ -166,6 +166,69 @@ export declare const ICON_REGISTRY: {
             readonly cx: "12";
             readonly cy: "7";
             readonly r: "4";
+        }]];
+        readonly mirror: false;
+    };
+    readonly smartphone: {
+        readonly nodes: readonly [readonly ["rect", {
+            readonly width: "14";
+            readonly height: "20";
+            readonly x: "5";
+            readonly y: "2";
+            readonly rx: "2";
+            readonly ry: "2";
+        }], readonly ["path", {
+            readonly d: "M12 18h.01";
+        }]];
+        readonly mirror: false;
+    };
+    readonly monitor: {
+        readonly nodes: readonly [readonly ["rect", {
+            readonly width: "20";
+            readonly height: "14";
+            readonly x: "2";
+            readonly y: "3";
+            readonly rx: "2";
+        }], readonly ["line", {
+            readonly x1: "8";
+            readonly x2: "16";
+            readonly y1: "21";
+            readonly y2: "21";
+        }], readonly ["line", {
+            readonly x1: "12";
+            readonly x2: "12";
+            readonly y1: "17";
+            readonly y2: "21";
+        }]];
+        readonly mirror: false;
+    };
+    readonly feed: {
+        readonly nodes: readonly [readonly ["rect", {
+            readonly width: "7";
+            readonly height: "7";
+            readonly x: "3";
+            readonly y: "3";
+            readonly rx: "1";
+        }], readonly ["rect", {
+            readonly width: "7";
+            readonly height: "7";
+            readonly x: "3";
+            readonly y: "14";
+            readonly rx: "1";
+        }], readonly ["path", {
+            readonly d: "M14 4h7";
+        }], readonly ["path", {
+            readonly d: "M14 9h7";
+        }], readonly ["path", {
+            readonly d: "M14 15h7";
+        }], readonly ["path", {
+            readonly d: "M14 20h7";
+        }]];
+        readonly mirror: false;
+    };
+    readonly "folder-open": {
+        readonly nodes: readonly [readonly ["path", {
+            readonly d: "m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2";
         }]];
         readonly mirror: false;
     };

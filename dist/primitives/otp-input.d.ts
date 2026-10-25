@@ -78,6 +78,14 @@
  * None of those is a public contract, and each can change without a ruling.
  */
 import { type CSSProperties, type HTMLAttributes, type Ref } from "react";
+/**
+ * How the cells are drawn. `default` is every cell alike, sharing the row
+ * (what every release before v0.5.0 drew). `filled` is the therapist
+ * design's cell: fixed 48 x 52 cells packed at the start of the row, and a
+ * cell that holds a digit takes the brand-green border and the subtle fill.
+ * Owner decision of 2026-10-25; ADR 0003, Amendment of 2026-10-25. Behaviour is identical.
+ */
+export type OtpInputAppearance = "default" | "filled";
 type PassThrough = Omit<HTMLAttributes<HTMLDivElement>, "children" | "className" | "onChange" | "style">;
 export interface OtpInputProps extends PassThrough {
     /** Number of cells. Defaults to 5, per §3.2's "Five-cell code entry". */
@@ -90,6 +98,11 @@ export interface OtpInputProps extends PassThrough {
     onComplete?: (value: string) => void;
     /** The error message. Its presence is what puts the field in the error state. */
     error?: string;
+    /**
+     * Opt-in since v0.5.0. Defaults to `default`, which renders exactly what
+     * v0.4.1 rendered. The count of cells stays `length`; the digits stay Latin.
+     */
+    appearance?: OtpInputAppearance;
     /** Applied to the outermost node, with `style` and the forwarded ref. */
     className?: string;
     /** Applied to the outermost node. */
@@ -97,6 +110,6 @@ export interface OtpInputProps extends PassThrough {
     /** Forwarded to the outermost DOM node, as v0.2 §3 requires. */
     ref?: Ref<HTMLDivElement>;
 }
-export declare function OtpInput({ length, value, onChange, onComplete, error, className, style, ref, id, ...rest }: OtpInputProps): import("react").JSX.Element;
+export declare function OtpInput({ length, value, onChange, onComplete, error, appearance, className, style, ref, id, ...rest }: OtpInputProps): import("react").JSX.Element;
 export {};
 //# sourceMappingURL=otp-input.d.ts.map

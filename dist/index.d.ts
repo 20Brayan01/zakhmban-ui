@@ -66,7 +66,7 @@ export type { TextFieldProps } from "./primitives/index.js";
 export { Select } from "./primitives/index.js";
 export type { SelectOption, SelectProps } from "./primitives/index.js";
 export { OtpInput } from "./primitives/index.js";
-export type { OtpInputProps } from "./primitives/index.js";
+export type { OtpInputAppearance, OtpInputProps } from "./primitives/index.js";
 export { Button } from "./primitives/index.js";
-export type { ButtonProps, ButtonSize, ButtonTone, ButtonVariant, } from "./primitives/index.js";
+export type { ButtonFill, ButtonProps, ButtonSize, ButtonTone, ButtonVariant, } from "./primitives/index.js";
 //# sourceMappingURL=index.d.ts.map

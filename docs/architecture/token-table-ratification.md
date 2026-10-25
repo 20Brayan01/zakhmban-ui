@@ -8610,3 +8610,86 @@ exports stay the six approved keys · the package stays **`0.2.0`** and
 implementation is authorized**: it settles a means inside work the OtpInput
 Implementation Authorization of 2026-10-06 already permits, and **merging any
 pull request remains a separate manual owner decision**.
+
+---
+
+## OWNER DECISION — THERAPIST DESIGN ADDITIONS FOR v0.5.0 — 2026-10-25
+
+**Status:** approved by the owner. **Governs:** the five additions below, and
+the rule under which every other Therapist-design gap was classified.
+**Supersedes in v0.2:** nothing — it adds, and it does not un-retire
+`--text-muted`. **Release state:** none. The version stays `0.4.1`; the bump,
+the tag and the release are separate, owner-run steps.
+
+### The decision
+
+`@zakhmban/ui` is consumed by the Therapist application and by the patient
+application. The owner approved adding what the Therapist design needs and the
+library cannot produce — the design's primary green, its muted text colour, its
+larger and filled OTP cells and its smartphone and monitor device glyphs —
+**only as new tokens or new exports, released under a new version tag, with the
+value of every existing token unchanged.** OTP stays six cells (`length`) with
+Latin digits, and `OtpInput`'s existing behaviour stays as it is.
+
+### Rulings that bound the work
+
+1. **Additive only.** Nothing that renders today renders differently: no
+   existing token value, no existing icon's shape, no existing primitive's
+   default output. A gap that can be met only by changing one of those is not
+   implemented and is listed below with the decision it needs. No new
+   dependency; the icon source stays `lucide@1.51.0` (ADR 0005).
+2. **RTL and logical properties throughout; no hardcoded colour outside the
+   token definitions; the existing theme structure is kept** — each new token is
+   authored in the file that holds its siblings.
+3. **Anything the design shows that the Therapist text documents do not define
+   is not built**, and is listed.
+
+### What was added
+
+| Addition | Form | Default output |
+| --- | --- | --- |
+| `--text-tertiary` `#8a9384` | colour token (`colors.css`) | none — nothing reads it |
+| `--action-green-brand-rest` `#3c9220`, `-hover` `#347f1b`, `-press` `#0c7912` | colour tokens (`colors.css`) | none — read only by `fill="brand"` |
+| `--control-width-otp-cell` `48px`, `--control-height-otp-cell` `52px` | geometry tokens (`base.css`) | none — read only by `appearance="filled"` |
+| `Button` prop `fill?: "action" \| "brand"` (default `"action"`) | opt-in prop; type `ButtonFill` | identical markup and CSS |
+| `OtpInput` prop `appearance?: "default" \| "filled"` (default `"default"`) | opt-in prop; type `OtpInputAppearance` | identical markup and CSS |
+| `Icon` names `smartphone`, `monitor`, `feed` (Lucide `layout-list`), `folder-open` | four registry entries; `rect` joins the generator's tag list | the fifteen existing entries identical |
+
+Representation is recorded in the ADR 0003 amendment and ADR 0005 §7.2 of the
+same date.
+
+### Two properties the owner should know before using them
+
+- **`--text-tertiary` fails 4.5:1.** `#8a9384` on `#ffffff` is 3.1879:1 — the
+  Owner Contrast Ruling's finding for the retired `--text-muted`, unchanged. It
+  was added under a different name so the retirement and every guard that
+  asserts it stand. Readable de-emphasis remains `--text-secondary`.
+- **`Button fill="brand"` fails 4.5:1 at rest.** White on `#3c9220` is 3.9440:1;
+  the default ladder's `#347f1b` is 5.0029:1. Hover and press pass.
+
+### Not implemented — and the decision each needs
+
+| Gap | Source | Why it is not built | Decision needed |
+| --- | --- | --- | --- |
+| `TextField` required marker (red asterisk) | RUN_LOG CS-21; design TextField | Ruling 3: no Therapist text document defines a required marker. Design-only. The design's ink (`--brand-red`) would also need an accessible binding. | UX Specification defines the marker and its ink |
+| `Select` read-only state | RUN_LOG CS-21 | A native `<select>` has no read-only. A disabled one leaves the tab order and is not announced as read-only; keeping it focusable needs script that blocks the picker. A behaviour contract, not a style. | Owner picks the contract (disabled, `aria-readonly` plus blocked picker, or non-interactive text) |
+| `Select` text sits ~8px further from the edge than `TextField` text | RUN_LOG CS-21 | Fixing it changes `Select`'s default output. | Owner accepts a default-output change in a minor, or declines |
+| `Chip` / multi-select | RUN_LOG CS-21; design Chip | A sixth primitive; the five-primitive freeze needs an ADR. Built locally as Tier 2, as the architecture directs. | ADR promoting it, after a second application needs it |
+| StatusBadge success tone, ScreenFrame, EmptyState, Stepper, TopAppBar, BottomNav and the other design components | RUN_LOG CS-14, CS-15, CS-20, design alignment | Tier 2 by v0.2 §9 and the freeze. | Same ADR route, per component |
+| `toAsciiDigits` as a public export | RUN_LOG CS-21 | Additively possible, but ADR 0002 fixes the validation exports at two, and it is not something the design needs. | ADR 0002 amendment |
+| OTP digit size 20px; OTP empty cell's pale `--border` | design OtpInput | 20px is outside the closed eight-step scale and Ruling 3 gives the digits 16px; `--border` measures 1.2653:1 against the 3:1 control boundary (IA-1). | Owner admits a 20px step, or accepts 16px; owner ratifies or refuses a sub-3:1 resting boundary |
+| `--radius-pill`, and the BottomNav badge | RUN_LOG CS-14; design | A role with no approved literal; the deferral rule forbids an implementer supplying one. | Owner supplies the literal |
+| `user-round` for Profile | RUN_LOG design alignment ("near match") | ADR 0005 §7.1 considered and rejected it; `person` stays. | None unless the owner reverses §7.1 |
+| Icons for screens not yet built: `map-pin`, `key-round`, `arrow-down-left`, `upload`, `shield-check`, `timer-off`, `phone`, `lock`, `headset`, `file-x`, `file-warning`, `file-badge`, `clock`, `briefcase-medical`, `award`, `sliders-horizontal` | design frames | No application has recorded them as a gap; ADR 0005 §7 admits a name only for a specified, consuming surface and excluded `phone`, `lock` and `clock`. | Owner names the glyphs when the screens are built |
+| Button visual differences — secondary white fill and hover fill; text-button hover fill; `sm` at 40px, 12px radius, 14px; primary disabled border; spinner; trailing icon | design Button | Each contradicts a ruling (Decision B `sm` ≥ 44px; Decision 12c; the 2026-10-06 default-variant ruling) or changes default output; the application has not recorded any as a gap. | Owner, per item, if wanted |
+| Field differences — 8px label gap, 1px error border, muted hint ink, `prefix` node, `rows` default, custom `Select` chevron, `BottomSheet` grabber and close control | design TextField, Select, BottomSheet | Default-output changes, or design-only with no Therapist text document behind them. | Owner, per item, if wanted |
+| Design tokens the library names differently or lacks — link, focus-ring, icon-ink, `--surface-*` aliases, 10px radius, spacing 40/48/64, shadows, layout widths, extra easings | design `tokens/` | Aliases of values the library already holds, or deliberate rulings (contrast, closed scales). No application recorded a gap. | None, unless an application records one |
+| UI System Specification v0.2 §3.3 BottomNav row («پرونده‌ها», badge on آگهی‌ها only) disagrees with Therapist UX §4.1 | RUN_LOG CS-14 | A canonical document; this change edits none. | Owner amends v0.2 or UX §4.1 |
+
+### What this decision does not do
+
+Create a sixth primitive, change an existing token value, retire or revive any
+identifier, add a dependency or a subpath, bump the version, tag or release, or
+touch `zakhmban-therapists` or `zakhmban-api-client`. **Token Foundation is now
+125 public tokens, 39 internal properties and one role without an approved
+literal (`--radius-pill`).**

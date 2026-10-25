@@ -136,6 +136,15 @@ function digitsOf(text: string): string {
 /** §3.2: "Five-cell code entry". */
 const DEFAULT_LENGTH = 5;
 
+/**
+ * How the cells are drawn. `default` is every cell alike, sharing the row
+ * (what every release before v0.5.0 drew). `filled` is the therapist
+ * design's cell: fixed 48 x 52 cells packed at the start of the row, and a
+ * cell that holds a digit takes the brand-green border and the subtle fill.
+ * Owner decision of 2026-10-25; ADR 0003, Amendment of 2026-10-25. Behaviour is identical.
+ */
+export type OtpInputAppearance = "default" | "filled";
+
 type PassThrough = Omit<
   HTMLAttributes<HTMLDivElement>,
   "children" | "className" | "onChange" | "style"
@@ -152,6 +161,11 @@ export interface OtpInputProps extends PassThrough {
   onComplete?: (value: string) => void;
   /** The error message. Its presence is what puts the field in the error state. */
   error?: string;
+  /**
+   * Opt-in since v0.5.0. Defaults to `default`, which renders exactly what
+   * v0.4.1 rendered. The count of cells stays `length`; the digits stay Latin.
+   */
+  appearance?: OtpInputAppearance;
   /** Applied to the outermost node, with `style` and the forwarded ref. */
   className?: string;
   /** Applied to the outermost node. */
@@ -166,6 +180,7 @@ export function OtpInput({
   onChange,
   onComplete,
   error,
+  appearance = "default",
   className,
   style,
   ref,
@@ -369,12 +384,19 @@ export function OtpInput({
       commit(pasted, index);
     };
 
+  /* Only the non-default appearance adds a class or an attribute, so a
+     default OtpInput's markup is byte-identical to v0.4.1's. */
+  const filledAppearance = appearance === "filled";
+  const rootClass = [
+    "zakhmban-otp",
+    ...(filledAppearance ? ["zakhmban-otp-filled"] : []),
+    ...(className === undefined ? [] : [className]),
+  ].join(" ");
+
   return (
     <div
       ref={ref}
-      className={
-        className === undefined ? "zakhmban-otp" : `zakhmban-otp ${className}`
-      }
+      className={rootClass}
       {...(style === undefined ? {} : { style })}
     >
       {/* §5's isolation, as an ATTRIBUTE: no CSS rule sets `direction`, so
@@ -405,6 +427,9 @@ export function OtpInput({
               aria-label={String(index + 1)}
               aria-invalid={invalid || undefined}
               aria-describedby={invalid ? errorId : undefined}
+              {...(filledAppearance && digit !== ""
+                ? { "data-zakhmban-otp-digit": "" }
+                : {})}
               {...(index === 0 ? { autoComplete: "one-time-code" } : {})}
             />
           );
