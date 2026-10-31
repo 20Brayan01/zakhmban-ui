@@ -1,0 +1,99 @@
+name: Auto-merge
+
+# Merges a pull request into main as soon as its required checks are green,
+# then starts the staging deploy. Source: zakhmban-infra/templates/workflows/
+# (docs/CI-CD.md). Copy changes back there so all repositories stay alike.
+#
+# A pull request is merged only when ALL of these hold:
+#   - it targets main, is not a draft, and comes from this repository (not a fork);
+#   - it has no "no-automerge" (or "do-not-merge") label;
+#   - every workflow in REQUIRED_WORKFLOWS succeeded on the PR's latest commit;
+#   - GitHub reports no merge conflict.
+# Merge method: squash. The PR branch is deleted afterwards.
+#
+# Switch off for one repository: Settings → Variables → AUTOMERGE = false.
+#
+# Note: a merge made with GITHUB_TOKEN does not fire "push" workflows, which is
+# why this job starts deploy.yml itself (workflow_dispatch is the exception).
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: automerge-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      (vars.AUTOMERGE || 'true') == 'true'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    steps:
+      - name: Merge when every required check is green
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          REQUIRED_WORKFLOWS: "CI"
+          DEPLOY_WORKFLOW: ""
+          DELETE_BRANCH: ${{ vars.AUTOMERGE_DELETE_BRANCH || 'true' }}
+        run: |
+          set -euo pipefail
+          api() { curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" "$@"; }
+          API="https://api.github.com/repos/$REPO"
+
+          prs="$(api "$API/commits/$SHA/pulls" | jq -r '.[] | select(.state=="open") | .number')"
+          [ -n "$prs" ] || { echo "No open pull request for $SHA."; exit 0; }
+
+          runs="$(api "$API/actions/runs?head_sha=$SHA&event=pull_request&per_page=100")"
+          IFS=',' read -ra required <<<"$REQUIRED_WORKFLOWS"
+          for name in "${required[@]}"; do
+            name="$(echo "$name" | xargs)"
+            verdict="$(jq -r --arg n "$name" '[.workflow_runs[] | select(.name==$n)] | sort_by(.created_at) | last
+                        | if . == null then "missing" else "\(.status)/\(.conclusion)" end' <<<"$runs")"
+            if [ "$verdict" != "completed/success" ]; then
+              echo "Workflow '$name' is $verdict on $SHA; waiting for it."; exit 0
+            fi
+          done
+
+          for n in $prs; do
+            pr="$(api "$API/pulls/$n")"
+            base="$(jq -r .base.ref <<<"$pr")"; head_sha="$(jq -r .head.sha <<<"$pr")"
+            draft="$(jq -r .draft <<<"$pr")"; head_repo="$(jq -r .head.repo.full_name <<<"$pr")"
+            head_ref="$(jq -r .head.ref <<<"$pr")"; title="$(jq -r .title <<<"$pr")"
+            mergeable="$(jq -r .mergeable <<<"$pr")"
+            labels="$(jq -r '[.labels[].name] | join(",")' <<<"$pr")"
+            if [ "$base" != main ]; then echo "#$n targets $base, not main; skipped."; continue; fi
+            if [ "$draft" = true ]; then echo "#$n is a draft; skipped."; continue; fi
+            if [ "$head_sha" != "$SHA" ]; then echo "#$n has newer commits; their checks decide."; continue; fi
+            if [ "$head_repo" != "$REPO" ]; then echo "#$n comes from a fork; merge it by hand."; continue; fi
+            case ",$labels," in *,no-automerge,*|*,do-not-merge,*) echo "#$n is labelled no-automerge; skipped."; continue ;; esac
+            if [ "$mergeable" = false ]; then echo "::warning::#$n has a merge conflict with main."; continue; fi
+
+            body="$(jq -n --arg t "$title (#$n)" --arg s "$SHA" '{merge_method:"squash", commit_title:$t, sha:$s}')"
+            if ! result="$(api -X PUT "$API/pulls/$n/merge" -d "$body" 2>&1)"; then
+              echo "::warning::#$n could not be merged: $result"; continue
+            fi
+            echo "Merged #$n: $(jq -r .sha <<<"$result")"
+            echo "### Auto-merged #$n — $title" >>"$GITHUB_STEP_SUMMARY"
+
+            if [ "$DELETE_BRANCH" = true ]; then
+              api -X DELETE "$API/git/refs/heads/$head_ref" >/dev/null 2>&1 || true
+            fi
+            if [ -n "$DEPLOY_WORKFLOW" ]; then
+              api -X POST "$API/actions/workflows/$DEPLOY_WORKFLOW/dispatches" \
+                -d '{"ref":"main","inputs":{"environment":"staging"}}' \
+                && echo "Staging deploy started."
+            fi
+          done
